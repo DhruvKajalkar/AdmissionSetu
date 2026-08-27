@@ -1,4 +1,5 @@
-export { admissions, demoCandidate, seats } from "./candidate";
+export { demoCandidate } from "./candidate";
+export { createInitialAdmissionSimulationState, demoSimulationTimestamps } from "./admission-simulation";
 export { colleges, programs } from "./colleges";
 export { demoAdmissionCycle } from "./demo-cycle";
 export {

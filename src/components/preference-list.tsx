@@ -12,6 +12,7 @@ import type {
   OfficialProgram,
 } from "@/types";
 import { PageHeader } from "./page-header";
+import { useAdmissionSimulation } from "./admission-simulation-provider";
 import { usePreferenceShortlist } from "./preference-shortlist";
 
 type PreferenceScreen = "DEFAULT" | "ARRANGE" | "REVIEW" | "CONFIRMED";
@@ -22,7 +23,6 @@ interface PreferenceBuilderProps {
   cutoffs: readonly OfficialCutoffObservation[];
   rule: CapRoundRule;
   cycle: DemoAdmissionCycle;
-  currentSeat: CurrentSeatContext;
 }
 
 function formatDeadline(value: string) {
@@ -54,8 +54,8 @@ export function PreferenceBuilder({
   cutoffs,
   rule,
   cycle,
-  currentSeat,
 }: PreferenceBuilderProps) {
+  const { state: admissionState } = useAdmissionSimulation();
   const {
     preferences,
     count,
@@ -80,6 +80,33 @@ export function PreferenceBuilder({
     () => new Map(programs.map((program) => [program.choiceCode, program])),
     [programs],
   );
+  const currentSeat = useMemo<CurrentSeatContext | null>(() => {
+    const admission = admissionState.currentAdmission;
+    if (!admission) return null;
+    if (admission.kind === "CONNECTED_ADMISSION") {
+      return {
+        kind: "CONNECTED_ADMISSION",
+        instituteName: admission.institutionName,
+        instituteShortName: admission.institutionName,
+        programName: admission.programName,
+        bettermentActive: false,
+        sourceLabel: admission.sourceLabel,
+        allotmentRound: "Connected demo event",
+      };
+    }
+    const program = programByCode.get(admission.programId);
+    const institute = program ? instituteByCode.get(program.instituteCode) : undefined;
+    if (!program || !institute) return null;
+    return {
+      kind: "PARTICIPATING_SEAT",
+      instituteName: institute.name,
+      instituteShortName: institute.commonName,
+      programName: program.name,
+      bettermentActive: admission.bettermentStatus === "ACTIVE",
+      sourceLabel: "MHT-CET CAP",
+      allotmentRound: admission.allotmentRound,
+    };
+  }, [admissionState.currentAdmission, instituteByCode, programByCode]);
   const cutoffByProgram = useMemo(() => {
     const result = new Map<string, OfficialCutoffObservation>();
     cutoffs.forEach((cutoff) => {
@@ -266,23 +293,34 @@ export function PreferenceBuilder({
   }
 
   function renderCurrentSeat() {
+    if (!currentSeat) {
+      return (
+        <section className="current-seat-context no-current-seat" aria-labelledby="current-seat-title">
+          <div>
+            <p className="context-label">Current admission state</p>
+            <h2 id="current-seat-title">No admission currently held</h2>
+          </div>
+          <p>The admission simulation has no current seat for Aarya. Your saved preferences remain available and unchanged.</p>
+        </section>
+      );
+    }
     return (
       <section className="current-seat-context" aria-labelledby="current-seat-title">
         <div>
-          <p className="context-label">Seat you currently hold</p>
+          <p className="context-label">{currentSeat.kind === "CONNECTED_ADMISSION" ? "Current connected demo admission" : "Seat you currently hold"}</p>
           <h2 id="current-seat-title">{currentSeat.instituteShortName} · {currentSeat.programName}</h2>
         </div>
         <dl>
           <div>
-            <dt>Allotted in</dt>
-            <dd>{cycle.currentSeatAllottedRound}</dd>
+            <dt>{currentSeat.kind === "CONNECTED_ADMISSION" ? "Route" : "Allotted in"}</dt>
+            <dd>{currentSeat.kind === "CONNECTED_ADMISSION" ? currentSeat.sourceLabel : currentSeat.allotmentRound}</dd>
           </div>
           <div>
             <dt>Betterment</dt>
             <dd>{currentSeat.bettermentActive ? "Active" : "Not active"}</dd>
           </div>
         </dl>
-        <p>This remains your current seat unless the simulated admission process gives you a higher preference or you intentionally exit. This page does not change it.</p>
+        <p>{currentSeat.kind === "CONNECTED_ADMISSION" ? "This fictional connected admission is now Aarya's single current admission in the simulation. Preference review does not change it." : "This remains your current seat unless the simulated admission process gives you a higher preference or you intentionally exit. This page does not change it."}</p>
       </section>
     );
   }
@@ -497,7 +535,7 @@ export function PreferenceBuilder({
           <div><dt>Prototype reference</dt><dd>{submission?.id ?? `demo-option-form-round-${rule.round}`}</dd></div>
           <div><dt>Confirmed at</dt><dd>{formatConfirmedAt(submission?.confirmedAt ?? cycle.deterministicConfirmationAt)}</dd></div>
           <div><dt>Preferences</dt><dd>{preferences.length}</dd></div>
-          <div><dt>Current seat</dt><dd>{currentSeat.instituteShortName} · held</dd></div>
+          <div><dt>Current admission</dt><dd>{currentSeat ? `${currentSeat.instituteShortName} · held` : "None held"}</dd></div>
         </dl>
         <ol className="confirmed-preference-list">
           {preferences.map((preference) => {

@@ -1,5 +1,4 @@
 import {
-  admissions,
   colleges,
   capThreeCutoffSource,
   currentFePortalSource,
@@ -9,15 +8,12 @@ import {
   officialInstitutes,
   officialPrograms,
   programs,
-  seats,
   spotRoundParticipants,
   spotRounds,
 } from "@/data";
-import type { AdmissionService } from "./admissions";
 import type { CandidateService } from "./candidates";
 import type { CollegeService } from "./colleges";
 import type { OfficialCatalogService } from "./official-catalog";
-import type { SeatService } from "./seats";
 import type { SpotRoundService } from "./spot-rounds";
 
 export const mockCollegeService: CollegeService = {
@@ -62,21 +58,6 @@ export const mockCandidateService: CandidateService = {
   },
   async getDemoCandidate() {
     return demoCandidate;
-  },
-};
-
-export const mockAdmissionService: AdmissionService = {
-  async getCurrentAdmission(candidateId) {
-    return admissions.find((admission) => admission.candidateId === candidateId && admission.status === "CONFIRMED") ?? null;
-  },
-};
-
-export const mockSeatService: SeatService = {
-  async getSeatById(id) {
-    return seats.find((seat) => seat.id === id) ?? null;
-  },
-  async listAvailableSeats(programId) {
-    return seats.filter((seat) => seat.lifecycleState === "AVAILABLE" && (!programId || seat.programId === programId));
   },
 };
 

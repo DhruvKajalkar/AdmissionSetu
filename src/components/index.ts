@@ -1,8 +1,12 @@
 export { AdmissionAlert } from "./admission-alert";
+export { AdmissionControl } from "./admission-control";
 export { AdmissionJourney } from "./admission-journey";
+export { AdmissionSimulationProvider, useAdmissionSimulation } from "./admission-simulation-provider";
 export { AppNavigation, AppNavigationFallback } from "./app-navigation";
 export { CollegeExplorer } from "./college-explorer";
+export { CitizenProviders } from "./citizen-providers";
 export { DeadlineBanner } from "./deadline-banner";
+export { DashboardView } from "./dashboard-view";
 export { DocumentReadiness } from "./document-readiness";
 export { PageHeader } from "./page-header";
 export { PlaceholderPage } from "./placeholder-page";
@@ -11,3 +15,4 @@ export { PreferenceBuilder } from "./preference-list";
 export { SectionCard } from "./section-card";
 export { StatCard } from "./stat-card";
 export { StatusBadge } from "./status-badge";
+export { VacancyExchange } from "./vacancy-exchange";

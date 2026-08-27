@@ -10,11 +10,13 @@ Students currently navigate CAP workflows, individual institute notices, vacancy
 
 ## Prototype scope
 
-Phase 3 keeps the Phase 1 product shell and dashboard plus the Phase 2 Pune-region College Explorer, then turns My Preferences into a mistake-resistant CAP Round III option-form simulation. Students can arrange an ordered list, use drag or accessible up/down controls, state whether they would genuinely accept each choice, preview the consequence of an allotment, review structured safety findings, acknowledge the first-six auto-freeze rule, and save a deterministic demo confirmation locally.
+Phase 4 keeps the dashboard, Pune-region College Explorer, and mistake-resistant CAP preference workflow, then adds a deterministic admission-state engine and centralized vacancy exchange. Aarya has one current admission state, and every synthetic seat has one live lifecycle state. Withdrawing her participating admission or confirming the fictional connected-counselling record releases her exact AISSMS Computer Engineering seat and immediately increases the derived vacancy count from 2 to 3.
 
 AdmissionSetu protects the student’s stated intent; it does not recommend a subjective college order. It does not label programmes as safe, target, or dream, estimate admission probability, compare placements, or infer preference quality from historical cutoffs. Cutoffs are displayed only as sourced historical context. Confirmation is simulated and does not submit information to the Maharashtra CET Cell.
 
-Live vacancies, queue simulation, offers, and seat-transition logic remain intentionally outside this phase. The current AISSMS seat is explanatory context only and is never mutated by the preference workflow.
+The `/admission` page provides controlled withdrawal, connected-admission, event-history, and reset interactions. `/vacancies` derives available counts directly from the small synthetic seat inventory and supports institute, programme, and availability filtering. Preference review remains non-mutating; only explicit Phase 4 demo actions change admission state.
+
+Spot-round registration, queues, offers, timers, and conflict handling remain outside this phase.
 
 ## Technical stack
 
@@ -25,6 +27,16 @@ Live vacancies, queue simulation, offers, and seat-transition logic remain inten
 - Local TypeScript seed data and mock services
 
 No authentication, database, or external government integration is used.
+
+## Unified admission simulation
+
+The versioned `admissionsetu:admission-simulation:v1` device-local state contains Aarya's current admission, a deliberately small synthetic seat inventory, one fictional connected-counselling record, deterministic events, and the latest vacancy change. Invalid or stale stored inventory is reset safely to the deterministic seed.
+
+- **One student → one current admission state:** transitions reject any result that would leave Aarya holding two participating seats.
+- **One seat → one live seat state:** availability is counted only from synthetic seat records whose lifecycle is `AVAILABLE`; there is no separately mutable vacancy count.
+- Official institute and programme records remain immutable reference metadata. Synthetic seats reference official programme choice codes, but their quantities, ownership, and lifecycle states are entirely fictional.
+- The connected JEE-based counselling event is mocked locally. No CET, JoSAA, JEE, or cross-government API exists in this prototype.
+- Reset Demo restores only admission simulation state. It does not delete Phase 3 preference selections.
 
 ## Run locally
 
@@ -66,4 +78,4 @@ The public subset was manually curated on 27 August 2026 for a hackathon demonst
 
 ## Local preference data
 
-Phase 3 stores ordered preferences in `admissionsetu:candidate-preferences:v2`. On first use, valid programme IDs from the Phase 2 `admissionsetu:preference-shortlist:v1` key are migrated in their existing order with a neutral `UNSURE` acceptance intent. Invalid, stale, and duplicate entries are ignored safely. A persisted demo confirmation contains the ordered snapshot and deterministic demo timestamp; any later list or intent change marks that snapshot as needing review without deleting it.
+Phase 3 stores ordered preferences in `admissionsetu:candidate-preferences:v2`. On first use, valid programme IDs from the Phase 2 `admissionsetu:preference-shortlist:v1` key are migrated in their existing order with a neutral `UNSURE` acceptance intent. Invalid, stale, and duplicate entries are ignored safely. A persisted demo confirmation contains the ordered snapshot and deterministic demo timestamp; any later list or intent change marks that snapshot as needing review without deleting it. Phase 4 reset does not modify either preference key.

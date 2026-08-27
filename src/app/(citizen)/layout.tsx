@@ -1,11 +1,12 @@
 import { Suspense } from "react";
 import type { ReactNode } from "react";
-import { AppNavigation, AppNavigationFallback, PreferenceShortlistProvider } from "@/components";
-import { demoCandidate, officialPrograms } from "@/data";
+import { AppNavigation, AppNavigationFallback, CitizenProviders } from "@/components";
+import { createInitialAdmissionSimulationState, demoCandidate, officialPrograms } from "@/data";
 
 export default function CitizenLayout({ children }: { children: ReactNode }) {
   return (
-    <PreferenceShortlistProvider
+    <CitizenProviders
+      initialAdmissionState={createInitialAdmissionSimulationState()}
       initialProgramIds={demoCandidate.preferenceProgramIds}
       validProgramIds={officialPrograms.map((program) => program.choiceCode)}
     >
@@ -20,6 +21,6 @@ export default function CitizenLayout({ children }: { children: ReactNode }) {
           <main className="page-container">{children}</main>
         </div>
       </div>
-    </PreferenceShortlistProvider>
+    </CitizenProviders>
   );
 }

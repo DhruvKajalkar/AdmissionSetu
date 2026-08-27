@@ -97,7 +97,7 @@ export function reviewPreferenceList(
 export function getPreferenceConsequence(
   preference: CandidatePreference,
   rule: CapRoundRule,
-  currentSeat: CurrentSeatContext,
+  currentSeat: CurrentSeatContext | null,
 ): PreferenceConsequence {
   const autoFrozen =
     rule.autoFreezePreferenceLimit !== null &&
@@ -106,7 +106,11 @@ export function getPreferenceConsequence(
   return {
     position: preference.position,
     autoFrozen,
-    currentSeatEffect: `${currentSeat.instituteShortName} — ${currentSeat.programName} would be superseded or released according to the admission process once the new allotment is acted upon. This preview does not change that seat.`,
+    currentSeatEffect: currentSeat === null
+      ? "No participating seat is currently held in the demo. This preview does not create or change an admission."
+      : currentSeat.kind === "CONNECTED_ADMISSION"
+        ? `${currentSeat.instituteShortName} — ${currentSeat.programName} is the current connected demo admission. A future replacement would require a separate confirmed transition; this preview changes nothing.`
+        : `${currentSeat.instituteShortName} — ${currentSeat.programName} would be superseded or released according to the admission process once the new allotment is acted upon. This preview does not change that seat.`,
     capStatus: autoFrozen
       ? `Auto-frozen in ${rule.label}`
       : `Not automatically frozen by the first-${rule.autoFreezePreferenceLimit ?? 0} rule`,

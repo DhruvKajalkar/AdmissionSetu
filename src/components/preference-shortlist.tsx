@@ -17,6 +17,10 @@ const listeners = new Set<() => void>();
 let cachedSignature: string | undefined;
 let cachedStore: PreferenceStorageV2 | undefined;
 
+const subscribeToHydration = () => () => undefined;
+const getClientHydrationSnapshot = () => true;
+const getServerHydrationSnapshot = () => false;
+
 interface PreferenceShortlistValue {
   preferences: readonly CandidatePreference[];
   programIds: readonly string[];
@@ -190,7 +194,13 @@ export function PreferenceShortlistProvider({
     [initialProgramIds, validProgramIds],
   );
   const getServerSnapshot = useCallback(() => serverStore, [serverStore]);
-  const store = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const persistedStore = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const hasHydrated = useSyncExternalStore(
+    subscribeToHydration,
+    getClientHydrationSnapshot,
+    getServerHydrationSnapshot,
+  );
+  const store = hasHydrated ? persistedStore : serverStore;
 
   useEffect(() => {
     const parsedV2 = safeParse(localStorage.getItem(V2_STORAGE_KEY));

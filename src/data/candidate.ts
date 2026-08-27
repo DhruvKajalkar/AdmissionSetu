@@ -1,5 +1,4 @@
-import type { Admission, Candidate, Seat } from "@/types";
-import { demoAdmissionCycle } from "./demo-cycle";
+import type { Candidate } from "@/types";
 
 export const demoCandidate: Candidate = {
   id: "candidate-demo-aarya-deshmukh",
@@ -21,28 +20,6 @@ export const demoCandidate: Candidate = {
     { id: "doc-nationality", kind: "NATIONALITY_CERTIFICATE", label: "Nationality certificate", status: "PENDING" },
     { id: "doc-category", kind: "CATEGORY_CERTIFICATE", label: "Category certificate", status: "NOT_REQUIRED" },
   ],
-  currentAdmissionId: "admission-cap-aarya",
   preferenceProgramIds: ["0627324510", "0617524510", "0627824510", "0613924510"],
   spotRoundInterestIds: ["spot-vit-2026", "spot-pict-2026"],
 };
-
-export const seats: readonly Seat[] = [
-  { id: "seat-aissms-ce-open-042", programId: "aissms-ce", category: "OPEN", lifecycleState: "ACCEPTED", heldByCandidateId: demoCandidate.id, academicYear: "2026-27" },
-  { id: "seat-vit-ai-open-011", programId: "vit-ai", category: "OPEN", lifecycleState: "AVAILABLE", heldByCandidateId: null, academicYear: "2026-27" },
-  { id: "seat-pict-it-open-007", programId: "pict-it", category: "OPEN", lifecycleState: "AVAILABLE", heldByCandidateId: null, academicYear: "2026-27" },
-  { id: "seat-pccoe-ce-open-019", programId: "pccoe-ce", category: "OPEN", lifecycleState: "AVAILABLE", heldByCandidateId: null, academicYear: "2026-27" },
-];
-
-export const admissions: readonly Admission[] = [
-  {
-    id: "admission-cap-aarya",
-    candidateId: demoCandidate.id,
-    seatId: "seat-aissms-ce-open-042",
-    source: "MHT_CET_CAP",
-    allotmentRound: demoAdmissionCycle.currentSeatAllottedRound,
-    status: "CONFIRMED",
-    bettermentStatus: "ACTIVE",
-    allottedAt: demoAdmissionCycle.currentSeatAllottedAt,
-    reportingDeadline: demoAdmissionCycle.currentSeatReportingDeadline,
-  },
-];

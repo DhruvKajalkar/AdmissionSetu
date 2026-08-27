@@ -953,6 +953,476 @@ a {
   }
 }
 
+/* Phase 4 admission state and centralized vacancy exchange */
+.seat-release-feedback {
+  display: grid;
+  margin-bottom: 18px;
+  padding: 20px 22px;
+  border: 1px solid #9ed4ca;
+  border-left: 5px solid var(--teal-700);
+  border-radius: 9px;
+  background: var(--teal-50);
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+}
+
+.seat-release-feedback > span {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--teal-700);
+  font-weight: 900;
+}
+
+.seat-release-feedback p,
+.admission-state-heading p,
+.simulation-action-card > p:first-child {
+  margin: 0 0 5px;
+  color: var(--teal-700);
+  font-size: 0.59rem;
+  font-weight: 850;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.seat-release-feedback h2 {
+  margin: 0 0 5px;
+  color: var(--navy-950);
+  font-size: 0.96rem;
+}
+
+.seat-release-feedback strong {
+  display: block;
+  color: #175c54;
+  font-size: 0.76rem;
+}
+
+.seat-release-feedback small {
+  color: var(--slate-600);
+  font-size: 0.63rem;
+}
+
+.seat-release-feedback a {
+  color: var(--blue-700);
+  font-size: 0.68rem;
+  font-weight: 850;
+  text-decoration: underline;
+}
+
+.simulation-error {
+  display: flex;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid #e4bbb6;
+  border-radius: 7px;
+  background: var(--red-50);
+  color: var(--red-700);
+  font-size: 0.7rem;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.simulation-error button {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--red-700);
+  cursor: pointer;
+  font-weight: 850;
+  text-decoration: underline;
+}
+
+.admission-state-card,
+.seat-lifecycle-card,
+.admission-event-log {
+  margin-bottom: 20px;
+  padding: 24px;
+  border: 1px solid var(--slate-200);
+  border-radius: 10px;
+  background: var(--white);
+}
+
+.admission-state-heading,
+.event-log-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 17px;
+  border-bottom: 1px solid var(--slate-200);
+  gap: 16px;
+}
+
+.admission-state-heading h2,
+.seat-lifecycle-card h2,
+.simulation-action-card h2,
+.admission-event-log h2 {
+  margin: 0;
+  color: var(--navy-950);
+  font-size: 1.08rem;
+}
+
+.admission-seat-content {
+  padding-top: 20px;
+}
+
+.admission-seat-content > div:first-child > p {
+  margin: 0 0 6px;
+  color: var(--blue-700);
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.admission-seat-content h3 {
+  margin: 0 0 6px;
+  color: var(--navy-950);
+  font-size: 1.35rem;
+}
+
+.admission-seat-content > div:first-child > span {
+  color: var(--slate-500);
+  font-size: 0.68rem;
+}
+
+.admission-seat-content dl {
+  display: grid;
+  margin: 20px 0 0;
+  padding: 16px;
+  border-radius: 8px;
+  background: var(--slate-50);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.admission-seat-content dt,
+.vacancy-card dt {
+  color: var(--slate-500);
+  font-size: 0.57rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admission-seat-content dd {
+  margin: 5px 0 0;
+  overflow-wrap: anywhere;
+  color: var(--navy-900);
+  font-size: 0.72rem;
+  font-weight: 850;
+}
+
+.student-first-explanation {
+  margin: 16px 0 0;
+  padding: 13px 15px;
+  border-left: 3px solid var(--teal-700);
+  background: var(--teal-50);
+  color: #175c54;
+  font-size: 0.7rem;
+  line-height: 1.55;
+}
+
+.no-current-admission,
+.no-admission-dashboard {
+  padding: 26px 0 4px;
+}
+
+.no-current-admission strong,
+.no-admission-dashboard strong {
+  color: var(--navy-950);
+  font-size: 1rem;
+}
+
+.no-current-admission p,
+.no-admission-dashboard p {
+  margin: 7px 0;
+  color: var(--slate-600);
+  font-size: 0.72rem;
+}
+
+.no-admission-dashboard a {
+  color: var(--blue-700);
+  font-size: 0.68rem;
+  font-weight: 850;
+  text-decoration: underline;
+}
+
+.seat-lifecycle-card {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.75fr) minmax(480px, 1.25fr);
+  align-items: center;
+  gap: 30px;
+}
+
+.seat-lifecycle-card > div > p:last-child {
+  margin: 8px 0 0;
+  color: var(--slate-600);
+  font-size: 0.7rem;
+  line-height: 1.55;
+}
+
+.seat-lifecycle-card ol {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 7px;
+}
+
+.seat-lifecycle-card li {
+  position: relative;
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  border: 1px solid var(--slate-200);
+  border-radius: 6px;
+  background: var(--slate-50);
+  color: var(--navy-800);
+  font-size: 0.62rem;
+  font-weight: 850;
+}
+
+.seat-lifecycle-card li:not(:last-child)::after {
+  position: absolute;
+  right: -11px;
+  color: var(--slate-400);
+  content: "→";
+}
+
+.seat-lifecycle-card li:last-child {
+  border-color: #9ed4ca;
+  background: var(--teal-50);
+  color: var(--teal-700);
+}
+
+.simulation-action-grid {
+  display: grid;
+  margin-bottom: 20px;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.simulation-action-card {
+  display: flex;
+  padding: 23px;
+  border: 1px solid var(--slate-200);
+  border-top: 4px solid var(--amber-700);
+  border-radius: 9px;
+  background: var(--white);
+  flex-direction: column;
+}
+
+.simulation-action-card.connected {
+  border-top-color: var(--blue-700);
+}
+
+.simulation-action-card > p:not(:first-child) {
+  margin: 8px 0 16px;
+  color: var(--slate-600);
+  font-size: 0.7rem;
+  line-height: 1.55;
+}
+
+.connected-record {
+  display: flex;
+  margin-bottom: 15px;
+  padding: 13px;
+  border-radius: 7px;
+  background: var(--blue-50);
+  flex-direction: column;
+  gap: 3px;
+}
+
+.connected-record strong { color: var(--navy-900); font-size: 0.7rem; }
+.connected-record span { color: var(--slate-700); font-size: 0.66rem; }
+.connected-record small { color: var(--blue-700); font-size: 0.6rem; }
+
+.simulation-action-card > button,
+.danger-action-button {
+  min-height: 43px;
+  margin-top: auto;
+  padding: 0 14px;
+  border: 1px solid var(--blue-700);
+  border-radius: 7px;
+  background: var(--white);
+  color: var(--blue-700);
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 850;
+}
+
+.simulation-action-card > button:disabled {
+  border-color: var(--slate-200);
+  color: var(--slate-400);
+  cursor: not-allowed;
+}
+
+.simulation-confirmation {
+  display: flex;
+  margin-bottom: 20px;
+  padding: 20px 22px;
+  border: 1px solid #e4c784;
+  border-left: 5px solid var(--amber-700);
+  border-radius: 9px;
+  background: var(--amber-50);
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.simulation-confirmation > div:first-child > p:first-child {
+  margin: 0 0 4px;
+  color: var(--amber-700);
+  font-size: 0.59rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.simulation-confirmation h2 { margin: 0; color: #513708; font-size: 1rem; }
+.simulation-confirmation > div:first-child > p:last-child { max-width: 700px; margin: 7px 0 0; color: #6f4d18; font-size: 0.69rem; line-height: 1.5; }
+.simulation-confirmation > div:last-child { display: flex; flex: 0 0 auto; gap: 8px; }
+.danger-action-button { border-color: var(--red-700); background: var(--red-700); color: var(--white); }
+
+.event-log-heading button {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--slate-300);
+  border-radius: 6px;
+  background: var(--white);
+  color: var(--red-700);
+  cursor: pointer;
+  font-size: 0.66rem;
+  font-weight: 850;
+}
+
+.admission-event-log ol { margin: 0; padding: 8px 0 0; list-style: none; }
+.admission-event-log li { display: grid; padding: 15px 0 3px; grid-template-columns: 100px 16px minmax(0, 1fr); gap: 10px; }
+.admission-event-log time { color: var(--slate-500); font-size: 0.62rem; font-weight: 750; }
+.admission-event-log li > span { position: relative; width: 10px; height: 10px; margin-top: 2px; border: 2px solid var(--blue-700); border-radius: 50%; }
+.admission-event-log li > span::after { position: absolute; top: 9px; left: 2px; width: 2px; height: calc(100% + 55px); background: var(--slate-200); content: ""; }
+.admission-event-log li:last-child > span::after { display: none; }
+.admission-event-log li strong { color: var(--navy-900); font-size: 0.73rem; }
+.admission-event-log li p { margin: 4px 0; color: var(--slate-600); font-size: 0.67rem; line-height: 1.5; }
+.admission-event-log li small { color: var(--teal-700); font-size: 0.62rem; font-weight: 850; }
+
+.vacancy-disclaimer {
+  display: flex;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border-left: 4px solid var(--amber-700);
+  border-radius: 7px;
+  background: var(--amber-50);
+  color: #6f4d18;
+  font-size: 0.7rem;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.vacancy-change-banner {
+  display: flex;
+  margin-bottom: 16px;
+  padding: 15px 17px;
+  border: 1px solid #9ed4ca;
+  border-radius: 8px;
+  background: var(--teal-50);
+  align-items: center;
+  gap: 13px;
+}
+
+.vacancy-change-banner > span { padding: 6px 8px; border-radius: 999px; background: var(--teal-700); color: var(--white); font-size: 0.58rem; font-weight: 850; text-transform: uppercase; }
+.vacancy-change-banner strong { color: #175c54; font-size: 0.76rem; }
+.vacancy-change-banner p { margin: 3px 0 0; color: var(--slate-600); font-size: 0.66rem; }
+
+.vacancy-overview {
+  display: grid;
+  margin-bottom: 16px;
+  padding: 20px 22px;
+  border: 1px solid var(--slate-200);
+  border-radius: 9px;
+  background: var(--navy-900);
+  color: var(--white);
+  grid-template-columns: 160px 190px minmax(0, 1fr);
+  align-items: center;
+  gap: 24px;
+}
+
+.vacancy-overview > div { display: flex; flex-direction: column; }
+.vacancy-overview span { color: #b9d4e1; font-size: 0.59rem; font-weight: 850; text-transform: uppercase; }
+.vacancy-overview strong { margin: 3px 0; font-size: 1.65rem; }
+.vacancy-overview small { color: #b9d4e1; font-size: 0.62rem; }
+.vacancy-overview > p { margin: 0; padding-left: 24px; border-left: 1px solid #31546a; color: #d7e5ec; font-size: 0.7rem; line-height: 1.55; }
+
+.vacancy-filters {
+  display: grid;
+  margin-bottom: 20px;
+  padding: 21px;
+  border: 1px solid var(--slate-200);
+  border-radius: 9px;
+  background: var(--white);
+  grid-template-columns: minmax(180px, 0.7fr) minmax(240px, 1.2fr) minmax(170px, 0.7fr) minmax(170px, 0.7fr);
+  align-items: end;
+  gap: 12px;
+}
+
+.vacancy-filters h2 { margin: 0; color: var(--navy-950); font-size: 1rem; }
+.vacancy-filters > div p { margin: 5px 0 0; color: var(--slate-500); font-size: 0.65rem; }
+.vacancy-filters label { display: flex; color: var(--navy-800); font-size: 0.64rem; font-weight: 850; flex-direction: column; gap: 7px; }
+.vacancy-filters input, .vacancy-filters select { min-height: 43px; width: 100%; padding: 0 11px; border: 1px solid var(--slate-300); border-radius: 6px; background: var(--white); color: var(--navy-900); font: inherit; font-size: 0.7rem; }
+.vacancy-results-heading { margin-bottom: 12px; }
+.vacancy-results-heading h2 { margin: 0; color: var(--navy-950); font-size: 1rem; }
+.vacancy-results-heading p { margin: 4px 0 0; color: var(--slate-500); font-size: 0.65rem; }
+
+.vacancy-card-grid { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.vacancy-card { padding: 20px; border: 1px solid var(--slate-200); border-top: 4px solid var(--slate-300); border-radius: 9px; background: var(--white); }
+.vacancy-card.available { border-top-color: var(--teal-700); }
+.vacancy-card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.vacancy-card-top > span { color: var(--blue-700); font-size: 0.67rem; font-weight: 850; }
+.vacancy-card-top em { padding: 5px 7px; border-radius: 999px; background: var(--teal-50); color: var(--teal-700); font-size: 0.57rem; font-style: normal; font-weight: 850; }
+.vacancy-card.full .vacancy-card-top em { background: var(--slate-100); color: var(--slate-600); }
+.vacancy-card h3 { margin: 13px 0 5px; color: var(--navy-950); font-size: 1rem; }
+.vacancy-card > p { min-height: 34px; margin: 0; color: var(--slate-500); font-size: 0.64rem; line-height: 1.45; }
+.vacancy-card dl { display: grid; margin: 16px 0; padding: 13px 0; border-top: 1px solid var(--slate-100); border-bottom: 1px solid var(--slate-100); grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.vacancy-card dd { margin: 5px 0 0; overflow-wrap: anywhere; color: var(--navy-900); font-size: 0.72rem; font-weight: 850; }
+.vacancy-card-actions { display: grid; grid-template-columns: 0.65fr 1.35fr; gap: 8px; }
+.vacancy-card-actions a, .vacancy-card-actions button { display: inline-flex; min-height: 40px; align-items: center; justify-content: center; padding: 0 11px; border: 1px solid var(--blue-700); border-radius: 6px; background: var(--white); color: var(--blue-700); font-size: 0.64rem; font-weight: 850; }
+.vacancy-card-actions button:disabled { border-color: var(--slate-200); background: var(--slate-50); color: var(--slate-500); }
+.vacancy-empty { padding: 35px; border: 1px dashed var(--slate-300); border-radius: 9px; background: var(--white); text-align: center; }
+.vacancy-empty h2 { margin: 0; color: var(--navy-950); font-size: 1rem; }
+.vacancy-empty p { margin: 6px 0 0; color: var(--slate-500); font-size: 0.7rem; }
+.current-seat-context.no-current-seat { grid-template-columns: minmax(250px, 0.6fr) minmax(0, 1fr); }
+
+@media (max-width: 980px) {
+  .seat-lifecycle-card,
+  .vacancy-overview,
+  .vacancy-filters { grid-template-columns: 1fr; }
+  .vacancy-overview > p { padding-top: 14px; padding-left: 0; border-top: 1px solid #31546a; border-left: 0; }
+  .vacancy-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 680px) {
+  .seat-release-feedback { grid-template-columns: auto minmax(0, 1fr); }
+  .seat-release-feedback a { grid-column: 2; }
+  .admission-state-card, .seat-lifecycle-card, .admission-event-log, .simulation-action-card { padding: 18px; }
+  .admission-seat-content dl, .simulation-action-grid, .vacancy-card-grid, .vacancy-filters { grid-template-columns: 1fr; }
+  .seat-lifecycle-card ol { align-items: stretch; flex-direction: column; }
+  .seat-lifecycle-card li { width: 100%; }
+  .seat-lifecycle-card li:not(:last-child)::after { right: auto; bottom: -14px; content: "↓"; }
+  .simulation-confirmation { align-items: stretch; flex-direction: column; }
+  .simulation-confirmation > div:last-child { flex-direction: column; }
+  .admission-event-log li { grid-template-columns: 70px 14px minmax(0, 1fr); }
+  .vacancy-card dl { grid-template-columns: 1fr; }
+  .vacancy-card-actions { grid-template-columns: 1fr; }
+  .current-seat-context.no-current-seat { grid-template-columns: 1fr; }
+}
+
 /* Phase 1 dashboard */
 .candidate-overview {
   display: grid;

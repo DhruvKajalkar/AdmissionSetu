@@ -40,7 +40,6 @@ export interface Candidate {
   homeUniversity: HomeUniversity;
   currentJourneyStage: AdmissionJourneyStageId;
   documents: CandidateDocument[];
-  currentAdmissionId: string | null;
   preferenceProgramIds: string[];
   spotRoundInterestIds: string[];
 }
@@ -76,7 +75,6 @@ export interface Program {
   name: string;
   intake: number;
   historicalCutoffs: HistoricalCutoff[];
-  currentVacancies: number;
 }
 
 export type PublicDataKind = "OFFICIAL_CET_CELL";
@@ -208,10 +206,13 @@ export interface PreferenceReview {
 }
 
 export interface CurrentSeatContext {
+  kind: "PARTICIPATING_SEAT" | "CONNECTED_ADMISSION";
   instituteName: string;
   instituteShortName: string;
   programName: string;
   bettermentActive: boolean;
+  sourceLabel: string;
+  allotmentRound: string;
 }
 
 export interface PreferenceConsequence {
@@ -287,6 +288,113 @@ export interface Seat {
   heldByCandidateId: string | null;
   academicYear: string;
 }
+
+export interface SimulationSeat {
+  id: string;
+  programId: string;
+  category: CandidateCategory;
+  lifecycleState: SeatLifecycleState;
+  heldByCandidateId: string | null;
+  academicYear: "2026-27";
+  isSyntheticSimulation: true;
+}
+
+export interface SimulationParticipatingAdmission {
+  id: string;
+  kind: "PARTICIPATING_SEAT";
+  candidateId: string;
+  seatId: string;
+  programId: string;
+  source: "MHT_CET_CAP";
+  allotmentRound: string;
+  status: "CONFIRMED";
+  bettermentStatus: BettermentStatus;
+  confirmedAt: string;
+}
+
+export interface SimulationConnectedAdmission {
+  id: string;
+  kind: "CONNECTED_ADMISSION";
+  candidateId: string;
+  externalAdmissionId: string;
+  institutionName: string;
+  programName: string;
+  sourceLabel: string;
+  status: "CONFIRMED";
+  confirmedAt: string;
+}
+
+export type SimulationCurrentAdmission =
+  | SimulationParticipatingAdmission
+  | SimulationConnectedAdmission;
+
+export interface ConnectedAdmissionRecord {
+  id: string;
+  candidateId: string;
+  institutionName: string;
+  programName: string;
+  sourceLabel: string;
+  status: "READY" | "CONFIRMED";
+  confirmedAt: string | null;
+  isSyntheticSimulation: true;
+}
+
+export type AdmissionSimulationEventType =
+  | "SEAT_ACCEPTED"
+  | "SEAT_RELEASED"
+  | "ADMISSION_WITHDRAWN"
+  | "CONNECTED_ADMISSION_CONFIRMED";
+
+export interface AdmissionSimulationEvent {
+  id: string;
+  type: AdmissionSimulationEventType;
+  occurredAt: string;
+  title: string;
+  description: string;
+  seatId?: string;
+  programId?: string;
+  availabilityBefore?: number;
+  availabilityAfter?: number;
+}
+
+export interface AdmissionSimulationFeedback {
+  kind: "SEAT_RELEASED";
+  occurredAt: string;
+  seatId: string;
+  programId: string;
+  availabilityBefore: number;
+  availabilityAfter: number;
+  title: string;
+}
+
+export interface AdmissionSimulationState {
+  version: 1;
+  candidateId: string;
+  currentAdmission: SimulationCurrentAdmission | null;
+  seats: SimulationSeat[];
+  externalAdmissions: ConnectedAdmissionRecord[];
+  events: AdmissionSimulationEvent[];
+  lastFeedback: AdmissionSimulationFeedback | null;
+  updatedAt: string;
+}
+
+export type AdmissionTransitionErrorCode =
+  | "NO_CURRENT_ADMISSION"
+  | "SEAT_NOT_FOUND"
+  | "SEAT_UNAVAILABLE"
+  | "SEAT_HELD_BY_ANOTHER_CANDIDATE"
+  | "SEAT_ALREADY_AVAILABLE"
+  | "CONNECTED_ADMISSION_NOT_READY"
+  | "INVALID_STATE";
+
+export interface AdmissionTransitionError {
+  code: AdmissionTransitionErrorCode;
+  message: string;
+}
+
+export type AdmissionTransitionResult =
+  | { ok: true; state: AdmissionSimulationState }
+  | { ok: false; state: AdmissionSimulationState; error: AdmissionTransitionError };
 
 export type SpotRoundStatus = "REGISTRATION_OPEN" | "SCHEDULED" | "LIVE" | "COMPLETED";
 
