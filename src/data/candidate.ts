@@ -21,7 +21,7 @@ export const demoCandidate: Candidate = {
     { id: "doc-category", kind: "CATEGORY_CERTIFICATE", label: "Category certificate", status: "NOT_REQUIRED" },
   ],
   currentAdmissionId: "admission-cap-aarya",
-  preferenceProgramIds: ["vit-ce", "pccoe-ce", "aissms-ce", "modern-ce"],
+  preferenceProgramIds: ["0627324510", "0617524510", "0627824510", "0613924510"],
   spotRoundInterestIds: ["spot-vit-2026", "spot-pict-2026"],
 };
 

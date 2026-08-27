@@ -1,10 +1,13 @@
 export { AdmissionAlert } from "./admission-alert";
 export { AdmissionJourney } from "./admission-journey";
 export { AppNavigation, AppNavigationFallback } from "./app-navigation";
+export { CollegeExplorer } from "./college-explorer";
 export { DeadlineBanner } from "./deadline-banner";
 export { DocumentReadiness } from "./document-readiness";
 export { PageHeader } from "./page-header";
 export { PlaceholderPage } from "./placeholder-page";
+export { PreferenceShortlistProvider, usePreferenceShortlist } from "./preference-shortlist";
+export { PreferenceList } from "./preference-list";
 export { SectionCard } from "./section-card";
 export { StatCard } from "./stat-card";
 export { StatusBadge } from "./status-badge";

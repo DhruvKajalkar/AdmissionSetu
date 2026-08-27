@@ -1,13 +1,24 @@
-import { PlaceholderPage } from "@/components";
+import { CollegeExplorer } from "@/components";
+import { mockCandidateService, mockOfficialCatalogService } from "@/services";
 
-export default function ExplorePage() {
+export default async function ExplorePage() {
+  const [catalog, candidate] = await Promise.all([
+    mockOfficialCatalogService.getCatalog(),
+    mockCandidateService.getDemoCandidate(),
+  ]);
+
   return (
-    <PlaceholderPage
-      eyebrow="College explorer"
-      title="Explore Colleges"
-      description="Compare Maharashtra engineering colleges and programmes through one consistent view."
-      futureCapability="College discovery starts here"
-      context="A later phase will connect the seeded college and historical cutoff data to search, filters, and programme comparisons. No recommendations are being generated in Phase 0."
+    <CollegeExplorer
+      institutes={catalog.institutes}
+      programs={catalog.programs}
+      cutoffs={catalog.cutoffs}
+      sources={catalog.sources}
+      candidate={{
+        name: candidate.fullName,
+        cetPercentile: candidate.cetPercentile,
+        category: candidate.category,
+        homeUniversity: candidate.homeUniversity,
+      }}
     />
   );
 }

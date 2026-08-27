@@ -79,6 +79,68 @@ export interface Program {
   currentVacancies: number;
 }
 
+export type PublicDataKind = "OFFICIAL_CET_CELL";
+
+export type OfficialInstituteStatus = "Government" | "Un-Aided";
+export type OfficialAutonomyStatus = "Autonomous" | "Non-Autonomous";
+export type OfficialProgramGender = "Co-Education" | "Female";
+
+export type BranchFamily =
+  | "Computer & IT"
+  | "AI & Data"
+  | "Electronics & Electrical"
+  | "Mechanical & Automation"
+  | "Civil & Core"
+  | "Chemical & Biotechnology";
+
+export interface OfficialSourceReference {
+  kind: PublicDataKind;
+  label: string;
+  academicYear: string;
+  url: string;
+  accessedOn: string;
+}
+
+export interface OfficialInstitute {
+  code: string;
+  name: string;
+  commonName: string;
+  searchAliases: readonly string[];
+  address: string;
+  locality: string;
+  city: string;
+  district: "Pune";
+  university: string;
+  status: OfficialInstituteStatus;
+  autonomyStatus: OfficialAutonomyStatus;
+  minorityStatus: string;
+  gender: OfficialProgramGender;
+  source: OfficialSourceReference;
+}
+
+export interface OfficialProgram {
+  choiceCode: string;
+  instituteCode: string;
+  name: string;
+  branchFamily: BranchFamily;
+  intake: number;
+  shift: "General Shift" | "Morning Shift";
+  gender: OfficialProgramGender;
+  source: OfficialSourceReference;
+}
+
+export type CutoffSeatType = "GOPENS" | "GOPENH" | "LOPENS";
+
+export interface OfficialCutoffObservation {
+  programChoiceCode: string;
+  academicYear: "2024-25";
+  round: "CAP Round III";
+  seatType: CutoffSeatType;
+  meritNumber: number;
+  percentile: number;
+  source: OfficialSourceReference;
+}
+
 export type AdmissionSource = "MHT_CET_CAP" | "JEE_CAP" | "INSTITUTE_LEVEL" | "SPOT_ROUND";
 export type AdmissionStatus = "PROVISIONAL" | "CONFIRMED" | "CANCELLED" | "SUPERSEDED";
 export type BettermentStatus = "ACTIVE" | "NOT_REQUESTED" | "CLOSED";

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { usePreferenceShortlist } from "./preference-shortlist";
 
 const navigation = [
   { label: "Overview", shortLabel: "Overview", href: "/dashboard", index: "01" },
@@ -18,6 +19,7 @@ function isRouteActive(pathname: string, href: string) {
 
 export function AppNavigation() {
   const pathname = usePathname();
+  const { count } = usePreferenceShortlist();
 
   return (
     <>
@@ -38,7 +40,7 @@ export function AppNavigation() {
                 aria-current={active ? "page" : undefined}
               >
                 <span className="nav-index" aria-hidden="true">{item.index}</span>
-                <span>{item.label}</span>
+                <span>{item.href === "/preferences" ? `${item.label} · ${count}` : item.label}</span>
               </Link>
             );
           })}
@@ -70,7 +72,7 @@ export function AppNavigation() {
               href={item.href}
               aria-current={active ? "page" : undefined}
             >
-              {item.shortLabel}
+              {item.href === "/preferences" ? `${item.shortLabel} · ${count}` : item.shortLabel}
             </Link>
           );
         })}

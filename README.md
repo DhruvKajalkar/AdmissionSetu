@@ -10,7 +10,9 @@ Students currently navigate CAP workflows, individual institute notices, vacancy
 
 ## Prototype scope
 
-Phase 1 provides the product shell, shared navigation, a student-centred admission dashboard, domain types, synthetic development data, and mock service boundaries. The dashboard explains the candidate's current seat, deterministic deadline, admission journey, document readiness, alerts, and next actions. Admission workflows, recommendations, live updates, queue simulation, and seat transition logic are intentionally not implemented yet.
+Phase 2 keeps the Phase 1 product shell and student-centred dashboard, and adds a useful Pune-region College Explorer. The explorer provides client-side search and filters across a deliberately bounded catalog of 13 institutes and 69 programmes, contextual historical cutoff observations where a value was manually verified, expandable source details, and a local shortlist that is visible on My Preferences.
+
+The shortlist is not an ordered or submitted CAP preference form. Preference ordering, preference safety review, live vacancies, queue simulation, offers, and seat-transition logic remain intentionally outside this phase.
 
 ## Technical stack
 
@@ -43,4 +45,18 @@ npm run build
 
 ## Data disclaimer
 
-All candidate identities, admissions, seat ownership, vacancy counts, cutoffs, round dates, and queue-related records in this repository are synthetic demonstration data. Government, CET, JEE, and institute integrations are mocked behind local interfaces.
+The repository keeps public catalog records separate from synthetic admission simulation data:
+
+- `src/data/official/` contains the manually curated public institute, programme, intake, and limited historical cutoff records used by the explorer. Every record carries its academic year, official CET Cell source URL, and access date.
+- `src/data/colleges.ts`, `src/data/candidate.ts`, `src/data/dashboard.ts`, and `src/data/spot-rounds.ts` contain synthetic records used to demonstrate the candidate journey, current admission, vacancies, dates, queues, and future seat transitions.
+- Aarya Deshmukh, her scores, preferences, seat ownership, deadlines, and all live-state concepts are synthetic. No student identity, ownership, vacancy, queue, or offer data was obtained from public sources.
+- Missing cutoff values are displayed as unavailable. The prototype does not infer or estimate them.
+
+### Official public sources
+
+- [Maharashtra CET Cell FE 2026–27 portal](https://fe2026.mahacet.org/StaticPages/HomePage) — current-cycle reference link; its existence does not make the curated 2025–26 catalog current-cycle availability data.
+- [Maharashtra CET Cell 2025–26 participating institutes list](https://fe2025.mahacet.org/StaticPages/frmInstituteList) — institute and overall intake reference.
+- Official 2025–26 institute summaries at `https://fe2025.mahacet.org/StaticPages/frmInstituteSummary?InstituteCode={code}` — institute status, autonomy, programme choice code, sanctioned intake, shift, and gender. Each curated institute stores its exact resolved URL.
+- [Official 2024–25 Maharashtra CAP Round III cutoff list](https://fe2025.mahacet.org/2024/2024ENGG_CAP3_CutOff.pdf) — source for the limited cutoff observations shown in the explorer.
+
+The public subset was manually curated on 27 August 2026 for a hackathon demonstration. There is no runtime scraping, live CET integration, or claim of completeness. Students must check the current CET Cell portal and admission notices before acting.

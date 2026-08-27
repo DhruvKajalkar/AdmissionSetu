@@ -1,5 +1,8 @@
 import type { College, Program } from "@/types";
 
+// Synthetic Phase 0/1 simulation data. The Phase 2 public explorer uses the
+// separately sourced catalog under src/data/official and never reads these cutoffs.
+
 export const colleges = [
   { id: "college-coep", instituteCode: "06006", name: "COEP Technological University", shortName: "COEP Tech", city: "Pune", district: "Pune", university: "SPPU", type: "UNIVERSITY", isSyntheticDataset: true },
   { id: "college-pict", instituteCode: "06271", name: "Pune Institute of Computer Technology", shortName: "PICT", city: "Pune", district: "Pune", university: "SPPU", type: "UNAIDED", isSyntheticDataset: true },

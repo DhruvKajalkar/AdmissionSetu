@@ -1,7 +1,22 @@
-import { admissions, colleges, demoCandidate, programs, seats, spotRoundParticipants, spotRounds } from "@/data";
+import {
+  admissions,
+  colleges,
+  capThreeCutoffSource,
+  currentFePortalSource,
+  demoCandidate,
+  instituteListSource,
+  officialCutoffs,
+  officialInstitutes,
+  officialPrograms,
+  programs,
+  seats,
+  spotRoundParticipants,
+  spotRounds,
+} from "@/data";
 import type { AdmissionService } from "./admissions";
 import type { CandidateService } from "./candidates";
 import type { CollegeService } from "./colleges";
+import type { OfficialCatalogService } from "./official-catalog";
 import type { SeatService } from "./seats";
 import type { SpotRoundService } from "./spot-rounds";
 
@@ -17,6 +32,27 @@ export const mockCollegeService: CollegeService = {
   },
   async getProgramById(id) {
     return programs.find((program) => program.id === id) ?? null;
+  },
+};
+
+export const mockOfficialCatalogService: OfficialCatalogService = {
+  async getCatalog() {
+    return {
+      institutes: officialInstitutes,
+      programs: officialPrograms,
+      cutoffs: officialCutoffs,
+      sources: {
+        currentPortal: currentFePortalSource,
+        instituteList: instituteListSource,
+        cutoffDocument: capThreeCutoffSource,
+      },
+    };
+  },
+  async getInstituteByCode(code) {
+    return officialInstitutes.find((institute) => institute.code === code) ?? null;
+  },
+  async getProgramByChoiceCode(choiceCode) {
+    return officialPrograms.find((program) => program.choiceCode === choiceCode) ?? null;
   },
 };
 
