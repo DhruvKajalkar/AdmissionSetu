@@ -19,6 +19,7 @@ const quickActions = [
   { title: "Review Preferences", description: "Review the order and consequences of your choices.", href: "/preferences", index: "02" },
   { title: "Live Vacancies", description: "See seats released by demo admission transitions.", href: "/vacancies", index: "03" },
   { title: "My Admission", description: "Control and trace your single demo admission state.", href: "/admission", index: "04" },
+  { title: "Spot Rounds", description: "Join centralized synthetic queues and act on live offers.", href: "/spot-rounds", index: "05" },
 ] as const;
 
 export function DashboardView({ candidate, institutes, programs }: { candidate: Candidate; institutes: readonly OfficialInstitute[]; programs: readonly OfficialProgram[] }) {
@@ -39,8 +40,8 @@ export function DashboardView({ candidate, institutes, programs }: { candidate: 
           {admission?.kind === "PARTICIPATING_SEAT" && participatingProgram && participatingInstitute ? (
             <div className="current-seat">
               <div className="seat-heading"><p>{participatingInstitute.name}</p><h3>{participatingProgram.name}</h3><span>{participatingInstitute.city} · Institute code {participatingInstitute.code}</span></div>
-              <dl className="seat-details"><div><dt>Admission route</dt><dd>MHT-CET CAP</dd></div><div><dt>Allotment round</dt><dd>{admission.allotmentRound}</dd></div><div><dt>Current status</dt><dd>Confirmed and held by you</dd></div><div><dt>Betterment</dt><dd>{admission.bettermentStatus === "ACTIVE" ? "Active" : "Not active"}</dd></div></dl>
-              <div className="seat-explanation"><span className="seat-explanation-marker" aria-hidden="true">i</span><p><strong>This is Aarya&apos;s one participating seat.</strong> If it is released through the demo, this dashboard and the vacancy exchange update from the same state.</p></div>
+              <dl className="seat-details"><div><dt>Admission route</dt><dd>{admission.source === "SPOT_ROUND" ? "Centralized live spot round · demo" : "MHT-CET CAP"}</dd></div><div><dt>Allotment round</dt><dd>{admission.allotmentRound}</dd></div><div><dt>Current status</dt><dd>Confirmed and held by you</dd></div><div><dt>Betterment</dt><dd>{admission.bettermentStatus === "ACTIVE" ? "Active" : "Not active"}</dd></div></dl>
+              <div className="seat-explanation"><span className="seat-explanation-marker" aria-hidden="true">i</span><p><strong>This is Aarya&apos;s one participating seat.</strong> {admission.source === "SPOT_ROUND" ? "The previous AISSMS seat has returned to the centralized vacancy pool." : "If it is released through the demo, this dashboard and the vacancy exchange update from the same state."}</p></div>
             </div>
           ) : admission?.kind === "CONNECTED_ADMISSION" ? (
             <div className="current-seat connected-current-seat"><div className="seat-heading"><p>{admission.institutionName}</p><h3>{admission.programName}</h3><span>Demo connected counselling event · fictional record</span></div><dl className="seat-details"><div><dt>Admission route</dt><dd>{admission.sourceLabel}</dd></div><div><dt>Current status</dt><dd>Confirmed in simulation</dd></div><div><dt>Participating CET seat</dt><dd>Released</dd></div><div><dt>Betterment</dt><dd>Not applicable</dd></div></dl></div>

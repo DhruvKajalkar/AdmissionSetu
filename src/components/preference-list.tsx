@@ -103,7 +103,7 @@ export function PreferenceBuilder({
       instituteShortName: institute.commonName,
       programName: program.name,
       bettermentActive: admission.bettermentStatus === "ACTIVE",
-      sourceLabel: "MHT-CET CAP",
+      sourceLabel: admission.source === "SPOT_ROUND" ? "Centralized live spot round · demo" : "MHT-CET CAP",
       allotmentRound: admission.allotmentRound,
     };
   }, [admissionState.currentAdmission, instituteByCode, programByCode]);

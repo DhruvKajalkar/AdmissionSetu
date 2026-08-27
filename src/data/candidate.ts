@@ -21,5 +21,4 @@ export const demoCandidate: Candidate = {
     { id: "doc-category", kind: "CATEGORY_CERTIFICATE", label: "Category certificate", status: "NOT_REQUIRED" },
   ],
   preferenceProgramIds: ["0627324510", "0617524510", "0627824510", "0613924510"],
-  spotRoundInterestIds: ["spot-vit-2026", "spot-pict-2026"],
 };

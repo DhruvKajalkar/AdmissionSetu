@@ -41,7 +41,6 @@ export interface Candidate {
   currentJourneyStage: AdmissionJourneyStageId;
   documents: CandidateDocument[];
   preferenceProgramIds: string[];
-  spotRoundInterestIds: string[];
 }
 
 export type InstituteType = "GOVERNMENT" | "GOVERNMENT_AIDED" | "UNIVERSITY" | "UNAIDED";
@@ -305,7 +304,7 @@ export interface SimulationParticipatingAdmission {
   candidateId: string;
   seatId: string;
   programId: string;
-  source: "MHT_CET_CAP";
+  source: "MHT_CET_CAP" | "SPOT_ROUND";
   allotmentRound: string;
   status: "CONFIRMED";
   bettermentStatus: BettermentStatus;
@@ -341,6 +340,8 @@ export interface ConnectedAdmissionRecord {
 
 export type AdmissionSimulationEventType =
   | "SEAT_ACCEPTED"
+  | "SEAT_OFFERED"
+  | "SEAT_OFFER_RETURNED"
   | "SEAT_RELEASED"
   | "ADMISSION_WITHDRAWN"
   | "CONNECTED_ADMISSION_CONFIRMED";
@@ -368,13 +369,15 @@ export interface AdmissionSimulationFeedback {
 }
 
 export interface AdmissionSimulationState {
-  version: 1;
+  version: 2;
   candidateId: string;
   currentAdmission: SimulationCurrentAdmission | null;
   seats: SimulationSeat[];
   externalAdmissions: ConnectedAdmissionRecord[];
   events: AdmissionSimulationEvent[];
   lastFeedback: AdmissionSimulationFeedback | null;
+  spotRounds: SpotRound[];
+  lastSpotRoundOutcome: SpotRoundOutcome | null;
   updatedAt: string;
 }
 
@@ -385,6 +388,12 @@ export type AdmissionTransitionErrorCode =
   | "SEAT_HELD_BY_ANOTHER_CANDIDATE"
   | "SEAT_ALREADY_AVAILABLE"
   | "CONNECTED_ADMISSION_NOT_READY"
+  | "SPOT_ROUND_NOT_FOUND"
+  | "SPOT_ROUND_NOT_ACTIVE"
+  | "SPOT_ROUND_LIMIT_REACHED"
+  | "SPOT_ROUND_NOT_JOINED"
+  | "SPOT_EVENT_UNAVAILABLE"
+  | "SPOT_OFFER_UNAVAILABLE"
   | "INVALID_STATE";
 
 export interface AdmissionTransitionError {
@@ -396,27 +405,78 @@ export type AdmissionTransitionResult =
   | { ok: true; state: AdmissionSimulationState }
   | { ok: false; state: AdmissionSimulationState; error: AdmissionTransitionError };
 
-export type SpotRoundStatus = "REGISTRATION_OPEN" | "SCHEDULED" | "LIVE" | "COMPLETED";
+export type SpotRoundStatus = "UPCOMING" | "LIVE" | "PAUSED" | "COMPLETED";
 
-export interface SpotRound {
-  id: string;
-  title: string;
-  collegeId: string;
-  programIds: string[];
-  registrationDeadline: string;
-  startsAt: string;
-  status: SpotRoundStatus;
-  vacancyCount: number;
-}
+export type ParticipantStatus =
+  | "REGISTERED"
+  | "WAITING"
+  | "ELIGIBLE"
+  | "OFFERED"
+  | "ACCEPTED"
+  | "DECLINED"
+  | "WITHDRAWN"
+  | "EXPIRED";
 
-export type ParticipantStatus = "INTERESTED" | "REGISTERED" | "WAITING" | "CALLED" | "OFFERED" | "COMPLETED";
+export type SpotOfferStatus = "AWAITING_DECISION" | "ACCEPTED" | "DECLINED" | "EXPIRED";
 
 export interface SpotRoundParticipant {
   id: string;
-  spotRoundId: string;
-  candidateId: string;
+  label: string;
+  meritOrder: number;
   status: ParticipantStatus;
-  joinedAt: string;
-  queuePosition?: number;
-  offeredSeatId?: string;
+  joinedAt: string | null;
+  isDemoCandidate: boolean;
+}
+
+export interface SpotRoundEvent {
+  id: string;
+  occurredAt: string;
+  title: string;
+  description: string;
+  queuePositionBefore?: number;
+  queuePositionAfter?: number;
+  availabilityBefore?: number;
+  availabilityAfter?: number;
+}
+
+export interface SpotRoundOffer {
+  id: string;
+  seatId: string;
+  participantId: string;
+  status: SpotOfferStatus;
+  offeredAt: string;
+  remainingSeconds: number;
+}
+
+export interface SpotRound {
+  id: string;
+  instituteCode: string;
+  programId: string;
+  startsAt: string;
+  endsAt: string;
+  status: SpotRoundStatus;
+  seatIds: string[];
+  participants: SpotRoundParticipant[];
+  candidateParticipantId: string;
+  queuePosition: number;
+  candidatesAhead: number;
+  activeCandidates: number;
+  progressStep: number;
+  events: SpotRoundEvent[];
+  offer: SpotRoundOffer | null;
+  scheduleConflictRoundIds: string[];
+  isHeroRound: boolean;
+  isSyntheticSimulation: true;
+}
+
+export interface SpotRoundOutcome {
+  roundId: string;
+  status: "ACCEPTED" | "DECLINED" | "EXPIRED";
+  occurredAt: string;
+  offeredSeatId: string;
+  previousProgramId: string;
+  previousSeatId: string;
+  previousAvailabilityBefore: number;
+  previousAvailabilityAfter: number;
+  closedInterestCount: number;
 }

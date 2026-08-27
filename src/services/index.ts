@@ -1,5 +1,5 @@
 export type { AdmissionService } from "./admissions";
-export { acceptSeat, confirmExternalAdmission, getAdmissionEvents, getCandidateCurrentAdmission, getProgrammeVacancies, isAdmissionSimulationStateValid, releaseSeat, resetAdmissionSimulation, sanitizeAdmissionSimulationState, withdrawCurrentAdmission } from "./admission-state";
+export { acceptSeat, confirmExternalAdmission, getAdmissionEvents, getCandidateCurrentAdmission, getProgrammeVacancies, isAdmissionSimulationStateValid, offerSeat, releaseSeat, resetAdmissionSimulation, returnOfferedSeat, sanitizeAdmissionSimulationState, withdrawCurrentAdmission } from "./admission-state";
 export type { CandidateService } from "./candidates";
 export type { CollegeService } from "./colleges";
 export type { OfficialCatalog, OfficialCatalogService } from "./official-catalog";
@@ -7,3 +7,4 @@ export { getPreferenceConsequence, normalizePreferencePositions, reorderPreferen
 export { mockCandidateService, mockCollegeService, mockOfficialCatalogService, mockSpotRoundService } from "./mock";
 export type { SeatService } from "./seats";
 export type { SpotRoundService } from "./spot-rounds";
+export { acceptSpotRoundOffer, advanceSpotRound, declineSpotRoundOffer, expireSpotRoundOffer, getActiveSpotInterestCount, getCandidateSpotStatus, getSpotRoundAvailableSeats, isActiveSpotInterest, joinSpotRound, leaveSpotRound } from "./spot-round-state";

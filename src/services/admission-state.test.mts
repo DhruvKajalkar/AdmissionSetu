@@ -87,5 +87,5 @@ test("vacancy totals are derived from seat records", () => {
   const state = createInitialAdmissionSimulationState();
   const expected = state.seats.filter((seat) => seat.programId === "0627137210" && seat.lifecycleState === "AVAILABLE").length;
   assert.equal(getProgrammeVacancies(state, "0627137210"), expected);
-  assert.equal(expected, 3);
+  assert.equal(expected, 2);
 });

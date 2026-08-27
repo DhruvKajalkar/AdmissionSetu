@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { PageHeader, SectionCard, StatusBadge } from "@/components";
-import { colleges, programs, spotRounds } from "@/data";
-import { formatDateTime } from "@/lib/format";
+import { SpotRoundLive } from "@/components";
+import { officialInstitutes, officialPrograms, spotRounds } from "@/data";
+
+export const dynamicParams = false;
 
 export function generateStaticParams() {
   return spotRounds.map((round) => ({ id: round.id }));
@@ -12,12 +12,12 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/spot-rounds/[id]">): Promise<Metadata> {
   const { id } = await params;
   const round = spotRounds.find((item) => item.id === id);
-
   if (!round) return { title: "Spot round not found" };
-
+  const institute = officialInstitutes.find((item) => item.code === round.instituteCode);
+  const program = officialPrograms.find((item) => item.choiceCode === round.programId);
   return {
-    title: round.title,
-    description: `Synthetic AdmissionSetu spot-round shell with ${round.vacancyCount} demo vacancies.`,
+    title: `${institute?.commonName ?? "Spot Round"} — ${program?.name ?? "Live round"}`,
+    description: "Synthetic AdmissionSetu live online spot-round simulation. No official admission submission occurs.",
     openGraph: { images: [] },
     twitter: { images: [] },
   };
@@ -25,32 +25,6 @@ export async function generateMetadata({ params }: PageProps<"/spot-rounds/[id]"
 
 export default async function SpotRoundDetailPage({ params }: PageProps<"/spot-rounds/[id]">) {
   const { id } = await params;
-  const round = spotRounds.find((item) => item.id === id);
-  if (!round) notFound();
-
-  const college = colleges.find((item) => item.id === round.collegeId);
-  const roundProgramIds: readonly string[] = round.programIds;
-  const roundPrograms = programs.filter((program) => roundProgramIds.includes(program.id));
-
-  return (
-    <>
-      <PageHeader
-        eyebrow="Spot-round detail"
-        title={round.title}
-        description="A static preview of the information students will receive before deciding whether to join."
-        action={<StatusBadge tone="info">Static preview</StatusBadge>}
-      />
-      <SectionCard title="Round information" description="All dates, vacancy counts, and participant activity are synthetic.">
-        <div className="round-detail-grid">
-          <div className="detail-item"><span>Institute</span><strong>{college?.name}</strong></div>
-          <div className="detail-item"><span>Registration closes</span><strong>{formatDateTime(round.registrationDeadline)}</strong></div>
-          <div className="detail-item"><span>Round starts</span><strong>{formatDateTime(round.startsAt)}</strong></div>
-          <div className="detail-item"><span>Programmes</span><strong>{roundPrograms.map((program) => program.name).join(", ")}</strong></div>
-          <div className="detail-item"><span>Vacancies</span><strong>{round.vacancyCount} demo seats</strong></div>
-          <div className="detail-item"><span>Current state</span><strong>{round.status.replaceAll("_", " ")}</strong></div>
-        </div>
-      </SectionCard>
-      <p style={{ marginTop: "22px" }}><Link className="text-link" href="/spot-rounds">← Back to all spot rounds</Link></p>
-    </>
-  );
+  if (!spotRounds.some((round) => round.id === id)) notFound();
+  return <SpotRoundLive roundId={id} institutes={officialInstitutes} programs={officialPrograms} />;
 }

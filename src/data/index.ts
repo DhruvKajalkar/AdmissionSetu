@@ -1,5 +1,5 @@
 export { demoCandidate } from "./candidate";
-export { createInitialAdmissionSimulationState, demoSimulationTimestamps } from "./admission-simulation";
+export { createInitialAdmissionSimulationState, demoSimulationTimestamps, HERO_SPOT_ROUND_ID, MAX_ACTIVE_SPOT_INTERESTS } from "./admission-simulation";
 export { colleges, programs } from "./colleges";
 export { demoAdmissionCycle } from "./demo-cycle";
 export {

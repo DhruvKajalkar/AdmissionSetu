@@ -59,6 +59,10 @@ export type {
   SimulationParticipatingAdmission,
   SimulationSeat,
   SpotRound,
+  SpotRoundEvent,
+  SpotRoundOffer,
+  SpotRoundOutcome,
   SpotRoundParticipant,
+  SpotOfferStatus,
   SpotRoundStatus,
 } from "./admissions";

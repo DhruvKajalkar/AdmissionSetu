@@ -15,4 +15,6 @@ export { PreferenceBuilder } from "./preference-list";
 export { SectionCard } from "./section-card";
 export { StatCard } from "./stat-card";
 export { StatusBadge } from "./status-badge";
+export { SpotRoundDiscovery } from "./spot-round-discovery";
+export { SpotRoundLive } from "./spot-round-live";
 export { VacancyExchange } from "./vacancy-exchange";

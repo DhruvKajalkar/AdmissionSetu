@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useSyncExternalStore } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
 import { normalizePreferencePositions, reorderPreferences } from "@/services/preference-safety";
 import type {
@@ -16,10 +16,6 @@ const V2_STORAGE_KEY = "admissionsetu:candidate-preferences:v2";
 const listeners = new Set<() => void>();
 let cachedSignature: string | undefined;
 let cachedStore: PreferenceStorageV2 | undefined;
-
-const subscribeToHydration = () => () => undefined;
-const getClientHydrationSnapshot = () => true;
-const getServerHydrationSnapshot = () => false;
 
 interface PreferenceShortlistValue {
   preferences: readonly CandidatePreference[];
@@ -195,18 +191,16 @@ export function PreferenceShortlistProvider({
   );
   const getServerSnapshot = useCallback(() => serverStore, [serverStore]);
   const persistedStore = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const hasHydrated = useSyncExternalStore(
-    subscribeToHydration,
-    getClientHydrationSnapshot,
-    getServerHydrationSnapshot,
-  );
+  const [hasHydrated, setHasHydrated] = useState(false);
   const store = hasHydrated ? persistedStore : serverStore;
 
   useEffect(() => {
+    const hydrationFrame = window.requestAnimationFrame(() => setHasHydrated(true));
     const parsedV2 = safeParse(localStorage.getItem(V2_STORAGE_KEY));
     if (!parsedV2 || typeof parsedV2 !== "object" || (parsedV2 as Record<string, unknown>).version !== 2) {
       writeStore(readStore(initialProgramIds, validProgramIds));
     }
+    return () => window.cancelAnimationFrame(hydrationFrame);
   }, [initialProgramIds, validProgramIds]);
 
   const preferences = store.preferences;

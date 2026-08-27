@@ -10,16 +10,20 @@ import {
   sanitizeAdmissionSimulationState,
   withdrawCurrentAdmission,
 } from "@/services/admission-state";
+import {
+  acceptSpotRoundOffer,
+  advanceSpotRound,
+  declineSpotRoundOffer,
+  expireSpotRoundOffer,
+  joinSpotRound,
+  leaveSpotRound,
+} from "@/services/spot-round-state";
 import type { AdmissionSimulationState, AdmissionTransitionError } from "@/types";
 
-const STORAGE_KEY = "admissionsetu:admission-simulation:v1";
+const STORAGE_KEY = "admissionsetu:admission-simulation:v2";
 const listeners = new Set<() => void>();
 let cachedRaw: string | null | undefined;
 let cachedState: AdmissionSimulationState | undefined;
-
-const subscribeToHydration = () => () => undefined;
-const getClientHydrationSnapshot = () => true;
-const getServerHydrationSnapshot = () => false;
 
 interface AdmissionSimulationValue {
   state: AdmissionSimulationState;
@@ -27,6 +31,12 @@ interface AdmissionSimulationValue {
   withdrawCurrent: () => boolean;
   confirmConnected: (externalAdmissionId: string) => boolean;
   acceptParticipatingSeat: (seatId: string) => boolean;
+  joinRound: (roundId: string) => boolean;
+  leaveRound: (roundId: string) => boolean;
+  advanceRound: (roundId: string) => boolean;
+  acceptRoundOffer: (roundId: string) => boolean;
+  declineRoundOffer: (roundId: string) => boolean;
+  expireRoundOffer: (roundId: string) => boolean;
   resetDemo: () => void;
   clearError: () => void;
 }
@@ -80,14 +90,11 @@ export function AdmissionSimulationProvider({
   const getSnapshot = useCallback(() => readState(initialState), [initialState]);
   const getServerSnapshot = useCallback(() => serverState, [serverState]);
   const persistedState = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const hasHydrated = useSyncExternalStore(
-    subscribeToHydration,
-    getClientHydrationSnapshot,
-    getServerHydrationSnapshot,
-  );
+  const [hasHydrated, setHasHydrated] = useState(false);
   const state = hasHydrated ? persistedState : serverState;
 
   useEffect(() => {
+    const hydrationFrame = window.requestAnimationFrame(() => setHasHydrated(true));
     const raw = localStorage.getItem(STORAGE_KEY);
     let parsed: unknown = null;
     try {
@@ -97,6 +104,7 @@ export function AdmissionSimulationProvider({
     }
     const sanitized = sanitizeAdmissionSimulationState(parsed, initialState);
     if (!raw || JSON.stringify(parsed) !== JSON.stringify(sanitized)) writeState(sanitized);
+    return () => window.cancelAnimationFrame(hydrationFrame);
   }, [initialState]);
 
   const applyResult = useCallback((result: ReturnType<typeof withdrawCurrentAdmission>) => {
@@ -122,6 +130,12 @@ export function AdmissionSimulationProvider({
     (seatId: string) => applyResult(acceptSeat(state, seatId, demoSimulationTimestamps.acceptParticipatingSeat)),
     [applyResult, state],
   );
+  const joinRound = useCallback((roundId: string) => applyResult(joinSpotRound(state, roundId)), [applyResult, state]);
+  const leaveRound = useCallback((roundId: string) => applyResult(leaveSpotRound(state, roundId)), [applyResult, state]);
+  const advanceRound = useCallback((roundId: string) => applyResult(advanceSpotRound(state, roundId)), [applyResult, state]);
+  const acceptRoundOffer = useCallback((roundId: string) => applyResult(acceptSpotRoundOffer(state, roundId)), [applyResult, state]);
+  const declineRoundOffer = useCallback((roundId: string) => applyResult(declineSpotRoundOffer(state, roundId)), [applyResult, state]);
+  const expireRoundOffer = useCallback((roundId: string) => applyResult(expireSpotRoundOffer(state, roundId)), [applyResult, state]);
   const resetDemo = useCallback(() => {
     setLastError(null);
     writeState(resetAdmissionSimulation(initialState));
@@ -129,8 +143,8 @@ export function AdmissionSimulationProvider({
   const clearError = useCallback(() => setLastError(null), []);
 
   const value = useMemo(
-    () => ({ state, lastError, withdrawCurrent, confirmConnected, acceptParticipatingSeat, resetDemo, clearError }),
-    [acceptParticipatingSeat, clearError, confirmConnected, lastError, resetDemo, state, withdrawCurrent],
+    () => ({ state, lastError, withdrawCurrent, confirmConnected, acceptParticipatingSeat, joinRound, leaveRound, advanceRound, acceptRoundOffer, declineRoundOffer, expireRoundOffer, resetDemo, clearError }),
+    [acceptParticipatingSeat, acceptRoundOffer, advanceRound, clearError, confirmConnected, declineRoundOffer, expireRoundOffer, joinRound, lastError, leaveRound, resetDemo, state, withdrawCurrent],
   );
   return <AdmissionSimulationContext.Provider value={value}>{children}</AdmissionSimulationContext.Provider>;
 }

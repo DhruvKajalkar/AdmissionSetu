@@ -14,6 +14,15 @@ function cloneState(state: AdmissionSimulationState): AdmissionSimulationState {
     externalAdmissions: state.externalAdmissions.map((admission) => ({ ...admission })),
     events: state.events.map((event) => ({ ...event })),
     lastFeedback: state.lastFeedback ? { ...state.lastFeedback } : null,
+    spotRounds: state.spotRounds.map((round) => ({
+      ...round,
+      seatIds: [...round.seatIds],
+      participants: round.participants.map((participant) => ({ ...participant })),
+      events: round.events.map((event) => ({ ...event })),
+      offer: round.offer ? { ...round.offer } : null,
+      scheduleConflictRoundIds: [...round.scheduleConflictRoundIds],
+    })),
+    lastSpotRoundOutcome: state.lastSpotRoundOutcome ? { ...state.lastSpotRoundOutcome } : null,
   };
 }
 
@@ -43,8 +52,9 @@ export function getAdmissionEvents(state: AdmissionSimulationState) {
 }
 
 export function isAdmissionSimulationStateValid(state: AdmissionSimulationState) {
-  if (state.version !== 1 || !state.candidateId || !Array.isArray(state.seats)) return false;
+  if (state.version !== 2 || !state.candidateId || !Array.isArray(state.seats)) return false;
   if (!Array.isArray(state.events) || !Array.isArray(state.externalAdmissions)) return false;
+  if (!Array.isArray(state.spotRounds)) return false;
 
   const seatIds = new Set<string>();
   for (const seat of state.seats) {
@@ -62,9 +72,29 @@ export function isAdmissionSimulationStateValid(state: AdmissionSimulationState)
   const candidateSeats = state.seats.filter(
     (seat) =>
       seat.heldByCandidateId === state.candidateId &&
-      ["HELD", "OFFERED", "ACCEPTED"].includes(seat.lifecycleState),
+      ["HELD", "ACCEPTED"].includes(seat.lifecycleState),
   );
   if (candidateSeats.length > 1) return false;
+
+  const activeInterestStates = ["REGISTERED", "WAITING", "ELIGIBLE", "OFFERED"];
+  let activeInterests = 0;
+  const referencedRoundSeats = new Set<string>();
+  for (const round of state.spotRounds) {
+    if (!round.id || !round.candidateParticipantId || !Array.isArray(round.participants)) return false;
+    if (!round.participants.some((participant) => participant.id === round.candidateParticipantId && participant.isDemoCandidate)) return false;
+    const candidateParticipant = round.participants.find((participant) => participant.id === round.candidateParticipantId);
+    if (candidateParticipant && activeInterestStates.includes(candidateParticipant.status)) activeInterests += 1;
+    for (const seatId of round.seatIds) {
+      if (!seatIds.has(seatId) || referencedRoundSeats.has(seatId)) return false;
+      referencedRoundSeats.add(seatId);
+    }
+    if (round.offer?.status === "AWAITING_DECISION") {
+      const offeredSeat = state.seats.find((seat) => seat.id === round.offer?.seatId);
+      if (!offeredSeat || offeredSeat.lifecycleState !== "OFFERED" || offeredSeat.heldByCandidateId !== state.candidateId) return false;
+      if (candidateParticipant?.status !== "OFFERED") return false;
+    }
+  }
+  if (activeInterests > 5) return false;
 
   if (state.currentAdmission?.kind === "PARTICIPATING_SEAT") {
     return (
@@ -84,18 +114,85 @@ export function sanitizeAdmissionSimulationState(
   if (!value || typeof value !== "object") return cloneState(initialState);
   const candidate = value as AdmissionSimulationState;
   const expectedSeatIds = initialState.seats.map((seat) => seat.id).sort().join("|");
+  const expectedRoundIds = initialState.spotRounds.map((round) => round.id).sort().join("|");
   const candidateSeatIds = Array.isArray(candidate.seats)
     ? candidate.seats.map((seat) => seat?.id).sort().join("|")
     : "";
+  const candidateRoundIds = Array.isArray(candidate.spotRounds)
+    ? candidate.spotRounds.map((round) => round?.id).sort().join("|")
+    : "";
   if (
-    candidate.version !== 1 ||
+    candidate.version !== 2 ||
     candidate.candidateId !== initialState.candidateId ||
     expectedSeatIds !== candidateSeatIds ||
+    expectedRoundIds !== candidateRoundIds ||
     !isAdmissionSimulationStateValid(candidate)
   ) {
     return cloneState(initialState);
   }
   return cloneState(candidate);
+}
+
+export function offerSeat(
+  state: AdmissionSimulationState,
+  seatId: string,
+  candidateId: string,
+  occurredAt: string,
+): AdmissionTransitionResult {
+  const target = state.seats.find((seat) => seat.id === seatId);
+  if (!target) return failure(state, "SEAT_NOT_FOUND", "The requested seat could not be found.");
+  if (target.lifecycleState !== "AVAILABLE") {
+    return failure(state, "SEAT_UNAVAILABLE", "Only an available synthetic seat can be offered.");
+  }
+  const next = cloneState(state);
+  next.seats = next.seats.map((seat) => seat.id === seatId
+    ? { ...seat, lifecycleState: "OFFERED", heldByCandidateId: candidateId }
+    : seat);
+  next.events = [...next.events, {
+    id: `EVENT-OFFER-${seatId}-${occurredAt}`,
+    type: "SEAT_OFFERED",
+    occurredAt,
+    title: "Synthetic spot-round seat offered",
+    description: "The exact seat is temporarily reserved while Aarya makes the demo decision.",
+    seatId,
+    programId: target.programId,
+  }];
+  next.updatedAt = occurredAt;
+  return isAdmissionSimulationStateValid(next)
+    ? { ok: true, state: next }
+    : failure(state, "INVALID_STATE", "The seat offer would violate the simulation invariants.");
+}
+
+export function returnOfferedSeat(
+  state: AdmissionSimulationState,
+  seatId: string,
+  candidateId: string,
+  occurredAt: string,
+): AdmissionTransitionResult {
+  const target = state.seats.find((seat) => seat.id === seatId);
+  if (!target) return failure(state, "SEAT_NOT_FOUND", "The offered seat could not be found.");
+  if (target.lifecycleState !== "OFFERED" || target.heldByCandidateId !== candidateId) {
+    return failure(state, "SPOT_OFFER_UNAVAILABLE", "There is no active offer for this seat.");
+  }
+  const availabilityBefore = getProgrammeVacancies(state, target.programId);
+  const next = cloneState(state);
+  next.seats = next.seats.map((seat) => seat.id === seatId
+    ? { ...seat, lifecycleState: "AVAILABLE", heldByCandidateId: null }
+    : seat);
+  const availabilityAfter = getProgrammeVacancies(next, target.programId);
+  next.events = [...next.events, {
+    id: `EVENT-OFFER-RETURN-${seatId}-${occurredAt}`,
+    type: "SEAT_OFFER_RETURNED",
+    occurredAt,
+    title: "Spot-round offer returned",
+    description: "The offered synthetic seat returned to the live round for the next eligible participant.",
+    seatId,
+    programId: target.programId,
+    availabilityBefore,
+    availabilityAfter,
+  }];
+  next.updatedAt = occurredAt;
+  return { ok: true, state: next };
 }
 
 function releaseOwnedSeat(
@@ -288,10 +385,19 @@ export function acceptSeat(
   state: AdmissionSimulationState,
   seatId: string,
   occurredAt: string,
+  options: {
+    source?: "MHT_CET_CAP" | "SPOT_ROUND";
+    allotmentRound?: string;
+    eventTitle?: string;
+    eventDescription?: string;
+    consumedSpotRoundId?: string;
+  } = {},
 ): AdmissionTransitionResult {
   const target = state.seats.find((seat) => seat.id === seatId);
   if (!target) return failure(state, "SEAT_NOT_FOUND", "The requested seat could not be found.");
-  if (target.lifecycleState !== "AVAILABLE") {
+  const availableToCandidate = target.lifecycleState === "AVAILABLE" ||
+    (target.lifecycleState === "OFFERED" && target.heldByCandidateId === state.candidateId);
+  if (!availableToCandidate) {
     return failure(
       state,
       target.heldByCandidateId && target.heldByCandidateId !== state.candidateId
@@ -325,8 +431,8 @@ export function acceptSeat(
     candidateId: state.candidateId,
     seatId,
     programId: target.programId,
-    source: "MHT_CET_CAP",
-    allotmentRound: "Demo participating admission",
+    source: options.source ?? "MHT_CET_CAP",
+    allotmentRound: options.allotmentRound ?? "Demo participating admission",
     status: "CONFIRMED",
     bettermentStatus: "CLOSED",
     confirmedAt: occurredAt,
@@ -337,12 +443,23 @@ export function acceptSeat(
       id: `EVENT-ACCEPT-${seatId}-${occurredAt}`,
       type: "SEAT_ACCEPTED",
       occurredAt,
-      title: "Participating seat accepted",
-      description: "The available synthetic seat became Aarya's single current participating admission.",
+      title: options.eventTitle ?? "Participating seat accepted",
+      description: options.eventDescription ?? "The available synthetic seat became Aarya's single current participating admission.",
       seatId,
       programId: target.programId,
     },
   ];
+  if (options.consumedSpotRoundId) {
+    working.spotRounds = working.spotRounds.map((round) => round.id === options.consumedSpotRoundId
+      ? {
+          ...round,
+          participants: round.participants.map((participant) => participant.id === round.candidateParticipantId
+            ? { ...participant, status: "ACCEPTED" }
+            : participant),
+          offer: round.offer ? { ...round.offer, status: "ACCEPTED" } : null,
+        }
+      : round);
+  }
   working.updatedAt = occurredAt;
   return isAdmissionSimulationStateValid(working)
     ? { ok: true, state: working }

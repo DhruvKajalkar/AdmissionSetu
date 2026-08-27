@@ -8,7 +8,6 @@ import {
   officialInstitutes,
   officialPrograms,
   programs,
-  spotRoundParticipants,
   spotRounds,
 } from "@/data";
 import type { CandidateService } from "./candidates";
@@ -69,6 +68,6 @@ export const mockSpotRoundService: SpotRoundService = {
     return spotRounds.find((round) => round.id === id) ?? null;
   },
   async listParticipants(spotRoundId) {
-    return spotRoundParticipants.filter((participant) => participant.spotRoundId === spotRoundId);
+    return spotRounds.find((round) => round.id === spotRoundId)?.participants ?? [];
   },
 };
