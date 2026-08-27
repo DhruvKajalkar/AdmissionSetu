@@ -1,7 +1,10 @@
 export { admissions, demoCandidate, seats } from "./candidate";
 export { colleges, programs } from "./colleges";
+export { demoAdmissionCycle } from "./demo-cycle";
 export {
   capThreeCutoffSource,
+  capRoundThreeRule,
+  capRoundThreeRuleSource,
   currentFePortalSource,
   instituteListSource,
   officialCutoffs,

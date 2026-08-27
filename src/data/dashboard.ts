@@ -1,25 +1,26 @@
 import type { AdmissionAlert, AdmissionDeadline, AdmissionJourneyStage } from "@/types";
+import { demoAdmissionCycle } from "./demo-cycle";
 
-export const DEMO_NOW = "2026-08-27T17:00:00+05:30";
+export const DEMO_NOW = demoAdmissionCycle.now;
 
 export const admissionJourneyStages: readonly AdmissionJourneyStage[] = [
   { id: "EXAMS_COMPLETED", title: "Exams completed", description: "MHT-CET and JEE Main scores recorded" },
   { id: "CET_REGISTRATION", title: "CET registration", description: "Engineering application submitted" },
   { id: "DOCUMENTS_VERIFIED", title: "Document check completed", description: "Core eligibility documents checked; one follow-up remains" },
-  { id: "CAP_PREFERENCES", title: "CAP preferences", description: "Programme choices submitted" },
-  { id: "CAP_ALLOTMENT", title: "CAP allotment", description: "A seat was allotted in CAP Round III" },
-  { id: "BETTERMENT", title: "Betterment", description: "Current stage — review stronger choices" },
+  { id: "CAP_PREFERENCES", title: "CAP preferences", description: "Earlier CAP option form submitted" },
+  { id: "CAP_ALLOTMENT", title: "CAP allotment", description: `Current seat secured in ${demoAdmissionCycle.currentSeatAllottedRound}` },
+  { id: "BETTERMENT", title: "Betterment", description: `Current stage — arrange and review ${demoAdmissionCycle.roundLabel} choices` },
   { id: "INSTITUTE_SPOT_ROUNDS", title: "Institute / spot rounds", description: "Explore eligible institute vacancies" },
   { id: "FINAL_ADMISSION", title: "Final admission", description: "Confirm the seat you will retain" },
 ];
 
 export const nextAdmissionDeadline: AdmissionDeadline = {
-  id: "deadline-cap-round-iv",
-  title: "CAP Round IV preference window closes",
-  deadlineAt: "2026-08-28T17:00:00+05:30",
+  id: "deadline-cap-round-iii-review",
+  title: `${demoAdmissionCycle.roundLabel} option-form review closes`,
+  deadlineAt: demoAdmissionCycle.preferenceReviewDeadline,
   actionLabel: "Review Preferences",
   actionHref: "/preferences",
-  whyItMatters: "Review your order before the window closes to remain eligible for betterment.",
+  whyItMatters: "Review the exact order and auto-freeze consequences before confirming the demo option form.",
 };
 
 export const dashboardAlerts: readonly AdmissionAlert[] = [

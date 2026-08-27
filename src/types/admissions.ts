@@ -141,6 +141,87 @@ export interface OfficialCutoffObservation {
   source: OfficialSourceReference;
 }
 
+export type CapRound = 1 | 2 | 3 | 4;
+
+export interface CapRoundRule {
+  round: CapRound;
+  label: string;
+  autoFreezePreferenceLimit: number | null;
+  bettermentAvailableAfterRound: boolean;
+  finalRound: boolean;
+  explanation: string;
+  source: OfficialSourceReference;
+}
+
+export interface DemoAdmissionCycle {
+  academicYear: "2026-27";
+  currentRound: CapRound;
+  roundLabel: string;
+  now: string;
+  preferenceReviewDeadline: string;
+  deterministicConfirmationAt: string;
+  currentSeatAllottedRound: string;
+  currentSeatAllottedAt: string;
+  currentSeatReportingDeadline: string;
+}
+
+export type PreferenceAcceptanceIntent = "YES" | "UNSURE";
+
+export interface CandidatePreference {
+  programId: string;
+  position: number;
+  acceptanceIntent: PreferenceAcceptanceIntent;
+}
+
+export interface ConfirmedPreferenceSubmission {
+  id: string;
+  round: CapRound;
+  confirmedAt: string;
+  acknowledgedAutoFreezeRule: true;
+  preferences: readonly CandidatePreference[];
+}
+
+export interface PreferenceStorageV2 {
+  version: 2;
+  preferences: readonly CandidatePreference[];
+  confirmedPreferenceSubmission: ConfirmedPreferenceSubmission | null;
+}
+
+export type PreferenceFindingSeverity = "INFO" | "CAUTION" | "BLOCKING";
+export type PreferenceFindingType = "EMPTY_LIST" | "DUPLICATE_PROGRAM" | "UNSURE_AUTO_FREEZE";
+
+export interface PreferenceReviewFinding {
+  id: string;
+  severity: PreferenceFindingSeverity;
+  type: PreferenceFindingType;
+  preferenceId?: string;
+  position?: number;
+  title: string;
+  explanation: string;
+}
+
+export interface PreferenceReview {
+  findings: readonly PreferenceReviewFinding[];
+  blockingCount: number;
+  cautionCount: number;
+  autoFreezePreferenceLimit: number | null;
+}
+
+export interface CurrentSeatContext {
+  instituteName: string;
+  instituteShortName: string;
+  programName: string;
+  bettermentActive: boolean;
+}
+
+export interface PreferenceConsequence {
+  position: number;
+  autoFrozen: boolean;
+  currentSeatEffect: string;
+  capStatus: string;
+  nextRoundStatus: string;
+}
+
 export type AdmissionSource = "MHT_CET_CAP" | "JEE_CAP" | "INSTITUTE_LEVEL" | "SPOT_ROUND";
 export type AdmissionStatus = "PROVISIONAL" | "CONFIRMED" | "CANCELLED" | "SUPERSEDED";
 export type BettermentStatus = "ACTIVE" | "NOT_REQUESTED" | "CLOSED";

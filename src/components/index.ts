@@ -7,7 +7,7 @@ export { DocumentReadiness } from "./document-readiness";
 export { PageHeader } from "./page-header";
 export { PlaceholderPage } from "./placeholder-page";
 export { PreferenceShortlistProvider, usePreferenceShortlist } from "./preference-shortlist";
-export { PreferenceList } from "./preference-list";
+export { PreferenceBuilder } from "./preference-list";
 export { SectionCard } from "./section-card";
 export { StatCard } from "./stat-card";
 export { StatusBadge } from "./status-badge";

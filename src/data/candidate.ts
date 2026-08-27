@@ -1,4 +1,5 @@
 import type { Admission, Candidate, Seat } from "@/types";
+import { demoAdmissionCycle } from "./demo-cycle";
 
 export const demoCandidate: Candidate = {
   id: "candidate-demo-aarya-deshmukh",
@@ -38,10 +39,10 @@ export const admissions: readonly Admission[] = [
     candidateId: demoCandidate.id,
     seatId: "seat-aissms-ce-open-042",
     source: "MHT_CET_CAP",
-    allotmentRound: "CAP Round III",
+    allotmentRound: demoAdmissionCycle.currentSeatAllottedRound,
     status: "CONFIRMED",
     bettermentStatus: "ACTIVE",
-    allottedAt: "2026-08-20T14:30:00+05:30",
-    reportingDeadline: "2026-08-29T17:00:00+05:30",
+    allottedAt: demoAdmissionCycle.currentSeatAllottedAt,
+    reportingDeadline: demoAdmissionCycle.currentSeatReportingDeadline,
   },
 ];
