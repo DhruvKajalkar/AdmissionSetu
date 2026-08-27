@@ -10,7 +10,7 @@ Students currently navigate CAP workflows, individual institute notices, vacancy
 
 ## Prototype scope
 
-Phase 0 provides the product shell, shared navigation, dashboard, domain types, synthetic development data, and mock service boundaries. Admission workflows, recommendations, live updates, queue simulation, and seat transition logic are intentionally not implemented yet.
+Phase 1 provides the product shell, shared navigation, a student-centred admission dashboard, domain types, synthetic development data, and mock service boundaries. The dashboard explains the candidate's current seat, deterministic deadline, admission journey, document readiness, alerts, and next actions. Admission workflows, recommendations, live updates, queue simulation, and seat transition logic are intentionally not implemented yet.
 
 ## Technical stack
 

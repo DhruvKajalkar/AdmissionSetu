@@ -9,6 +9,7 @@ export const demoCandidate: Candidate = {
   jeePercentile: 91.27,
   category: "OPEN",
   homeUniversity: "SPPU",
+  currentJourneyStage: "BETTERMENT",
   documents: [
     { id: "doc-cet", kind: "MHT_CET_SCORECARD", label: "MHT-CET scorecard", status: "VERIFIED", updatedAt: "2026-08-18T10:00:00+05:30" },
     { id: "doc-jee", kind: "JEE_MAIN_SCORECARD", label: "JEE Main scorecard", status: "VERIFIED", updatedAt: "2026-08-18T10:00:00+05:30" },
@@ -39,6 +40,7 @@ export const admissions: readonly Admission[] = [
     source: "MHT_CET_CAP",
     allotmentRound: "CAP Round III",
     status: "CONFIRMED",
+    bettermentStatus: "ACTIVE",
     allottedAt: "2026-08-20T14:30:00+05:30",
     reportingDeadline: "2026-08-29T17:00:00+05:30",
   },

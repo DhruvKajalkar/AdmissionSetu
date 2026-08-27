@@ -4,4 +4,5 @@ export interface CollegeService {
   listColleges(): Promise<readonly College[]>;
   getCollegeById(id: string): Promise<College | null>;
   listPrograms(collegeId?: string): Promise<readonly Program[]>;
+  getProgramById(id: string): Promise<Program | null>;
 }

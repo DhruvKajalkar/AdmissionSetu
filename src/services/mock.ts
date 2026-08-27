@@ -1,5 +1,6 @@
-import { admissions, colleges, programs, seats, spotRoundParticipants, spotRounds } from "@/data";
+import { admissions, colleges, demoCandidate, programs, seats, spotRoundParticipants, spotRounds } from "@/data";
 import type { AdmissionService } from "./admissions";
+import type { CandidateService } from "./candidates";
 import type { CollegeService } from "./colleges";
 import type { SeatService } from "./seats";
 import type { SpotRoundService } from "./spot-rounds";
@@ -13,6 +14,18 @@ export const mockCollegeService: CollegeService = {
   },
   async listPrograms(collegeId) {
     return collegeId ? programs.filter((program) => program.collegeId === collegeId) : programs;
+  },
+  async getProgramById(id) {
+    return programs.find((program) => program.id === id) ?? null;
+  },
+};
+
+export const mockCandidateService: CandidateService = {
+  async getCandidateById(id) {
+    return id === demoCandidate.id ? demoCandidate : null;
+  },
+  async getDemoCandidate() {
+    return demoCandidate;
   },
 };
 

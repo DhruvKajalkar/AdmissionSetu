@@ -17,7 +17,7 @@ export function PlaceholderPage({ eyebrow, title, description, futureCapability,
       <PageHeader eyebrow={eyebrow} title={title} description={description} />
       <SectionCard>
         <div className="placeholder-content">
-          <StatusBadge tone="info">Phase 0 shell</StatusBadge>
+          <StatusBadge tone="info">Planned experience</StatusBadge>
           <h2>{futureCapability}</h2>
           <p>{context}</p>
           <Link className="text-link" href="/dashboard">← Return to overview</Link>

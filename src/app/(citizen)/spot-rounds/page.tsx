@@ -9,7 +9,7 @@ export default function SpotRoundsPage() {
       <PageHeader
         eyebrow="Institute rounds"
         title="Spot Rounds"
-        description="A single place to discover and track institute-level vacancy rounds. Joining and queue activity are not enabled in Phase 0."
+        description="A single place to discover and track institute-level vacancy rounds. Joining and queue activity are not enabled in this phase."
       />
       <div className="round-list">
         {spotRounds.map((round) => {

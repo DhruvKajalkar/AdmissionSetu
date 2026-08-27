@@ -38,6 +38,7 @@ export interface Candidate {
   jeePercentile: number;
   category: CandidateCategory;
   homeUniversity: HomeUniversity;
+  currentJourneyStage: AdmissionJourneyStageId;
   documents: CandidateDocument[];
   currentAdmissionId: string | null;
   preferenceProgramIds: string[];
@@ -80,6 +81,7 @@ export interface Program {
 
 export type AdmissionSource = "MHT_CET_CAP" | "JEE_CAP" | "INSTITUTE_LEVEL" | "SPOT_ROUND";
 export type AdmissionStatus = "PROVISIONAL" | "CONFIRMED" | "CANCELLED" | "SUPERSEDED";
+export type BettermentStatus = "ACTIVE" | "NOT_REQUESTED" | "CLOSED";
 
 export interface Admission {
   id: string;
@@ -88,8 +90,48 @@ export interface Admission {
   source: AdmissionSource;
   allotmentRound: string;
   status: AdmissionStatus;
+  bettermentStatus: BettermentStatus;
   allottedAt: string;
   reportingDeadline: string;
+}
+
+export type AdmissionJourneyStageId =
+  | "EXAMS_COMPLETED"
+  | "CET_REGISTRATION"
+  | "DOCUMENTS_VERIFIED"
+  | "CAP_PREFERENCES"
+  | "CAP_ALLOTMENT"
+  | "BETTERMENT"
+  | "INSTITUTE_SPOT_ROUNDS"
+  | "FINAL_ADMISSION";
+
+export type AdmissionJourneyStageState = "COMPLETED" | "CURRENT" | "UPCOMING";
+
+export interface AdmissionJourneyStage {
+  id: AdmissionJourneyStageId;
+  title: string;
+  description: string;
+}
+
+export interface AdmissionDeadline {
+  id: string;
+  title: string;
+  deadlineAt: string;
+  actionLabel: string;
+  actionHref: string;
+  whyItMatters: string;
+}
+
+export type AdmissionAlertTone = "INFO" | "WARNING";
+
+export interface AdmissionAlert {
+  id: string;
+  tone: AdmissionAlertTone;
+  label: string;
+  title: string;
+  message: string;
+  actionLabel?: string;
+  actionHref?: string;
 }
 
 export type SeatLifecycleState = "AVAILABLE" | "HELD" | "OFFERED" | "ACCEPTED" | "RELEASED";

@@ -38,7 +38,7 @@ export default async function SpotRoundDetailPage({ params }: PageProps<"/spot-r
         eyebrow="Spot-round detail"
         title={round.title}
         description="A static preview of the information students will receive before deciding whether to join."
-        action={<StatusBadge tone="info">Phase 0 preview</StatusBadge>}
+        action={<StatusBadge tone="info">Static preview</StatusBadge>}
       />
       <SectionCard title="Round information" description="All dates, vacancy counts, and participant activity are synthetic.">
         <div className="round-detail-grid">
