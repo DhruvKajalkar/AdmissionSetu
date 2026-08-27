@@ -8,7 +8,7 @@ import {
   getSpotRoundAvailableSeats,
   isActiveSpotInterest,
 } from "@/services";
-import type { OfficialInstitute, OfficialProgram, SpotRoundStatus } from "@/types";
+import type { OfficialInstitute, OfficialProgram, ParticipantStatus, SpotRoundStatus } from "@/types";
 import { useAdmissionSimulation } from "./admission-simulation-provider";
 import { PageHeader } from "./page-header";
 import { StatusBadge } from "./status-badge";
@@ -28,6 +28,20 @@ function toneForStatus(status: SpotRoundStatus) {
   if (status === "UPCOMING") return "info" as const;
   if (status === "PAUSED") return "warning" as const;
   return "neutral" as const;
+}
+
+function participantStatusLabel(status: ParticipantStatus) {
+  const labels: Record<ParticipantStatus, string> = {
+    REGISTERED: "Joined",
+    WAITING: "Waiting in queue",
+    ELIGIBLE: "Next for offer",
+    OFFERED: "Offer received",
+    ACCEPTED: "Accepted",
+    DECLINED: "Declined",
+    WITHDRAWN: "Not joined",
+    EXPIRED: "Offer expired",
+  };
+  return labels[status];
 }
 
 export function SpotRoundDiscovery({
@@ -111,7 +125,7 @@ export function SpotRoundDiscovery({
               <dl>
                 <div><dt>Synthetic seats available</dt><dd>{available}</dd></div>
                 <div><dt>{round.status === "LIVE" ? "Started" : "Starts"}</dt><dd>{formatRoundTime(round.startsAt)}</dd></div>
-                <div><dt>Your state</dt><dd>{accepted ? "Accepted" : active ? candidateStatus : "Not joined"}</dd></div>
+                <div><dt>Your state</dt><dd>{accepted || active ? participantStatusLabel(candidateStatus) : "Not joined"}</dd></div>
               </dl>
               <div className="spot-round-card-actions">
                 {accepted ? <Link className="primary-link-button" href={`/spot-rounds/${round.id}`}>View admission</Link> : null}

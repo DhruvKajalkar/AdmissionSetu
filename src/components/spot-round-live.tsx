@@ -50,6 +50,7 @@ export function SpotRoundLive({
     clearError,
   } = useAdmissionSimulation();
   const [pendingDecision, setPendingDecision] = useState<PendingDecision>(null);
+  const [resetComplete, setResetComplete] = useState(false);
   const round = state.spotRounds.find((item) => item.id === roundId);
 
   if (!round) {
@@ -75,8 +76,10 @@ export function SpotRoundLive({
     if (decision === "EXPIRE") succeeded = expireRoundOffer(liveRoundId);
     if (decision === "RESET") {
       resetDemo();
+      setResetComplete(true);
       succeeded = true;
     }
+    if (succeeded && decision !== "RESET") setResetComplete(false);
     if (succeeded) setPendingDecision(null);
   }
 
@@ -93,8 +96,10 @@ export function SpotRoundLive({
 
       <div className="spot-live-disclaimer">
         <strong>Demo live simulation</strong>
-        <span>This is a deterministic prototype queue. It is not a real institute round or admission authority.</span>
+        <span>This guided demo queue is not a real institute round or admission authority.</span>
       </div>
+
+      {resetComplete ? <div className="demo-reset-feedback" role="status"><strong>Demo reset complete.</strong><span>The original AISSMS seat, vacancies and live-round state were restored. Saved preferences were not changed.</span></div> : null}
 
       {lastError ? (
         <div className="simulation-error" role="alert">
@@ -107,15 +112,15 @@ export function SpotRoundLive({
         <section className="spot-admission-success" aria-labelledby="spot-success-title">
           <div className="spot-success-check" aria-hidden="true">✓</div>
           <p>Admission confirmed</p>
-          <h1 id="spot-success-title">{institute.commonName}</h1>
-          <h2>{program.name}</h2>
+          <h2 id="spot-success-title">{institute.commonName}</h2>
+          <h3>{program.name}</h3>
           <div className="spot-success-grid">
             <article><span>New admission</span><strong>{institute.commonName} — {program.name}</strong><small>Accepted through the demo live spot round</small></article>
             <article><span>Previous admission</span><strong>{previousInstitute.commonName} — {previousProgram.name}</strong><small>Released</small></article>
-            <article><span>Remaining spot interests</span><strong>Closed</strong><small>{outcome.closedInterestCount} active interest{outcome.closedInterestCount === 1 ? " was" : "s were"} withdrawn</small></article>
-            <article><span>Seat system</span><strong>{previousInstitute.commonName} vacancy returned</strong><small>{outcome.previousAvailabilityBefore} → {outcome.previousAvailabilityAfter}</small></article>
+            <article><span>Remaining spot interests</span><strong>Closed</strong><small>{outcome.closedInterestCount ? `${outcome.closedInterestCount} active interest${outcome.closedInterestCount === 1 ? " was" : "s were"} withdrawn` : "No other active interests"}</small></article>
+            <article><span>Seat released</span><strong>{previousInstitute.commonName} vacancy returned</strong><small>{outcome.previousAvailabilityBefore} → {outcome.previousAvailabilityAfter}</small></article>
           </div>
-          <p className="spot-success-explanation">Your remaining active spot-round interests were closed after you confirmed this seat.</p>
+          <p className="spot-success-explanation">{outcome.closedInterestCount ? "Your remaining active spot-round interests were closed after you confirmed this seat." : "You had no other active spot-round interests to close."}</p>
           <div className="spot-success-actions"><Link className="primary-link-button" href="/vacancies">View Updated Vacancies</Link><Link className="secondary-link-button" href="/dashboard">Open dashboard</Link></div>
         </section>
       ) : (
@@ -130,15 +135,15 @@ export function SpotRoundLive({
           ) : null}
 
           <section className="spot-live-metrics" aria-label="Live round summary">
-            <article><span>Seats available</span><strong>{available}</strong><small>derived from Phase 4 seat records</small></article>
-            <article><span>Your merit queue position</span><strong>{round.queuePosition}</strong><small>deterministic synthetic order</small></article>
+            <article><span>Seats available</span><strong>{available}</strong><small>calculated from live demo seats</small></article>
+            <article><span>Your position</span><strong>{round.queuePosition}</strong><small>demo merit order</small></article>
             <article><span>Candidates ahead</span><strong>{round.candidatesAhead}</strong><small>active entries before you</small></article>
             <article><span>Active candidates</span><strong>{round.activeCandidates}</strong><small>anonymous demo participants</small></article>
           </section>
 
           {!active && !outcome && round.status !== "COMPLETED" ? (
             <section className="spot-join-hero">
-              <div><p>Not yet in this queue</p><h2>Join the deterministic live merit queue</h2><span>Aarya will begin at queue position {round.queuePosition}. Joining does not release the current AISSMS seat.</span></div>
+              <div><p>Not yet in this queue</p><h2>Join the live demo merit queue</h2><span>Aarya will begin at queue position {round.queuePosition}. Joining does not release the current AISSMS seat.</span></div>
               <button className="primary-action-button" type="button" onClick={() => joinRound(round.id)}>Join Spot Round</button>
             </section>
           ) : null}
@@ -146,7 +151,7 @@ export function SpotRoundLive({
           {active && !offerAwaiting ? (
             <section className="spot-waiting-status" role="status" aria-live="polite">
               <span className="spot-live-pulse" aria-hidden="true" />
-              <div><p>{candidateStatus === "ELIGIBLE" ? "You are next for an offer" : "You are currently waiting"}</p><small>The queue changes only when you use the deterministic demo controller.</small></div>
+              <div><p>{candidateStatus === "ELIGIBLE" ? "You are next for an offer" : "You are currently waiting"}</p><small>The queue changes when you select Advance Demo Event.</small></div>
             </section>
           ) : null}
 
@@ -154,14 +159,14 @@ export function SpotRoundLive({
             <section className="spot-offer-panel" aria-labelledby="spot-offer-title" aria-live="assertive">
               <div className="spot-offer-heading"><div><p>Seat offered to you</p><h2 id="spot-offer-title">{institute.commonName} · {program.name}</h2><span>Awaiting your decision</span></div><div className="spot-countdown"><span>Demo decision window</span><strong>{formatCountdown(round.offer.remainingSeconds)} remaining</strong><small>Simulated timer — no real policy</small></div></div>
               <div className="spot-offer-consequence"><div><span>Current seat</span><strong>AISSMS COE</strong><small>Computer Engineering</small></div><span aria-hidden="true">→</span><div><span>New seat</span><strong>{institute.commonName}</strong><small>{program.name}</small></div></div>
-              <p>Accepting will use the shared admission engine to release the AISSMS seat exactly once, confirm this PICT seat, and close your other active spot interests.</p>
+              <p>Accepting will release the AISSMS seat exactly once, confirm this PICT seat, and close your other active spot interests.</p>
               <div className="spot-offer-actions"><button className="primary-action-button" type="button" onClick={() => setPendingDecision("ACCEPT")}>Accept Seat</button><button className="secondary-action-button" type="button" onClick={() => setPendingDecision("DECLINE")}>Decline</button><button className="spot-expiry-button" type="button" onClick={() => setPendingDecision("EXPIRE")}>Simulate Offer Expiry</button></div>
             </section>
           ) : null}
 
           {active && !offerAwaiting ? (
             <section className="spot-demo-controller" aria-labelledby="demo-controller-title">
-              <div><p>Prototype-only control</p><h2 id="demo-controller-title">Advance the live round without waiting</h2><span>Event {round.progressStep} of 5 completed. The same sequence runs after every Reset Demo.</span></div>
+              <div><p>Demo control</p><h2 id="demo-controller-title">Advance the live round without waiting</h2><span>Event {round.progressStep} of 5 completed. The same sequence runs after every Reset Demo.</span></div>
               <div><button className="primary-action-button" type="button" disabled={round.progressStep >= 5} onClick={() => advanceRound(round.id)}>Advance Demo Event</button><button className="spot-leave-button" type="button" onClick={() => leaveRound(round.id)}>Leave Round</button></div>
             </section>
           ) : null}
@@ -182,7 +187,7 @@ export function SpotRoundLive({
           <div>
             <p>Confirm demo action</p>
             <h2 id="spot-decision-title">{pendingDecision === "ACCEPT" ? "Accept PICT ENTC?" : pendingDecision === "DECLINE" ? "Decline this offer?" : pendingDecision === "EXPIRE" ? "Simulate offer expiry?" : "Reset the complete demo?"}</h2>
-            <p>{pendingDecision === "ACCEPT" ? "PICT ENTC will become your one active admission. AISSMS Computer Engineering will be released and its vacancy will increase from 2 to 3." : pendingDecision === "RESET" ? "The original AISSMS seat, queues, interests, offers and deterministic event progress will be restored. Phase 3 preferences will remain untouched." : "The PICT seat will return to the live round. Your current AISSMS Computer Engineering admission will remain held."}</p>
+            <p>{pendingDecision === "ACCEPT" ? "PICT ENTC will become your one active admission. AISSMS Computer Engineering will be released and its vacancy will increase from 2 to 3." : pendingDecision === "RESET" ? "The original AISSMS seat, queues, interests, offers and guided event progress will be restored. Saved preferences will remain untouched." : "The PICT seat will return to the live round. Your current AISSMS Computer Engineering admission will remain held."}</p>
           </div>
           <div><button className="secondary-action-button" type="button" onClick={() => setPendingDecision(null)}>Cancel</button><button className={pendingDecision === "RESET" ? "danger-action-button" : "primary-action-button"} type="button" onClick={() => completeDecision(pendingDecision)}>{pendingDecision === "ACCEPT" ? "Confirm Acceptance" : pendingDecision === "DECLINE" ? "Confirm Decline" : pendingDecision === "EXPIRE" ? "Expire Demo Offer" : "Reset Demo"}</button></div>
         </section>

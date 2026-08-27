@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { admissionJourneyStages, dashboardAlerts, DEMO_NOW, nextAdmissionDeadline } from "@/data";
 import { formatPercentile, formatShortDeadline, formatTimeRemaining } from "@/lib/format";
-import type { Candidate, OfficialInstitute, OfficialProgram } from "@/types";
+import type { AdmissionJourneyStage, Candidate, OfficialInstitute, OfficialProgram } from "@/types";
 import { AdmissionAlert } from "./admission-alert";
 import { AdmissionJourney } from "./admission-journey";
 import { useAdmissionSimulation } from "./admission-simulation-provider";
@@ -17,9 +17,9 @@ import { StatusBadge } from "./status-badge";
 const quickActions = [
   { title: "Explore Colleges", description: "Compare colleges, branches and cutoff information.", href: "/explore", index: "01" },
   { title: "Review Preferences", description: "Review the order and consequences of your choices.", href: "/preferences", index: "02" },
-  { title: "Live Vacancies", description: "See seats released by demo admission transitions.", href: "/vacancies", index: "03" },
-  { title: "My Admission", description: "Control and trace your single demo admission state.", href: "/admission", index: "04" },
-  { title: "Spot Rounds", description: "Join centralized synthetic queues and act on live offers.", href: "/spot-rounds", index: "05" },
+  { title: "Live Vacancies", description: "See seats released through the live demo journey.", href: "/vacancies", index: "03" },
+  { title: "My Admission", description: "Review and trace your one current admission.", href: "/admission", index: "04" },
+  { title: "Spot Rounds", description: "Join demo queues and act on live seat offers.", href: "/spot-rounds", index: "05" },
 ] as const;
 
 export function DashboardView({ candidate, institutes, programs }: { candidate: Candidate; institutes: readonly OfficialInstitute[]; programs: readonly OfficialProgram[] }) {
@@ -27,6 +27,19 @@ export function DashboardView({ candidate, institutes, programs }: { candidate: 
   const admission = state.currentAdmission;
   const participatingProgram = admission?.kind === "PARTICIPATING_SEAT" ? programs.find((program) => program.choiceCode === admission.programId) : undefined;
   const participatingInstitute = participatingProgram ? institutes.find((institute) => institute.code === participatingProgram.instituteCode) : undefined;
+  const hasFinalAdmission = admission?.kind === "CONNECTED_ADMISSION" || (admission?.kind === "PARTICIPATING_SEAT" && admission.source === "SPOT_ROUND");
+  const journeyStageId = hasFinalAdmission ? "FINAL_ADMISSION" : admission ? candidate.currentJourneyStage : "INSTITUTE_SPOT_ROUNDS";
+  const journeyStages: readonly AdmissionJourneyStage[] = hasFinalAdmission
+    ? admissionJourneyStages.map((stage) => {
+      if (stage.id === "BETTERMENT") return { ...stage, description: "Earlier CAP Betterment stage completed in this demo" };
+      if (stage.id === "INSTITUTE_SPOT_ROUNDS") return { ...stage, description: admission?.kind === "PARTICIPATING_SEAT" ? "PICT ENTC live spot-round offer accepted" : "Connected counselling confirmation received" };
+      if (stage.id === "FINAL_ADMISSION") return { ...stage, description: "Your new seat is confirmed as the one current admission" };
+      return stage;
+    })
+    : admissionJourneyStages;
+  const visibleAlerts = hasFinalAdmission
+    ? dashboardAlerts.filter((alert) => alert.id !== "alert-institute-window")
+    : dashboardAlerts;
 
   return (
     <>
@@ -49,11 +62,23 @@ export function DashboardView({ candidate, institutes, programs }: { candidate: 
             <div className="no-admission-dashboard"><strong>No current admission is held</strong><p>Aarya&apos;s previous participating seat has returned to the demo vacancy exchange.</p><Link href="/admission">View admission event history →</Link></div>
           )}
         </SectionCard>
-        <DeadlineBanner label="Next action" title={nextAdmissionDeadline.title} deadline={formatShortDeadline(nextAdmissionDeadline.deadlineAt)} relativeLabel={formatTimeRemaining(nextAdmissionDeadline.deadlineAt, DEMO_NOW)} detail={nextAdmissionDeadline.whyItMatters} action={<Link className="deadline-button" href={nextAdmissionDeadline.actionHref}>{nextAdmissionDeadline.actionLabel} →</Link>} />
+        {hasFinalAdmission ? (
+          <SectionCard
+            className="final-admission-summary"
+            title="Admission transition complete"
+            description="Your new seat is now your one current admission."
+            action={<StatusBadge tone="success">Seat confirmed</StatusBadge>}
+          >
+            <p>The previous AISSMS seat was released and returned to Live Vacancies. Your saved CAP preferences remain unchanged.</p>
+            <Link className="text-link" href="/admission">Review admission history →</Link>
+          </SectionCard>
+        ) : (
+          <DeadlineBanner label="Next action" title={nextAdmissionDeadline.title} deadline={formatShortDeadline(nextAdmissionDeadline.deadlineAt)} relativeLabel={formatTimeRemaining(nextAdmissionDeadline.deadlineAt, DEMO_NOW)} detail={nextAdmissionDeadline.whyItMatters} action={<Link className="deadline-button" href={nextAdmissionDeadline.actionHref}>{nextAdmissionDeadline.actionLabel} →</Link>} />
+        )}
       </div>
-      <AdmissionJourney stages={admissionJourneyStages} currentStageId={candidate.currentJourneyStage} />
-      <div className="dashboard-detail-grid"><DocumentReadiness documents={candidate.documents} /><SectionCard className="alerts-card" title="Important Alerts" description="Only the updates that need your attention now."><div className="alerts-list">{dashboardAlerts.map((alert) => <AdmissionAlert alert={alert} key={alert.id} />)}</div></SectionCard></div>
-      <section className="dashboard-actions" aria-labelledby="quick-actions-title"><div className="dashboard-section-heading"><div><h2 id="quick-actions-title">What you can do next</h2><p>Every page reads the same candidate admission simulation.</p></div></div><nav className="quick-actions" aria-label="Next admission actions">{quickActions.map((action) => <Link className="action-card" href={action.href} key={action.href}><span className="action-index" aria-hidden="true">{action.index}</span><strong>{action.title}</strong><span>{action.description}</span><b aria-hidden="true">Open →</b></Link>)}</nav></section>
+      <AdmissionJourney stages={journeyStages} currentStageId={journeyStageId} />
+      <div className="dashboard-detail-grid"><DocumentReadiness documents={candidate.documents} /><SectionCard className="alerts-card" title="Important Alerts" description="Only the updates that need your attention now."><div className="alerts-list">{visibleAlerts.map((alert) => <AdmissionAlert alert={alert} key={alert.id} />)}</div></SectionCard></div>
+      <section className="dashboard-actions" aria-labelledby="quick-actions-title"><div className="dashboard-section-heading"><div><h2 id="quick-actions-title">What you can do next</h2><p>Your current seat and Live Vacancies stay in sync across AdmissionSetu.</p></div></div><nav className="quick-actions" aria-label="Next admission actions">{quickActions.map((action) => <Link className="action-card" href={action.href} key={action.href}><span className="action-index" aria-hidden="true">{action.index}</span><strong>{action.title}</strong><span>{action.description}</span><b aria-hidden="true">Open →</b></Link>)}</nav></section>
     </>
   );
 }

@@ -2,83 +2,113 @@
 
 **One admission journey. Every seat accounted for.**
 
-AdmissionSetu is a hackathon prototype that reimagines Maharashtra engineering admissions as one student-centric journey. It brings the currently fragmented college discovery, preference planning, CAP admission, vacancy, and spot-round experiences into one coherent citizen service.
+AdmissionSetu is a hackathon prototype for a simpler, safer Maharashtra engineering admission journey.
 
 ## Problem
 
-Students currently navigate CAP workflows, individual institute notices, vacancy lists, documents, and parallel counselling systems separately. AdmissionSetu demonstrates a simpler model: one student has one admission state, and every seat has one live state.
+Students must currently connect decisions spread across MHT-CET CAP, institute-level rounds, individual college notices, vacancy lists and parallel counselling systems. The same student can be tracking several processes while seat releases appear elsewhere and later, making consequences difficult to understand.
 
-## Prototype scope
+## Solution
 
-Phase 5 keeps the dashboard, Pune-region College Explorer, mistake-resistant CAP preference workflow, admission-state engine, and centralized vacancy exchange, then adds centralized live online spot rounds. Aarya can maintain up to five active interests, join a deterministic anonymous merit queue, receive a synthetic timed offer, and accept, decline, or simulate expiry without navigating separate institute notices.
+AdmissionSetu demonstrates one citizen-facing journey with:
 
-AdmissionSetu protects the student’s stated intent; it does not recommend a subjective college order. It does not label programmes as safe, target, or dream, estimate admission probability, compare placements, or infer preference quality from historical cutoffs. Cutoffs are displayed only as sourced historical context. Confirmation is simulated and does not submit information to the Maharashtra CET Cell.
+- one unified student admission state;
+- an explorer built from sourced CET institute, programme, intake and historical cutoff references;
+- mistake-resistant CAP preference ordering and safety review;
+- one live state for each synthetic seat;
+- centralized live vacancies;
+- guided online spot-round queues and offers; and
+- automatic release of the previous seat when a new seat is accepted.
 
-The `/admission` page provides controlled withdrawal, connected-admission, event-history, and reset interactions. `/vacancies` derives available counts directly from the small synthetic seat inventory and supports institute, programme, and availability filtering. `/spot-rounds` provides discovery, overlap guidance, the five-interest limit, and the live PICT ENTC hero round. Preference review remains non-mutating; only explicit demo actions change admission state.
+## Core design principles
 
-The maximum of five active spot-round interests is a proposed **AdmissionSetu prototype participation limit**, not an existing Maharashtra CET policy. It is included to reduce indiscriminate registration and make candidate interest meaningful.
+**One student → one admission state.**
 
-## Technical stack
+**One seat → one live state.**
 
-- Next.js 16 with the App Router
+## Demo Journey
+
+1. Open the app and select **Continue as Demo Student**.
+2. Use **Reset Demo** to restore the deterministic starting state.
+3. On **Dashboard**, show Aarya's AISSMS Computer Engineering seat.
+4. In **College Explorer**, show sourced PICT programme and cutoff references.
+5. In **My Preferences**, show the first-six auto-freeze zone and an **I'm not sure** warning.
+6. In **Live Vacancies**, note that AISSMS Computer Engineering starts with 2 demo vacancies.
+7. In **Spot Rounds**, join the live PICT ENTC round.
+8. Select **Advance Demo Event** five times; PICT availability briefly moves 2 → 3 and Aarya reaches the offer.
+9. Accept PICT ENTC and confirm the consequence.
+10. Show that AISSMS availability moved 2 → 3 and PICT is now Aarya's one current admission.
+11. Reload to show persistence, then use **Reset Demo** to restore the starting state without changing preferences.
+
+See [DEMO.md](./DEMO.md) for the concise presenter walkthrough.
+
+## Data
+
+### Official CET/public reference information
+
+The manually curated subset in `src/data/official/` contains institute identities, programme choice codes, sanctioned intake and limited historical cutoffs. Every record carries its academic year, source URL and access date.
+
+- [Maharashtra CET Cell FE 2026–27 portal](https://fe2026.mahacet.org/StaticPages/HomePage) — source for the displayed CAP Round III first-six auto-freeze rule.
+- [Maharashtra CET Cell 2025–26 participating institutes](https://fe2025.mahacet.org/StaticPages/frmInstituteList) — institute and intake reference.
+- Official institute summaries at `https://fe2025.mahacet.org/StaticPages/frmInstituteSummary?InstituteCode={code}` — institute status, autonomy, choice codes and intake.
+- [Official 2024–25 CAP Round III cutoff list](https://fe2025.mahacet.org/2024/2024ENGG_CAP3_CutOff.pdf) — source for the limited historical cutoff observations.
+
+The subset was manually curated on 27 August 2026. It is not a live or complete current-cycle catalog. Missing values are shown as unavailable and are never inferred.
+
+### Synthetic demo information
+
+Aarya, her scores and documents, current admissions, seat ownership, live vacancies, spot rounds, queue positions, participants, offers, timers, deadlines and connected-counselling events are synthetic. Official programme codes are used only as references connecting the demo inventory to the public catalog.
+
+## Prototype limitations
+
+- No official CET API or live CET vacancy feed.
+- No real JoSAA, JEE or connected-counselling API.
+- No real applicant identity or admission data.
+- Admission, queue, vacancy and offer state is stored only on the current device.
+- Live queues, vacancies, offers and timers are guided synthetic simulations.
+- Demo confirmation does not submit an official option form or admission decision.
+
+## Tech stack
+
+- Next.js 16 App Router
 - React 19
 - TypeScript with strict checking
 - Tailwind CSS 4
-- Local TypeScript seed data and mock services
+- Local TypeScript seed data and service modules
+- Browser `localStorage` for device-local preferences and simulation state
+- Node's built-in test runner for domain tests
 
-No authentication, database, or external government integration is used.
+No secrets, authentication, database or external runtime integration are required.
 
-## Unified admission and spot-round simulation
+## Codex
 
-The versioned `admissionsetu:admission-simulation:v2` device-local state contains Aarya's current admission, a deliberately small synthetic seat inventory, one fictional connected-counselling record, spot-round interests, queues, offers, deterministic events, and the latest vacancy change. Invalid or stale stored inventory is reset safely to the deterministic seed.
+The prototype was developed iteratively with OpenAI Codex. Codex supported project scaffolding, domain modelling, implementation, automated tests, focused refactors and browser-led QA. Product decisions and the final prototype scope remained part of the human-directed hackathon workflow.
 
-- **One student → one current admission state:** transitions reject any result that would leave Aarya holding two participating seats.
-- **One seat → one live seat state:** availability is counted only from synthetic seat records whose lifecycle is `AVAILABLE`; there is no separately mutable vacancy count.
-- Official institute and programme records remain immutable reference metadata. Synthetic seats reference official programme choice codes, but their quantities, ownership, and lifecycle states are entirely fictional.
-- The connected JEE-based counselling event is mocked locally. No CET, JoSAA, JEE, or cross-government API exists in this prototype.
-- Spot-round offers reference the same Phase 4 synthetic seat records. Accepting the PICT ENTC offer calls the shared seat-acceptance transition, releases Aarya's previous AISSMS seat exactly once, and closes her remaining active spot interests.
-- Declining or simulating expiry returns the offered seat and preserves Aarya's existing admission.
-- Reset Demo restores admission, vacancy, interests, queue progress, participants, offers, and the deterministic timer. It does not delete Phase 3 preference selections.
-- No action submits an official admission, contacts an institute, or sends a notification.
+## Running locally
 
-## Run locally
-
-Requirements: Node.js 20.9 or newer and npm.
+Requires Node.js 20.9 or newer and npm.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000). No seeding, sign-in or environment variables are required.
 
-Useful validation commands:
+Validation commands:
 
 ```bash
 npm run lint
 npm run typecheck
 npm test
 npm run build
+git diff --check
 ```
 
-## Data disclaimer
+## Device-local state
 
-The repository keeps public catalog records separate from synthetic admission simulation data:
+- Admission and spot-round simulation: `admissionsetu:admission-simulation:v2`
+- Ordered CAP preferences: `admissionsetu:candidate-preferences:v2`
+- Legacy explorer shortlist migration source: `admissionsetu:preference-shortlist:v1`
 
-- `src/data/official/` contains the manually curated public institute, programme, intake, and limited historical cutoff records used by the explorer. Every record carries its academic year, official CET Cell source URL, and access date.
-- `src/data/colleges.ts`, `src/data/candidate.ts`, `src/data/dashboard.ts`, `src/data/admission-simulation.ts`, and `src/data/spot-rounds.ts` contain synthetic records used to demonstrate the candidate journey, current admission, vacancies, dates, queues, offers, and seat transitions.
-- Aarya Deshmukh, her scores, preferences, seat ownership, deadlines, and all live-state concepts are synthetic. No student identity, ownership, vacancy, queue, or offer data was obtained from public sources.
-- Missing cutoff values are displayed as unavailable. The prototype does not infer or estimate them.
-
-### Official public sources
-
-- [Maharashtra CET Cell FE 2026–27 portal](https://fe2026.mahacet.org/StaticPages/HomePage) — source for the Phase 3 Round III rule: an allotment within the first six preferences is auto-frozen and ends eligibility for subsequent rounds; for an allotment outside the first six, a candidate seeking betterment must accept the seat and select Not Freeze / Betterment according to the official process. This source does not make the curated 2025–26 catalog current-cycle availability data.
-- [Maharashtra CET Cell 2025–26 participating institutes list](https://fe2025.mahacet.org/StaticPages/frmInstituteList) — institute and overall intake reference.
-- Official 2025–26 institute summaries at `https://fe2025.mahacet.org/StaticPages/frmInstituteSummary?InstituteCode={code}` — institute status, autonomy, programme choice code, sanctioned intake, shift, and gender. Each curated institute stores its exact resolved URL.
-- [Official 2024–25 Maharashtra CAP Round III cutoff list](https://fe2025.mahacet.org/2024/2024ENGG_CAP3_CutOff.pdf) — source for the limited cutoff observations shown in the explorer.
-
-The public subset was manually curated on 27 August 2026 for a hackathon demonstration. There is no runtime scraping, live CET integration, or claim of completeness. Students must check the current CET Cell portal and admission notices before acting.
-
-## Local preference data
-
-Phase 3 stores ordered preferences in `admissionsetu:candidate-preferences:v2`. On first use, valid programme IDs from the Phase 2 `admissionsetu:preference-shortlist:v1` key are migrated in their existing order with a neutral `UNSURE` acceptance intent. Invalid, stale, and duplicate entries are ignored safely. A persisted demo confirmation contains the ordered snapshot and deterministic demo timestamp; any later list or intent change marks that snapshot as needing review without deleting it. Reset Demo does not modify either preference key.
+**Reset Demo** restores the admission, seat inventory, vacancies, interests, queue progress, offers and event history. It deliberately does not clear saved CAP preferences.

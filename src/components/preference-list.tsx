@@ -300,7 +300,7 @@ export function PreferenceBuilder({
             <p className="context-label">Current admission state</p>
             <h2 id="current-seat-title">No admission currently held</h2>
           </div>
-          <p>The admission simulation has no current seat for Aarya. Your saved preferences remain available and unchanged.</p>
+          <p>Aarya has no current seat in the demo. Your saved preferences remain available and unchanged.</p>
         </section>
       );
     }
@@ -320,7 +320,7 @@ export function PreferenceBuilder({
             <dd>{currentSeat.bettermentActive ? "Active" : "Not active"}</dd>
           </div>
         </dl>
-        <p>{currentSeat.kind === "CONNECTED_ADMISSION" ? "This fictional connected admission is now Aarya's single current admission in the simulation. Preference review does not change it." : "This remains your current seat unless the simulated admission process gives you a higher preference or you intentionally exit. This page does not change it."}</p>
+        <p>{currentSeat.kind === "CONNECTED_ADMISSION" ? "This fictional connected admission is now Aarya's single current admission in the simulation. Preference review does not change it." : currentSeat.bettermentActive ? "This remains your current seat unless the simulated admission process gives you a higher preference or you intentionally exit. This page does not change it." : "This is your current seat. Your saved CAP preferences remain unchanged, and Betterment is not active in this demo."}</p>
       </section>
     );
   }
@@ -532,7 +532,7 @@ export function PreferenceBuilder({
         <h2 id="confirmed-title">Your {cycle.roundLabel} preference order is confirmed</h2>
         <p className="confirmed-lead">This is a simulated AdmissionSetu confirmation. Nothing has been submitted to the CET Cell, and your current seat remains unchanged.</p>
         <dl className="confirmation-details">
-          <div><dt>Prototype reference</dt><dd>{submission?.id ?? `demo-option-form-round-${rule.round}`}</dd></div>
+          <div><dt>Demo reference</dt><dd>{submission?.id ?? `demo-option-form-round-${rule.round}`}</dd></div>
           <div><dt>Confirmed at</dt><dd>{formatConfirmedAt(submission?.confirmedAt ?? cycle.deterministicConfirmationAt)}</dd></div>
           <div><dt>Preferences</dt><dd>{preferences.length}</dd></div>
           <div><dt>Current admission</dt><dd>{currentSeat ? `${currentSeat.instituteShortName} · held` : "None held"}</dd></div>

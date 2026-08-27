@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import { CollegeExplorer } from "@/components";
 import { mockCandidateService, mockOfficialCatalogService } from "@/services";
+
+export const metadata: Metadata = {
+  title: "College Explorer",
+  description: "Explore sourced CET institutes, programmes, intake and historical cutoff references.",
+};
 
 export default async function ExplorePage() {
   const [catalog, candidate] = await Promise.all([

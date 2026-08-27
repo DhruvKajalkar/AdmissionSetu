@@ -115,7 +115,7 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, sour
   return (
     <>
       <PageHeader
-        eyebrow="Official public catalog · curated prototype subset"
+        eyebrow="Official CET reference data · curated subset"
         title="Explore Pune engineering colleges"
         description={`Search ${institutes.length} institutes and ${programs.length} programmes using official CET Cell institute and intake records.`}
         action={<Link className="header-shortlist-link" href="/preferences">My Preferences · {count}</Link>}
@@ -123,7 +123,7 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, sour
 
       <section className="candidate-context" aria-labelledby="candidate-context-title">
         <div>
-          <p id="candidate-context-title">Candidate context</p>
+          <p id="candidate-context-title">Synthetic demo candidate</p>
           <strong>{candidate.name}</strong>
         </div>
         <dl>

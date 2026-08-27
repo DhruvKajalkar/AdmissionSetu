@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import type { ReactNode } from "react";
-import { AppNavigation, AppNavigationFallback, CitizenProviders } from "@/components";
+import { AppNavigation, AppNavigationFallback, CitizenProviders, DemoResetControl } from "@/components";
 import { createInitialAdmissionSimulationState, demoCandidate, officialPrograms } from "@/data";
 
 export default function CitizenLayout({ children }: { children: ReactNode }) {
@@ -15,9 +15,7 @@ export default function CitizenLayout({ children }: { children: ReactNode }) {
           <AppNavigation />
         </Suspense>
         <div className="app-main">
-          <div className="prototype-banner" role="status">
-            Hackathon prototype · Candidate, admission, vacancy, and seat states are synthetic. Explorer catalog sources are labelled.
-          </div>
+          <DemoResetControl />
           <main className="page-container">{children}</main>
         </div>
       </div>
