@@ -2,6 +2,7 @@ export { AdmissionAlert } from "./admission-alert";
 export { AdmissionControl } from "./admission-control";
 export { AdmissionJourney } from "./admission-journey";
 export { AdmissionSimulationProvider, useAdmissionSimulation } from "./admission-simulation-provider";
+export { AdmissionSetuMark } from "./admission-setu-mark";
 export { AppNavigation, AppNavigationFallback } from "./app-navigation";
 export { CollegeExplorer } from "./college-explorer";
 export { CitizenProviders } from "./citizen-providers";

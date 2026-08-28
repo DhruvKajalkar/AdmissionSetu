@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { AdmissionSetuMark } from "./admission-setu-mark";
 import { usePreferenceShortlist } from "./preference-shortlist";
 
 const navigation = [
@@ -25,7 +26,7 @@ export function AppNavigation() {
     <>
       <aside className="app-sidebar" aria-label="Primary navigation">
         <Link className="brand sidebar-brand" href="/dashboard" aria-label="AdmissionSetu dashboard">
-          <span className="brand-mark" aria-hidden="true">AS</span>
+          <AdmissionSetuMark className="brand-mark" />
           <span>AdmissionSetu</span>
         </Link>
 
@@ -57,7 +58,7 @@ export function AppNavigation() {
 
       <header className="mobile-app-header">
         <Link className="brand" href="/dashboard" aria-label="AdmissionSetu dashboard">
-          <span className="brand-mark" aria-hidden="true">AS</span>
+          <AdmissionSetuMark className="brand-mark" />
           <span>AdmissionSetu</span>
         </Link>
         <span className="profile-avatar" aria-label="Aarya Deshmukh">AD</span>

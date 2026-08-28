@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { AdmissionSetuMark } from "@/components";
 
 export default function HomePage() {
   return (
     <main className="landing-shell">
       <header className="landing-header" aria-label="AdmissionSetu header">
         <Link className="brand" href="/" aria-label="AdmissionSetu home">
-          <span className="brand-mark" aria-hidden="true">AS</span>
+          <AdmissionSetuMark className="brand-mark" />
           <span>AdmissionSetu</span>
         </Link>
         <span className="prototype-pill">Hackathon prototype</span>

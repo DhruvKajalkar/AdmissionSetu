@@ -558,16 +558,13 @@ a {
 }
 
 .brand-mark {
-  display: grid;
   width: 38px;
   height: 38px;
-  place-items: center;
+  flex: 0 0 38px;
+  padding: 7px;
   border-radius: 7px;
   background: var(--navy-900);
   color: var(--white);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.04em;
 }
 
 .prototype-pill {
@@ -689,6 +686,8 @@ a {
   .brand-mark {
     width: 34px;
     height: 34px;
+    flex-basis: 34px;
+    padding: 6px;
   }
 
   .prototype-pill {
@@ -1413,6 +1412,8 @@ a {
   .mobile-app-header .brand-mark {
     width: 34px;
     height: 34px;
+    flex-basis: 34px;
+    padding: 6px;
   }
 
   .mobile-nav {
