@@ -2,17 +2,20 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { V2_HERO_OFFER_ROUND_ID } from "@/data";
 import {
-  getCandidateSpotStatus,
-  getSpotRoundAvailableSeats,
-  isActiveSpotInterest,
+  buildMeritList,
+  getCandidateClearingInterest,
+  getCandidateMeritPosition,
+  getProgrammeVacancies,
+  getRoundAwaitingOffers,
 } from "@/services";
 import type { OfficialInstitute, OfficialProgram } from "@/types";
 import { useAdmissionSimulation } from "./admission-simulation-provider";
 import { PageHeader } from "./page-header";
 import { StatusBadge } from "./status-badge";
 
-type PendingDecision = "ACCEPT" | "DECLINE" | "EXPIRE" | "RESET" | null;
+type Decision = "ACCEPT" | "DECLINE" | "RESET" | null;
 
 function formatEventTime(value: string) {
   return new Intl.DateTimeFormat("en-IN", {
@@ -22,10 +25,13 @@ function formatEventTime(value: string) {
   }).format(new Date(value));
 }
 
-function formatCountdown(seconds: number) {
-  const minutes = Math.floor(seconds / 60).toString().padStart(2, "0");
-  const remainder = (seconds % 60).toString().padStart(2, "0");
-  return `${minutes}:${remainder}`;
+function interestStatusLabel(status?: string) {
+  if (status === "OFFERED") return "Offer pending";
+  if (status === "ACCEPTED") return "Accepted";
+  if (status === "CLOSED_AFTER_ACCEPTANCE") return "Withdrawn after another admission";
+  if (status === "DECLINED") return "Offer declined";
+  if (status === "WITHDRAWN" || !status) return "Not active";
+  return "Waiting";
 }
 
 export function SpotRoundLive({
@@ -40,160 +46,147 @@ export function SpotRoundLive({
   const {
     state,
     lastError,
-    joinRound,
-    leaveRound,
-    advanceRound,
-    acceptRoundOffer,
-    declineRoundOffer,
-    expireRoundOffer,
+    advanceClearing,
+    acceptMeritOffer,
+    declineMeritOffer,
     resetDemo,
     clearError,
   } = useAdmissionSimulation();
-  const [pendingDecision, setPendingDecision] = useState<PendingDecision>(null);
+  const [decision, setDecision] = useState<Decision>(null);
   const [resetComplete, setResetComplete] = useState(false);
   const round = state.spotRounds.find((item) => item.id === roundId);
 
   if (!round) {
-    return <section className="spot-not-found"><h1>Spot round not found</h1><Link href="/spot-rounds">Return to Spot Rounds</Link></section>;
+    return <section className="spot-not-found"><h1>Merit round not found</h1><Link href="/spot-rounds">Return to Spot Rounds</Link></section>;
   }
 
   const institute = institutes.find((item) => item.code === round.instituteCode);
   const program = programs.find((item) => item.choiceCode === round.programId);
-  const candidateStatus = getCandidateSpotStatus(round);
-  const active = isActiveSpotInterest(candidateStatus);
-  const available = getSpotRoundAvailableSeats(state, round.id);
-  const outcome = state.lastSpotRoundOutcome?.roundId === round.id ? state.lastSpotRoundOutcome : null;
+  if (!institute || !program) return null;
+
+  const meritList = buildMeritList(roundId, state);
+  const candidatePosition = getCandidateMeritPosition(state, roundId);
+  const candidateInterest = getCandidateClearingInterest(state, state.candidateId, roundId);
+  const awaitingOffers = getRoundAwaitingOffers(state, roundId);
+  const candidateOffer = awaitingOffers.find((offer) => offer.candidateId === state.candidateId);
+  const available = getProgrammeVacancies(state, round.programId);
+  const outcome = state.clearing.lastOutcome?.roundId === roundId ? state.clearing.lastOutcome : null;
   const previousProgram = outcome ? programs.find((item) => item.choiceCode === outcome.previousProgramId) : undefined;
   const previousInstitute = previousProgram ? institutes.find((item) => item.code === previousProgram.instituteCode) : undefined;
-  const offerAwaiting = round.offer?.status === "AWAITING_DECISION";
-  const accepted = outcome?.status === "ACCEPTED";
-  const liveRoundId = round.id;
+  const recentEvents = [...state.clearing.events]
+    .filter((event) => !event.roundId || event.roundId === roundId || event.candidateId === state.candidateId)
+    .reverse()
+    .slice(0, 8);
 
-  function completeDecision(decision: PendingDecision) {
-    let succeeded = false;
-    if (decision === "ACCEPT") succeeded = acceptRoundOffer(liveRoundId);
-    if (decision === "DECLINE") succeeded = declineRoundOffer(liveRoundId);
-    if (decision === "EXPIRE") succeeded = expireRoundOffer(liveRoundId);
+  function completeDecision() {
+    if (decision === "ACCEPT" && candidateOffer && acceptMeritOffer(candidateOffer.id)) setDecision(null);
+    if (decision === "DECLINE" && candidateOffer && declineMeritOffer(candidateOffer.id)) setDecision(null);
     if (decision === "RESET") {
       resetDemo();
       setResetComplete(true);
-      succeeded = true;
+      setDecision(null);
     }
-    if (succeeded && decision !== "RESET") setResetComplete(false);
-    if (succeeded) setPendingDecision(null);
   }
-
-  if (!institute || !program) return null;
 
   return (
     <>
       <PageHeader
-        eyebrow="Centralized live online spot round"
+        eyebrow="Synchronized merit clearing"
         title={institute.commonName}
         description={program.name}
         action={<StatusBadge tone={round.status === "LIVE" ? "danger" : "info"}>{round.status}</StatusBadge>}
       />
 
       <div className="spot-live-disclaimer">
-        <strong>Demo live simulation</strong>
-        <span>This guided demo queue is not a real institute round or admission authority.</span>
+        <strong>Synthetic clearing data</strong>
+        <span>Positions use a simplified global merit rank. This is a proposed prototype model, not a statement of current CET policy.</span>
       </div>
 
-      {resetComplete ? <div className="demo-reset-feedback" role="status"><strong>Demo reset complete.</strong><span>The original AISSMS seat, vacancies and live-round state were restored. Saved preferences were not changed.</span></div> : null}
+      {resetComplete ? <div className="demo-reset-feedback" role="status"><strong>V2 demo reset complete.</strong><span>The original AISSMS admission, seats, interests, offers and merit lists were restored. Saved preferences were not changed.</span></div> : null}
+      {lastError ? <div className="simulation-error" role="alert"><strong>Clearing action could not be completed.</strong><span>{lastError.message}</span><button type="button" onClick={clearError}>Dismiss</button></div> : null}
 
-      {lastError ? (
-        <div className="simulation-error" role="alert">
-          <strong>Demo event could not be completed.</strong><span>{lastError.message}</span>
-          <button type="button" onClick={clearError}>Dismiss</button>
-        </div>
-      ) : null}
-
-      {accepted && outcome && previousProgram && previousInstitute ? (
-        <section className="spot-admission-success" aria-labelledby="spot-success-title">
+      {outcome && previousProgram && previousInstitute ? (
+        <section className="clearing-success" aria-labelledby="clearing-success-title">
           <div className="spot-success-check" aria-hidden="true">✓</div>
-          <p>Admission confirmed</p>
-          <h2 id="spot-success-title">{institute.commonName}</h2>
-          <h3>{program.name}</h3>
-          <div className="spot-success-grid">
-            <article><span>New admission</span><strong>{institute.commonName} — {program.name}</strong><small>Accepted through the demo live spot round</small></article>
-            <article><span>Previous admission</span><strong>{previousInstitute.commonName} — {previousProgram.name}</strong><small>Released</small></article>
-            <article><span>Remaining spot interests</span><strong>Closed</strong><small>{outcome.closedInterestCount ? `${outcome.closedInterestCount} active interest${outcome.closedInterestCount === 1 ? " was" : "s were"} withdrawn` : "No other active interests"}</small></article>
-            <article><span>Seat released</span><strong>{previousInstitute.commonName} vacancy returned</strong><small>{outcome.previousAvailabilityBefore} → {outcome.previousAvailabilityAfter}</small></article>
+          <p>Synchronized admission confirmed</p>
+          <h2 id="clearing-success-title">{institute.commonName} — {program.name}</h2>
+          <span>Aarya now has one active participating admission. Every competing list and affected seat was updated in one domain operation.</span>
+          <div className="clearing-success-grid">
+            <article><small>New admission</small><strong>{institute.commonName}</strong><span>{program.name}</span></article>
+            <article><small>Previous admission</small><strong>{previousInstitute.commonName} released</strong><span>{previousProgram.name}</span></article>
+            <article><small>AISSMS availability</small><strong>{outcome.previousAvailabilityBefore} → {outcome.previousAvailabilityAfterRelease}</strong><span>Released exactly once</span></article>
+            <article><small>Competing lists</small><strong>{outcome.closedRoundIds.length} closed</strong><span>PICT, PCCOE and MMCOE recomputed</span></article>
           </div>
-          <p className="spot-success-explanation">{outcome.closedInterestCount ? "Your remaining active spot-round interests were closed after you confirmed this seat." : "You had no other active spot-round interests to close."}</p>
-          <div className="spot-success-actions"><Link className="primary-link-button" href="/vacancies">View Updated Vacancies</Link><Link className="secondary-link-button" href="/dashboard">Open dashboard</Link></div>
+          {outcome.generatedOfferIds.length ? <p className="clearing-next-offer">The released AISSMS seat immediately produced the next merit offer. Current available count: {outcome.previousAvailabilityCurrent}; the released seat is now counted as offered, not available.</p> : null}
+          <section className="movement-summary" aria-labelledby="movement-title">
+            <h3 id="movement-title">Cascading queue movement</h3>
+            <ul>
+              {outcome.movements.slice(0, 8).map((movement) => {
+                const movedRound = state.spotRounds.find((item) => item.id === movement.roundId);
+                const movedProgram = programs.find((item) => item.choiceCode === movedRound?.programId);
+                const movedInstitute = institutes.find((item) => item.code === movedRound?.instituteCode);
+                return <li key={`${movement.roundId}-${movement.candidateId}`}><strong>{movedInstitute?.commonName} {movedProgram?.name}</strong><span>{movement.displayLabel}: #{movement.fromPosition} → #{movement.toPosition}</span></li>;
+              })}
+            </ul>
+          </section>
+          <div className="spot-success-actions"><Link className="primary-link-button" href="/operations">View synchronized operations</Link><Link className="secondary-link-button" href="/vacancies">View live vacancies</Link><button className="secondary-action-button" type="button" onClick={() => setDecision("RESET")}>Reset V2 demo</button></div>
         </section>
       ) : (
         <>
-          {outcome?.status === "DECLINED" || outcome?.status === "EXPIRED" ? (
-            <section className="spot-resolution-card" role="status">
-              <p>{outcome.status === "DECLINED" ? "Offer declined" : "Demo offer expired"}</p>
-              <h2>Your AISSMS admission remains unchanged</h2>
-              <p>The offered PICT seat returned to the synthetic live round so the next eligible participant can move forward.</p>
-              <button className="secondary-action-button" type="button" onClick={() => setPendingDecision("RESET")}>Reset Demo</button>
-            </section>
-          ) : null}
-
-          <section className="spot-live-metrics" aria-label="Live round summary">
-            <article><span>Seats available</span><strong>{available}</strong><small>calculated from live demo seats</small></article>
-            <article><span>Your position</span><strong>{round.queuePosition}</strong><small>demo merit order</small></article>
-            <article><span>Candidates ahead</span><strong>{round.candidatesAhead}</strong><small>active entries before you</small></article>
-            <article><span>Active candidates</span><strong>{round.activeCandidates}</strong><small>anonymous demo participants</small></article>
+          <section className="clearing-live-metrics" aria-label="Current merit-list status">
+            <article><span>Seats represented</span><strong>{round.seatIds.length}</strong><small>exact synthetic seat records</small></article>
+            <article><span>Seats available</span><strong>{available}</strong><small>offered seats excluded</small></article>
+            <article><span>Your merit position</span><strong>{candidatePosition ? `#${candidatePosition.position}` : "—"}</strong><small>{candidatePosition ? `${candidatePosition.position - 1} candidate${candidatePosition.position === 2 ? "" : "s"} ahead` : interestStatusLabel(candidateInterest?.status)}</small></article>
+            <article><span>Offers pending</span><strong>{awaitingOffers.length}</strong><small>limited by available seats</small></article>
           </section>
 
-          {!active && !outcome && round.status !== "COMPLETED" ? (
-            <section className="spot-join-hero">
-              <div><p>Not yet in this queue</p><h2>Join the live demo merit queue</h2><span>Aarya will begin at queue position {round.queuePosition}. Joining does not release the current AISSMS seat.</span></div>
-              <button className="primary-action-button" type="button" onClick={() => joinRound(round.id)}>Join Spot Round</button>
+          {roundId === V2_HERO_OFFER_ROUND_ID && state.clearing.heroScenario.status === "READY" ? (
+            <section className="clearing-trigger-card">
+              <div><p>Deterministic demo event</p><h2>Advance the VIT merit list</h2><span>Two higher-ranked candidates confirm other choices. Aarya moves from #3 to the next offerable position.</span></div>
+              <button className="primary-action-button" type="button" onClick={advanceClearing}>Make VIT seat offerable</button>
             </section>
           ) : null}
 
-          {active && !offerAwaiting ? (
-            <section className="spot-waiting-status" role="status" aria-live="polite">
-              <span className="spot-live-pulse" aria-hidden="true" />
-              <div><p>{candidateStatus === "ELIGIBLE" ? "You are next for an offer" : "You are currently waiting"}</p><small>The queue changes when you select Advance Demo Event.</small></div>
+          {candidateOffer ? (
+            <section className="clearing-offer-card" aria-labelledby="offer-title">
+              <div><p>Offer pending</p><h2 id="offer-title">{institute.commonName} — {program.name}</h2><span>Exact seat: {candidateOffer.seatId}</span></div>
+              <div className="offer-consequence">
+                <strong>Before you decide</strong>
+                <p>Accepting makes this your only participating admission, releases your AISSMS Computer seat, and closes PICT, PCCOE and MMCOE interests immediately.</p>
+              </div>
+              <div className="clearing-offer-actions"><button className="primary-action-button" type="button" onClick={() => setDecision("ACCEPT")}>Accept VIT seat</button><button className="secondary-action-button" type="button" onClick={() => setDecision("DECLINE")}>Decline offer</button></div>
             </section>
           ) : null}
 
-          {offerAwaiting && round.offer ? (
-            <section className="spot-offer-panel" aria-labelledby="spot-offer-title" aria-live="assertive">
-              <div className="spot-offer-heading"><div><p>Seat offered to you</p><h2 id="spot-offer-title">{institute.commonName} · {program.name}</h2><span>Awaiting your decision</span></div><div className="spot-countdown"><span>Demo decision window</span><strong>{formatCountdown(round.offer.remainingSeconds)} remaining</strong><small>Simulated timer — no real policy</small></div></div>
-              <div className="spot-offer-consequence"><div><span>Current seat</span><strong>AISSMS COE</strong><small>Computer Engineering</small></div><span aria-hidden="true">→</span><div><span>New seat</span><strong>{institute.commonName}</strong><small>{program.name}</small></div></div>
-              <p>Accepting will release the AISSMS seat exactly once, confirm this PICT seat, and close your other active spot interests.</p>
-              <div className="spot-offer-actions"><button className="primary-action-button" type="button" onClick={() => setPendingDecision("ACCEPT")}>Accept Seat</button><button className="secondary-action-button" type="button" onClick={() => setPendingDecision("DECLINE")}>Decline</button><button className="spot-expiry-button" type="button" onClick={() => setPendingDecision("EXPIRE")}>Simulate Offer Expiry</button></div>
+          <div className="clearing-detail-grid">
+            <section className="live-merit-list" aria-labelledby="merit-list-title">
+              <header><div><p>Live merit list</p><h2 id="merit-list-title">Ranked candidate queue</h2></div><span>{meritList.length} active</span></header>
+              {meritList.length ? <ol>
+                {meritList.slice(0, 10).map((entry) => <li className={entry.isDemoCandidate ? "is-aarya" : ""} key={entry.candidateId}><span>#{entry.position}</span><div><strong>{entry.displayLabel}</strong><small>Synthetic merit {entry.meritRank}</small></div><em>{entry.status === "OFFERED" ? "OFFERED" : "WAITING"}</em></li>)}
+              </ol> : <p className="empty-merit-list">No active candidates remain in this merit list.</p>}
             </section>
-          ) : null}
 
-          {active && !offerAwaiting ? (
-            <section className="spot-demo-controller" aria-labelledby="demo-controller-title">
-              <div><p>Demo control</p><h2 id="demo-controller-title">Advance the live round without waiting</h2><span>Event {round.progressStep} of 5 completed. The same sequence runs after every Reset Demo.</span></div>
-              <div><button className="primary-action-button" type="button" disabled={round.progressStep >= 5} onClick={() => advanceRound(round.id)}>Advance Demo Event</button><button className="spot-leave-button" type="button" onClick={() => leaveRound(round.id)}>Leave Round</button></div>
+            <section className="clearing-event-log" aria-labelledby="clearing-log-title">
+              <header><p>Shared state</p><h2 id="clearing-log-title">Clearing event log</h2></header>
+              <ol>{recentEvents.map((event) => <li key={event.id}><time>{formatEventTime(event.occurredAt)}</time><div><strong>{event.title}</strong><span>{event.description}</span></div></li>)}</ol>
+              <Link href="/operations">Open technical operations view →</Link>
             </section>
-          ) : null}
-
-          <section className="spot-event-stream" aria-labelledby="spot-event-stream-title" aria-live="polite">
-            <div><p>Human-readable live updates</p><h2 id="spot-event-stream-title">Round activity</h2></div>
-            <ol>
-              {[...round.events].reverse().map((event) => (
-                <li key={event.id}><time dateTime={event.occurredAt}>{formatEventTime(event.occurredAt)}</time><span aria-hidden="true" /><div><strong>{event.title}</strong><p>{event.description}</p>{event.availabilityBefore !== undefined ? <small>Seats available: {event.availabilityBefore} → {event.availabilityAfter}</small> : null}</div></li>
-              ))}
-            </ol>
-          </section>
+          </div>
         </>
       )}
 
-      {pendingDecision ? (
-        <section className="simulation-confirmation" role="alertdialog" aria-modal="false" aria-labelledby="spot-decision-title">
-          <div>
-            <p>Confirm demo action</p>
-            <h2 id="spot-decision-title">{pendingDecision === "ACCEPT" ? "Accept PICT ENTC?" : pendingDecision === "DECLINE" ? "Decline this offer?" : pendingDecision === "EXPIRE" ? "Simulate offer expiry?" : "Reset the complete demo?"}</h2>
-            <p>{pendingDecision === "ACCEPT" ? "PICT ENTC will become your one active admission. AISSMS Computer Engineering will be released and its vacancy will increase from 2 to 3." : pendingDecision === "RESET" ? "The original AISSMS seat, queues, interests, offers and guided event progress will be restored. Saved preferences will remain untouched." : "The PICT seat will return to the live round. Your current AISSMS Computer Engineering admission will remain held."}</p>
-          </div>
-          <div><button className="secondary-action-button" type="button" onClick={() => setPendingDecision(null)}>Cancel</button><button className={pendingDecision === "RESET" ? "danger-action-button" : "primary-action-button"} type="button" onClick={() => completeDecision(pendingDecision)}>{pendingDecision === "ACCEPT" ? "Confirm Acceptance" : pendingDecision === "DECLINE" ? "Confirm Decline" : pendingDecision === "EXPIRE" ? "Expire Demo Offer" : "Reset Demo"}</button></div>
-        </section>
-      ) : null}
+      <div className="spot-back-row"><Link href="/spot-rounds">← All merit rounds</Link><Link href="/operations">Prototype operations view</Link></div>
 
-      <p className="spot-back-link"><Link className="text-link" href="/spot-rounds">← Back to all spot rounds</Link></p>
+      {decision ? (
+        <div className="confirmation-overlay" role="presentation">
+          <section className="confirmation-dialog" role="dialog" aria-modal="true" aria-labelledby="clearing-confirmation-title">
+            <p>Confirm clearing action</p>
+            <h2 id="clearing-confirmation-title">{decision === "ACCEPT" ? "Accept VIT Computer Engineering?" : decision === "DECLINE" ? "Decline this seat offer?" : "Reset the V2 demo?"}</h2>
+            <span>{decision === "ACCEPT" ? "Your AISSMS seat will release and all other active merit-list interests will close immediately." : decision === "DECLINE" ? "The exact VIT seat will move to the next eligible candidate." : "Seats, candidates, offers, queues and clearing events return to the deterministic starting state. Preferences remain unchanged."}</span>
+            <div><button className={decision === "ACCEPT" ? "primary-action-button" : "danger-action-button"} type="button" onClick={completeDecision}>{decision === "ACCEPT" ? "Confirm and accept seat" : decision === "DECLINE" ? "Confirm decline" : "Reset demo now"}</button><button className="secondary-action-button" type="button" onClick={() => setDecision(null)}>Go back</button></div>
+          </section>
+        </div>
+      ) : null}
     </>
   );
 }

@@ -1508,6 +1508,290 @@ a {
   }
 }
 
+/* V2 merit clearing network */
+.clearing-intro,
+.clearing-hero-event,
+.clearing-offer-banner,
+.clearing-accepted-banner,
+.operations-principle {
+  display: grid;
+  margin-bottom: 20px;
+  padding: 22px 24px;
+  border: 1px solid var(--slate-200);
+  border-left: 4px solid var(--blue-700);
+  border-radius: 9px;
+  background: var(--white);
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 24px;
+}
+
+.clearing-intro p,
+.clearing-hero-event p,
+.clearing-offer-banner p,
+.clearing-accepted-banner p,
+.operations-principle p,
+.clearing-trigger-card p,
+.clearing-offer-card > div:first-child p,
+.live-merit-list header p,
+.clearing-event-log header p,
+.operations-round header p,
+.operations-event-log header p {
+  margin: 0 0 5px;
+  color: var(--blue-700);
+  font-size: 0.59rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.clearing-intro h2,
+.clearing-hero-event h2,
+.clearing-offer-banner h2,
+.clearing-accepted-banner h2,
+.operations-principle h2,
+.clearing-trigger-card h2,
+.clearing-offer-card h2,
+.live-merit-list h2,
+.clearing-event-log h2,
+.operations-event-log h2 {
+  margin: 0;
+  color: var(--navy-950);
+  font-size: 1.05rem;
+}
+
+.clearing-intro > div > span,
+.clearing-hero-event span,
+.clearing-offer-banner span,
+.clearing-accepted-banner span,
+.operations-principle > div > span,
+.clearing-trigger-card span,
+.clearing-offer-card > div:first-child span {
+  display: block;
+  max-width: 720px;
+  margin-top: 7px;
+  color: var(--slate-600);
+  font-size: 0.69rem;
+  line-height: 1.5;
+}
+
+.clearing-intro dl {
+  display: grid;
+  margin: 0;
+  padding: 0 22px;
+  border-right: 1px solid var(--slate-200);
+  border-left: 1px solid var(--slate-200);
+  grid-template-columns: repeat(2, minmax(100px, 1fr));
+  gap: 20px;
+}
+
+.clearing-intro dt,
+.merit-round-card dt,
+.operations-seat-summary dt {
+  color: var(--slate-500);
+  font-size: 0.56rem;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.clearing-intro dd,
+.merit-round-card dd,
+.operations-seat-summary dd {
+  margin: 4px 0 0;
+  color: var(--navy-950);
+  font-size: 0.83rem;
+  font-weight: 850;
+}
+
+.clearing-hero-event { border-left-color: var(--amber-700); background: var(--amber-50); grid-template-columns: minmax(0, 1fr) auto; }
+.clearing-offer-banner { border-left-color: var(--red-700); background: var(--red-50); grid-template-columns: minmax(0, 1fr) auto; }
+.clearing-accepted-banner { border-left-color: var(--teal-700); background: var(--teal-50); grid-template-columns: minmax(0, 1fr) auto; }
+
+.merit-round-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.merit-round-card {
+  display: flex;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--slate-200);
+  border-radius: 9px;
+  background: var(--white);
+  flex-direction: column;
+}
+
+.merit-round-card > header,
+.operations-round > header,
+.operations-event-log > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.merit-round-card > header > div { display: flex; align-items: center; gap: 8px; }
+.merit-round-card > header > div > span { color: var(--blue-700); font-size: 0.68rem; font-weight: 850; }
+.merit-round-card > header small { color: var(--slate-500); font-size: 0.58rem; }
+.merit-round-card > h2 { margin: 12px 0 18px; color: var(--navy-950); font-size: 0.98rem; line-height: 1.35; }
+.merit-round-card > dl { display: grid; margin: auto 0 0; padding: 15px; border-radius: 7px; background: var(--slate-50); grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
+.merit-round-actions { display: flex; margin-top: 16px; align-items: center; gap: 9px; flex-wrap: wrap; }
+.merit-round-actions button { min-height: 44px; }
+
+.clearing-live-metrics {
+  display: grid;
+  margin-bottom: 18px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.clearing-live-metrics article {
+  display: flex;
+  padding: 17px;
+  border: 1px solid var(--slate-200);
+  border-radius: 8px;
+  background: var(--white);
+  flex-direction: column;
+}
+
+.clearing-live-metrics span { color: var(--slate-500); font-size: 0.59rem; font-weight: 850; text-transform: uppercase; }
+.clearing-live-metrics strong { margin: 7px 0 3px; color: var(--navy-950); font-size: 1.35rem; }
+.clearing-live-metrics small { color: var(--slate-500); font-size: 0.6rem; }
+
+.clearing-trigger-card,
+.clearing-offer-card {
+  display: grid;
+  margin-bottom: 18px;
+  padding: 22px;
+  border: 1px solid #e4c784;
+  border-left: 4px solid var(--amber-700);
+  border-radius: 9px;
+  background: var(--amber-50);
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+}
+
+.clearing-offer-card { border-color: #e4bbb6; border-left-color: var(--red-700); background: var(--red-50); grid-template-columns: minmax(0, 0.7fr) minmax(300px, 1fr); }
+.offer-consequence { padding-left: 22px; border-left: 1px solid #e4bbb6; }
+.offer-consequence strong { color: var(--red-700); font-size: 0.68rem; }
+.offer-consequence p { margin: 6px 0 0; color: var(--slate-700); font-size: 0.69rem; line-height: 1.5; }
+.clearing-offer-actions { display: flex; grid-column: 1 / -1; gap: 9px; }
+
+.clearing-detail-grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.75fr); gap: 16px; }
+.live-merit-list,
+.clearing-event-log,
+.operations-event-log { overflow: hidden; border: 1px solid var(--slate-200); border-radius: 9px; background: var(--white); }
+.live-merit-list > header,
+.clearing-event-log > header,
+.operations-event-log > header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--slate-200); }
+.live-merit-list > header > span { color: var(--slate-500); font-size: 0.62rem; font-weight: 850; }
+.live-merit-list ol,
+.clearing-event-log ol,
+.operations-merit-list,
+.operations-event-log ol,
+.movement-summary ul { margin: 0; padding: 0; list-style: none; }
+.live-merit-list li { display: grid; padding: 13px 20px; border-bottom: 1px solid var(--slate-100); grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.live-merit-list li.is-aarya,
+.operations-merit-list li.is-aarya { background: var(--blue-50); }
+.live-merit-list li > span { color: var(--blue-700); font-size: 0.7rem; font-weight: 850; }
+.live-merit-list li div { display: flex; flex-direction: column; gap: 3px; }
+.live-merit-list li strong { color: var(--navy-900); font-size: 0.7rem; }
+.live-merit-list li small { color: var(--slate-500); font-size: 0.59rem; }
+.live-merit-list li em { color: var(--slate-600); font-size: 0.57rem; font-style: normal; font-weight: 850; }
+.empty-merit-list { margin: 0; padding: 22px; color: var(--slate-500); font-size: 0.7rem; }
+
+.clearing-event-log ol { max-height: 430px; overflow-y: auto; }
+.clearing-event-log li,
+.operations-event-log li { display: grid; padding: 14px 18px; border-bottom: 1px solid var(--slate-100); grid-template-columns: 54px minmax(0, 1fr); gap: 10px; }
+.clearing-event-log time,
+.operations-event-log time { color: var(--slate-500); font-size: 0.58rem; font-weight: 750; }
+.clearing-event-log li div,
+.operations-event-log li div { display: flex; flex-direction: column; gap: 4px; }
+.clearing-event-log li strong,
+.operations-event-log li strong { color: var(--navy-900); font-size: 0.68rem; }
+.clearing-event-log li span,
+.operations-event-log li span { color: var(--slate-600); font-size: 0.62rem; line-height: 1.45; }
+.clearing-event-log > a { display: block; padding: 14px 18px; color: var(--blue-700); font-size: 0.65rem; font-weight: 850; }
+
+.clearing-success { padding: 28px; border: 1px solid #b7ded6; border-top: 5px solid var(--teal-700); border-radius: 10px; background: var(--white); }
+.clearing-success > p { margin: 0 0 5px; color: var(--teal-700); font-size: 0.62rem; font-weight: 850; text-transform: uppercase; }
+.clearing-success > h2 { margin: 0; color: var(--navy-950); font-size: 1.35rem; }
+.clearing-success > span { display: block; max-width: 800px; margin-top: 8px; color: var(--slate-600); font-size: 0.73rem; line-height: 1.55; }
+.clearing-success-grid { display: grid; margin: 22px 0; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.clearing-success-grid article { display: flex; padding: 15px; border-radius: 7px; background: var(--slate-50); flex-direction: column; gap: 5px; }
+.clearing-success-grid small { color: var(--slate-500); font-size: 0.57rem; font-weight: 850; text-transform: uppercase; }
+.clearing-success-grid strong { color: var(--navy-900); font-size: 0.74rem; }
+.clearing-success-grid span { color: var(--slate-600); font-size: 0.62rem; line-height: 1.4; }
+.clearing-next-offer { padding: 13px 15px; border-left: 3px solid var(--blue-700); background: var(--blue-50); color: var(--navy-800) !important; font-size: 0.68rem !important; font-weight: 700 !important; line-height: 1.5; text-transform: none !important; }
+.movement-summary { margin-top: 20px; }
+.movement-summary h3 { margin: 0 0 10px; color: var(--navy-950); font-size: 0.88rem; }
+.movement-summary ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.movement-summary li { display: flex; padding: 12px; border: 1px solid var(--slate-200); border-radius: 6px; flex-direction: column; gap: 4px; }
+.movement-summary strong { color: var(--navy-900); font-size: 0.65rem; }
+.movement-summary span { color: var(--teal-700); font-size: 0.64rem; font-weight: 850; }
+
+.confirmation-overlay { position: fixed; z-index: 100; inset: 0; display: grid; padding: 20px; place-items: center; background: rgba(15, 32, 52, 0.58); }
+.confirmation-dialog { width: min(520px, 100%); padding: 26px; border-radius: 10px; background: var(--white); box-shadow: 0 24px 70px rgba(15, 32, 52, 0.28); }
+.confirmation-dialog > p { margin: 0 0 6px; color: var(--red-700); font-size: 0.59rem; font-weight: 850; text-transform: uppercase; }
+.confirmation-dialog h2 { margin: 0; color: var(--navy-950); font-size: 1.2rem; }
+.confirmation-dialog > span { display: block; margin: 10px 0 22px; color: var(--slate-600); font-size: 0.72rem; line-height: 1.55; }
+.confirmation-dialog > div { display: flex; gap: 9px; }
+
+.operations-principle { grid-template-columns: minmax(0, 1fr) auto; }
+.operations-rounds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.operations-round { overflow: hidden; border: 1px solid var(--slate-200); border-radius: 9px; background: var(--white); }
+.operations-round > header { padding: 18px 20px; border-bottom: 1px solid var(--slate-200); }
+.operations-round > header h2 { margin: 0; color: var(--navy-950); font-size: 0.9rem; }
+.operations-round > header span { color: var(--slate-500); font-size: 0.58rem; }
+.operations-seat-summary { display: grid; margin: 0; padding: 15px 20px; background: var(--slate-50); grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+.operations-list-heading { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px 8px; gap: 12px; }
+.operations-list-heading strong { color: var(--navy-900); font-size: 0.7rem; }
+.operations-list-heading span { color: var(--slate-500); font-size: 0.59rem; }
+.operations-merit-list li { display: grid; padding: 10px 20px; border-top: 1px solid var(--slate-100); grid-template-columns: 30px minmax(0, 1fr) 70px 62px; align-items: center; gap: 8px; }
+.operations-merit-list li > span { color: var(--blue-700); font-size: 0.65rem; font-weight: 850; }
+.operations-merit-list strong { color: var(--navy-900); font-size: 0.65rem; }
+.operations-merit-list small { color: var(--slate-500); font-size: 0.57rem; }
+.operations-merit-list em { color: var(--slate-600); font-size: 0.55rem; font-style: normal; font-weight: 850; }
+.operations-round > a { display: block; padding: 13px 20px; border-top: 1px solid var(--slate-100); color: var(--blue-700); font-size: 0.62rem; font-weight: 850; }
+.operations-event-log { margin-top: 18px; }
+.operations-event-log ol { max-height: 500px; overflow-y: auto; }
+.operations-event-log li small { color: var(--slate-500); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.57rem; line-height: 1.45; }
+
+@media (max-width: 1050px) {
+  .clearing-intro { grid-template-columns: 1fr auto; }
+  .clearing-intro > .secondary-link-button { grid-column: 1 / -1; justify-self: start; }
+  .clearing-success-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .operations-rounds { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 760px) {
+  .clearing-intro,
+  .clearing-hero-event,
+  .clearing-offer-banner,
+  .clearing-accepted-banner,
+  .operations-principle,
+  .clearing-trigger-card,
+  .clearing-offer-card { padding: 18px; grid-template-columns: 1fr; }
+  .clearing-intro dl { padding: 14px 0; border-right: 0; border-bottom: 1px solid var(--slate-200); border-left: 0; border-top: 1px solid var(--slate-200); }
+  .clearing-intro > .secondary-link-button { grid-column: auto; }
+  .merit-round-grid,
+  .clearing-detail-grid { grid-template-columns: 1fr; }
+  .clearing-live-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .clearing-offer-card .offer-consequence { padding-top: 14px; padding-left: 0; border-top: 1px solid #e4bbb6; border-left: 0; }
+  .clearing-offer-actions { grid-column: auto; flex-direction: column; }
+  .clearing-success { padding: 20px; }
+  .movement-summary ul { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 500px) {
+  .clearing-success-grid { grid-template-columns: 1fr; }
+  .confirmation-dialog > div { align-items: stretch; flex-direction: column; }
+}
+
 /* Phase 4 admission state and centralized vacancy exchange */
 .seat-release-feedback {
   display: grid;

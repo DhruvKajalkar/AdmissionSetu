@@ -11,6 +11,7 @@ export { DashboardView } from "./dashboard-view";
 export { DemoResetControl } from "./demo-reset-control";
 export { DocumentReadiness } from "./document-readiness";
 export { PageHeader } from "./page-header";
+export { OperationsView } from "./operations-view";
 export { PreferenceShortlistProvider, usePreferenceShortlist } from "./preference-shortlist";
 export { PreferenceBuilder } from "./preference-list";
 export { SectionCard } from "./section-card";

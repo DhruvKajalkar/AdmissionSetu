@@ -12,6 +12,7 @@ const navigation = [
   { label: "My Admission", shortLabel: "Admission", href: "/admission", index: "04" },
   { label: "Live Vacancies", shortLabel: "Vacancies", href: "/vacancies", index: "05" },
   { label: "Spot Rounds", shortLabel: "Spot Rounds", href: "/spot-rounds", index: "06" },
+  { label: "Operations", shortLabel: "Operations", href: "/operations", index: "07" },
 ] as const;
 
 function isRouteActive(pathname: string, href: string) {

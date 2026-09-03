@@ -32,7 +32,12 @@ export function DashboardView({ candidate, institutes, programs }: { candidate: 
   const journeyStages: readonly AdmissionJourneyStage[] = hasFinalAdmission
     ? admissionJourneyStages.map((stage) => {
       if (stage.id === "BETTERMENT") return { ...stage, description: "Earlier CAP Betterment stage completed in this demo" };
-      if (stage.id === "INSTITUTE_SPOT_ROUNDS") return { ...stage, description: admission?.kind === "PARTICIPATING_SEAT" ? "PICT ENTC live spot-round offer accepted" : "Connected counselling confirmation received" };
+      if (stage.id === "INSTITUTE_SPOT_ROUNDS") return {
+        ...stage,
+        description: admission?.kind === "PARTICIPATING_SEAT"
+          ? `${participatingInstitute?.commonName ?? "Participating institute"} ${participatingProgram?.name ?? "seat"} accepted through synchronized merit clearing`
+          : "Connected counselling confirmation received",
+      };
       if (stage.id === "FINAL_ADMISSION") return { ...stage, description: "Your new seat is confirmed as the one current admission" };
       return stage;
     })

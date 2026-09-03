@@ -24,6 +24,9 @@ export function AdmissionControl({ institutes, programs }: { institutes: readonl
   const connected = state.externalAdmissions[0];
   const feedbackProgram = state.lastFeedback ? programs.find((item) => item.choiceCode === state.lastFeedback?.programId) : undefined;
   const feedbackInstitute = feedbackProgram ? institutes.find((item) => item.code === feedbackProgram.instituteCode) : undefined;
+  const feedbackSeat = state.lastFeedback
+    ? state.seats.find((item) => item.id === state.lastFeedback?.seatId)
+    : undefined;
   const events = getAdmissionEvents(state);
 
   function complete(action: PendingAction) {
@@ -43,7 +46,7 @@ export function AdmissionControl({ institutes, programs }: { institutes: readonl
 
       {state.lastFeedback && feedbackProgram && feedbackInstitute ? (
         <section className="seat-release-feedback" role="status" aria-labelledby="release-feedback-title">
-          <span aria-hidden="true">✓</span><div><p>{state.lastFeedback.title}</p><h2 id="release-feedback-title">{feedbackInstitute.commonName} · {feedbackProgram.name}</h2><strong>Vacancies: {state.lastFeedback.availabilityBefore} → {state.lastFeedback.availabilityAfter}</strong><small>The specific synthetic seat is now AVAILABLE.</small></div><Link href="/vacancies">Open Live Vacancies →</Link>
+          <span aria-hidden="true">✓</span><div><p>{state.lastFeedback.title}</p><h2 id="release-feedback-title">{feedbackInstitute.commonName} · {feedbackProgram.name}</h2><strong>Vacancies: {state.lastFeedback.availabilityBefore} → {state.lastFeedback.availabilityAfter}</strong><small>{feedbackSeat?.lifecycleState === "OFFERED" ? "The released seat is now OFFERED to the next eligible candidate." : "The specific synthetic seat is now AVAILABLE."}</small></div><Link href="/vacancies">Open Live Vacancies →</Link>
         </section>
       ) : null}
       {lastError ? <div className="simulation-error" role="alert"><strong>Demo action could not be completed.</strong><span>{lastError.message}</span><button type="button" onClick={clearError}>Dismiss</button></div> : null}

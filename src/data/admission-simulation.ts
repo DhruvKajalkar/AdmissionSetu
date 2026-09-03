@@ -1,5 +1,7 @@
 import type {
   AdmissionSimulationState,
+  CandidateClearingProfile,
+  CandidateClearingInterest,
   ParticipantStatus,
   SimulationSeat,
   SpotRound,
@@ -10,6 +12,8 @@ import { demoCandidate } from "./candidate.ts";
 import { demoAdmissionCycle } from "./demo-cycle.ts";
 
 export const HERO_SPOT_ROUND_ID = "spot-pict-entc-live";
+export const V2_HERO_OFFER_ROUND_ID = "spot-vit-computer-live";
+export const AISSMS_CLEARING_ROUND_ID = "spot-aissms-computer-clearing";
 export const MAX_ACTIVE_SPOT_INTERESTS = 5;
 
 export const demoSimulationTimestamps = {
@@ -28,6 +32,11 @@ export const demoSimulationTimestamps = {
   acceptSpotOffer: "2026-08-27T10:13:00+05:30",
   declineSpotOffer: "2026-08-27T10:13:00+05:30",
   expireSpotOffer: "2026-08-27T10:22:42+05:30",
+  triggerClearingOffer: "2026-08-27T11:20:00+05:30",
+  acceptClearingOffer: "2026-08-27T11:21:00+05:30",
+  declineClearingOffer: "2026-08-27T11:21:00+05:30",
+  joinClearingRound: "2026-08-27T09:50:00+05:30",
+  leaveClearingRound: "2026-08-27T09:52:00+05:30",
 } as const;
 
 function seat(
@@ -111,9 +120,71 @@ function heroParticipants(): SpotRoundParticipant[] {
   ];
 }
 
+function interest(roundId: string): CandidateClearingInterest {
+  return { roundId, status: "WAITING", joinedAt: "2026-08-27T09:30:00+05:30" };
+}
+
+function clearingCandidate(
+  candidateId: string,
+  displayLabel: string,
+  meritRank: number,
+  roundIds: string[],
+  options: Pick<CandidateClearingProfile, "activeAdmissionSeatId" | "status"> = {
+    activeAdmissionSeatId: null,
+    status: "ACTIVE",
+  },
+): CandidateClearingProfile {
+  return {
+    candidateId,
+    displayLabel,
+    meritRank,
+    cetPercentile: Number((100 - meritRank / 10000).toFixed(5)),
+    activeAdmissionSeatId: options.activeAdmissionSeatId,
+    status: options.status,
+    interests: roundIds.map(interest),
+  };
+}
+
+function createInitialClearingCandidates(): CandidateClearingProfile[] {
+  const pict = HERO_SPOT_ROUND_ID;
+  const vit = V2_HERO_OFFER_ROUND_ID;
+  const pccoe = "spot-pccoe-aiml-upcoming";
+  const mmcoe = "spot-mmcoe-computer-upcoming";
+  const aissms = AISSMS_CLEARING_ROUND_ID;
+  const dyp = "spot-dypcoe-aids-upcoming";
+  return [
+    clearingCandidate("candidate-1042", "Candidate #1042", 412, [pict]),
+    clearingCandidate("candidate-1187", "Candidate #1187", 427, [pict, pccoe]),
+    clearingCandidate("candidate-2044", "Candidate #2044", 441, [pict]),
+    clearingCandidate("candidate-1014", "Candidate #1014", 401, [vit]),
+    clearingCandidate("candidate-1077", "Candidate #1077", 438, [vit]),
+    clearingCandidate("candidate-1126", "Candidate #1126", 390, [mmcoe, dyp]),
+    clearingCandidate("candidate-1219", "Candidate #1219", 405, [mmcoe, aissms]),
+    clearingCandidate("candidate-1328", "Candidate #1328", 420, [mmcoe]),
+    clearingCandidate("candidate-1436", "Candidate #1436", 433, [mmcoe, dyp]),
+    clearingCandidate("candidate-1510", "Candidate #1510", 450, [mmcoe, aissms]),
+    clearingCandidate(
+      demoCandidate.id,
+      "Aarya (you)",
+      463,
+      [pict, vit, pccoe, mmcoe],
+      { activeAdmissionSeatId: "AISSMS-COMP-DEMO-001", status: "ACTIVE" },
+    ),
+    clearingCandidate("candidate-2092", "Candidate #2092", 478, [pict, vit]),
+    clearingCandidate("candidate-2140", "Candidate #2140", 486, [pccoe, mmcoe]),
+    clearingCandidate("candidate-2268", "Candidate #2268", 502, [pict, aissms]),
+    clearingCandidate("candidate-2391", "Candidate #2391", 519, [vit, dyp]),
+    clearingCandidate("candidate-2475", "Candidate #2475", 533, [pccoe, aissms]),
+    clearingCandidate("candidate-2513", "Candidate #2513", 548, [mmcoe, dyp]),
+    clearingCandidate("candidate-2680", "Candidate #2680", 566, [pict, vit]),
+    clearingCandidate("candidate-2744", "Candidate #2744", 581, [aissms, dyp]),
+    clearingCandidate("candidate-2896", "Candidate #2896", 604, [pccoe, mmcoe]),
+  ];
+}
+
 export function createInitialAdmissionSimulationState(): AdmissionSimulationState {
   return {
-    version: 2,
+    version: 3,
     candidateId: demoCandidate.id,
     currentAdmission: {
       id: "DEMO-ADMISSION-AARYA-CAP-R2",
@@ -179,8 +250,24 @@ export function createInitialAdmissionSimulationState(): AdmissionSimulationStat
       round("spot-aissms-entc-upcoming", "06278", "0627837210", "UPCOMING", "2026-08-27T14:00:00+05:30", "2026-08-27T15:00:00+05:30", ["AISSMS-ENTC-DEMO-001"]),
       round("spot-dypcoe-aids-upcoming", "06272", "0627299510", "UPCOMING", "2026-08-27T15:30:00+05:30", "2026-08-27T16:30:00+05:30", ["DYPCOE-AIDS-DEMO-001", "DYPCOE-AIDS-DEMO-002"]),
       round("spot-modern-aids-completed", "06139", "0613999510", "COMPLETED", "2026-08-26T16:00:00+05:30", "2026-08-26T17:00:00+05:30", ["MODERN-AIDS-DEMO-001"]),
+      round(AISSMS_CLEARING_ROUND_ID, "06278", "0627824510", "LIVE", "2026-08-27T10:30:00+05:30", "2026-08-27T15:00:00+05:30", ["AISSMS-COMP-DEMO-001", "AISSMS-COMP-DEMO-002", "AISSMS-COMP-DEMO-003"]),
     ],
     lastSpotRoundOutcome: null,
+    clearing: {
+      version: 1,
+      candidates: createInitialClearingCandidates(),
+      offers: [],
+      events: [{
+        id: "CLEARING-EVENT-NETWORK-OPENED",
+        type: "MERIT_LIST_RECOMPUTED",
+        occurredAt: "2026-08-27T09:45:00+05:30",
+        title: "Merit clearing network opened",
+        description: "Synthetic programme merit lists are ready.",
+        technicalDetail: "All positions were derived from global merit rank, declared interest and candidate state.",
+      }],
+      heroScenario: { status: "READY" },
+      lastOutcome: null,
+    },
     updatedAt: demoAdmissionCycle.currentSeatAllottedAt,
   };
 }

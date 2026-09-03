@@ -369,7 +369,7 @@ export interface AdmissionSimulationFeedback {
 }
 
 export interface AdmissionSimulationState {
-  version: 2;
+  version: 3;
   candidateId: string;
   currentAdmission: SimulationCurrentAdmission | null;
   seats: SimulationSeat[];
@@ -378,6 +378,7 @@ export interface AdmissionSimulationState {
   lastFeedback: AdmissionSimulationFeedback | null;
   spotRounds: SpotRound[];
   lastSpotRoundOutcome: SpotRoundOutcome | null;
+  clearing: MeritClearingState;
   updatedAt: string;
 }
 
@@ -394,6 +395,9 @@ export type AdmissionTransitionErrorCode =
   | "SPOT_ROUND_NOT_JOINED"
   | "SPOT_EVENT_UNAVAILABLE"
   | "SPOT_OFFER_UNAVAILABLE"
+  | "CLEARING_CANDIDATE_NOT_FOUND"
+  | "CLEARING_OFFER_NOT_FOUND"
+  | "CLEARING_INTEREST_NOT_ACTIVE"
   | "INVALID_STATE";
 
 export interface AdmissionTransitionError {
@@ -479,4 +483,116 @@ export interface SpotRoundOutcome {
   previousAvailabilityBefore: number;
   previousAvailabilityAfter: number;
   closedInterestCount: number;
+}
+
+export type ClearingCandidateStatus = "ACTIVE" | "ADMITTED" | "INACTIVE";
+
+export type ClearingInterestStatus =
+  | "REGISTERED"
+  | "WAITING"
+  | "ELIGIBLE"
+  | "OFFERED"
+  | "ACCEPTED"
+  | "DECLINED"
+  | "WITHDRAWN"
+  | "CLOSED_AFTER_ACCEPTANCE";
+
+export interface CandidateClearingInterest {
+  roundId: string;
+  status: ClearingInterestStatus;
+  joinedAt: string;
+}
+
+export interface CandidateClearingProfile {
+  candidateId: string;
+  displayLabel: string;
+  meritRank: number;
+  cetPercentile?: number;
+  activeAdmissionSeatId: string | null;
+  status: ClearingCandidateStatus;
+  interests: CandidateClearingInterest[];
+}
+
+export type ClearingOfferStatus =
+  | "AWAITING_DECISION"
+  | "ACCEPTED"
+  | "DECLINED"
+  | "WITHDRAWN";
+
+export interface ClearingOffer {
+  id: string;
+  roundId: string;
+  candidateId: string;
+  seatId: string;
+  status: ClearingOfferStatus;
+  offeredAt: string;
+  remainingSeconds: number;
+}
+
+export interface MeritListEntry {
+  candidateId: string;
+  displayLabel: string;
+  meritRank: number;
+  position: number;
+  status: ClearingInterestStatus;
+  isDemoCandidate: boolean;
+}
+
+export interface ClearingQueueMovement {
+  roundId: string;
+  candidateId: string;
+  displayLabel: string;
+  fromPosition: number;
+  toPosition: number;
+}
+
+export type ClearingEventType =
+  | "INTEREST_JOINED"
+  | "INTEREST_WITHDRAWN"
+  | "SEAT_AVAILABLE"
+  | "OFFER_GENERATED"
+  | "OFFER_DECLINED"
+  | "OFFER_ACCEPTED"
+  | "PREVIOUS_SEAT_RELEASED"
+  | "COMPETING_LISTS_CLOSED"
+  | "MERIT_LIST_RECOMPUTED"
+  | "CANDIDATE_ADVANCED";
+
+export interface ClearingEvent {
+  id: string;
+  type: ClearingEventType;
+  occurredAt: string;
+  title: string;
+  description: string;
+  technicalDetail: string;
+  roundId?: string;
+  candidateId?: string;
+  seatId?: string;
+  movements?: ClearingQueueMovement[];
+}
+
+export interface ClearingAcceptanceOutcome {
+  offerId: string;
+  roundId: string;
+  seatId: string;
+  previousSeatId: string;
+  previousProgramId: string;
+  previousAvailabilityBefore: number;
+  previousAvailabilityAfterRelease: number;
+  previousAvailabilityCurrent: number;
+  closedRoundIds: string[];
+  movements: ClearingQueueMovement[];
+  generatedOfferIds: string[];
+  occurredAt: string;
+}
+
+export interface MeritClearingState {
+  version: 1;
+  candidates: CandidateClearingProfile[];
+  offers: ClearingOffer[];
+  events: ClearingEvent[];
+  heroScenario: {
+    status: "READY" | "OFFER_READY" | "ACCEPTED";
+  };
+  lastOutcome: ClearingAcceptanceOutcome | null;
 }

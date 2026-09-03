@@ -34,11 +34,12 @@ AdmissionSetu demonstrates one citizen-facing journey with:
 4. In **College Explorer**, show sourced PICT programme and cutoff references.
 5. In **My Preferences**, show the first-six auto-freeze zone and an **I'm not sure** warning.
 6. In **Live Vacancies**, note that AISSMS Computer Engineering starts with 2 demo vacancies.
-7. In **Spot Rounds**, join the live PICT ENTC round.
-8. Select **Advance Demo Event** five times; PICT availability briefly moves 2 → 3 and Aarya reaches the offer.
-9. Accept PICT ENTC and confirm the consequence.
-10. Show that AISSMS availability moved 2 → 3 and PICT is now Aarya's one current admission.
-11. Reload to show persistence, then use **Reset Demo** to restore the starting state without changing preferences.
+7. In **Spot Rounds**, show Aarya's derived positions across PICT, VIT, PCCOE and MMCOE.
+8. Select **Make VIT seat offerable** to recompute VIT's synthetic merit list and generate exact seat offers.
+9. Review and accept VIT Computer Engineering, then confirm the consequence.
+10. Show AISSMS availability moving 2 → 3, Aarya leaving three competing lists, and lower-ranked candidates advancing.
+11. Open **Operations** to show the synchronized queues, seats and event record from the same state.
+12. Reload to show persistence, then use **Reset Demo** to restore the starting state without changing preferences.
 
 See [DEMO.md](./DEMO.md) for the concise presenter walkthrough.
 
@@ -58,6 +59,14 @@ The subset was manually curated on 27 August 2026. It is not a live or complete 
 ### Synthetic demo information
 
 Aarya, her scores and documents, current admissions, seat ownership, live vacancies, spot rounds, queue positions, participants, offers, timers, deadlines and connected-counselling events are synthetic. Official programme codes are used only as references connecting the demo inventory to the public catalog.
+
+## V2 Merit Clearing Network
+
+V2 proposes merit-ranked digital institute and spot rounds that share one central candidate and seat state. A candidate can declare interest in up to five participating programme lists. Each list is generated from active interests using a simplified global synthetic merit rank and a deterministic candidate-ID tie-break; institutes cannot manually reorder candidates.
+
+When Aarya accepts VIT Computer Engineering, the clearing service accepts the exact offered VIT seat, releases her previous AISSMS seat, closes her PICT, PCCOE and MMCOE interests, rebuilds all affected merit lists, records candidate movements and offers the released seat to the next eligible interested candidate. The student pages and compact `/operations` view read this same state and authoritative seat inventory.
+
+This is a proposed AdmissionSetu clearing model. Its simplified merit logic does not reproduce all official category, reservation, home-university or candidature rules. Every candidate identity, rank, interest, queue event, offer and seat-ownership record is synthetic. Official CET institute and programme reference data remains immutable and separate in `src/data/official/`.
 
 ## Prototype limitations
 
@@ -107,7 +116,7 @@ git diff --check
 
 ## Device-local state
 
-- Admission and spot-round simulation: `admissionsetu:admission-simulation:v2`
+- Admission, seat and V2 merit-clearing simulation: `admissionsetu:admission-simulation:v3`
 - Ordered CAP preferences: `admissionsetu:candidate-preferences:v2`
 - Legacy explorer shortlist migration source: `admissionsetu:preference-shortlist:v1`
 
