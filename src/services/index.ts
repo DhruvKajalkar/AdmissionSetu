@@ -13,3 +13,9 @@ export { cloneDocumentPassportState, connectDocumentProvider, getAccessibleDocum
 export { buildScholarshipEvaluationContext, cloneScholarshipNavigatorState, evaluateAllSchemes, evaluateScheme, getScholarshipSummary, isScholarshipNavigatorStateValid, recordScholarshipPortalHandoff, updateScholarshipProfile } from "./scholarships";
 export type { ScholarshipEvaluationContext, ScholarshipProfileUpdate } from "./scholarships";
 export type { ShareDocumentsInput } from "./document-passport";
+export { buildAssistantContextSnapshot } from "./assistant-context";
+export { ADMISSION_ASSISTANT_INSTRUCTIONS, DeterministicDemoAssistantProvider, getAssistantProvider, MockAssistantProvider, OpenAIResponsesAssistantProvider } from "./assistant-provider";
+export type { AssistantProvider } from "./assistant-provider";
+export { ASSISTANT_READ_ONLY_TOOL_NAMES, runAssistantTool, runToolsForMessage, selectAssistantTools } from "./assistant-tools";
+export type { AssistantReadOnlyToolName, AssistantToolResult } from "./assistant-tools";
+export { ASSISTANT_LIMITS, isAssistantContextSnapshot, validateAssistantRequest } from "./assistant-validation";

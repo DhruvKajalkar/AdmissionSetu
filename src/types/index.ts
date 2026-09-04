@@ -1,4 +1,14 @@
 export type {
+  AssistantAction,
+  AssistantAnswer,
+  AssistantContextSnapshot,
+  AssistantHistoryMessage,
+  AssistantRequest,
+  AssistantSource,
+  AssistantSourceKind,
+} from "./assistant";
+
+export type {
   Admission,
   AdmissionAlert,
   AdmissionAlertTone,

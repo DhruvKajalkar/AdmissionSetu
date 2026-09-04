@@ -1,5 +1,5 @@
 import type { OfficialInstitute } from "@/types";
-import { instituteSummarySource } from "./sources";
+import { instituteSummarySource } from "./sources.ts";
 
 export const officialInstitutes = [
   {

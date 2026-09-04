@@ -1,5 +1,5 @@
 import type { CutoffSeatType, OfficialCutoffObservation } from "@/types";
-import { capThreeCutoffSource } from "./sources";
+import { capThreeCutoffSource } from "./sources.ts";
 
 function cutoff(
   programChoiceCode: string,

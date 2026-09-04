@@ -1,5 +1,5 @@
 import type { BranchFamily, OfficialProgram, OfficialProgramGender } from "@/types";
-import { instituteSummarySource } from "./sources";
+import { instituteSummarySource } from "./sources.ts";
 
 function program(
   choiceCode: string,

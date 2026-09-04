@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types --test src/services/preference-safety.test.mts src/services/admission-state.test.mts src/services/spot-round-state.test.mts src/services/clearing-network.test.mts src/services/document-passport.test.mts src/services/scholarships.test.mts"
+    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types --test src/services/preference-safety.test.mts src/services/admission-state.test.mts src/services/spot-round-state.test.mts src/services/clearing-network.test.mts src/services/document-passport.test.mts src/services/scholarships.test.mts src/services/assistant.test.mts"
   },
   "dependencies": {
     "next": "16.3.3",

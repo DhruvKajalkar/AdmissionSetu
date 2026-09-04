@@ -1,4 +1,5 @@
 export { AdmissionAlert } from "./admission-alert";
+export { AdmissionAssistantView } from "./admission-assistant-view";
 export { AdmissionControl } from "./admission-control";
 export { AdmissionJourney } from "./admission-journey";
 export { AdmissionSimulationProvider, useAdmissionSimulation } from "./admission-simulation-provider";

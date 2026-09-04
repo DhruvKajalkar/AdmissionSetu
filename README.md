@@ -30,6 +30,8 @@ AdmissionSetu demonstrates one citizen-facing journey with:
 
 **One profile → reused for financial-aid discovery.**
 
+**One current context → clearer admission answers.**
+
 ## Demo Journey
 
 1. Open the app and select **Continue as Demo Student**.
@@ -95,6 +97,23 @@ Official-portal actions are handoffs only. AdmissionSetu records that MahaDBT or
 
 The navigator has no production NSP or MahaDBT API, real OTR, Aadhaar flow or scholarship submission. Candidate values are synthetic, only selected published rules and a minimum document subset are modelled, and results are explanatory previews rather than legal guarantees of eligibility. Final decisions and complete requirements remain with the responsible government portal and department.
 
+## V2 Admission Assistant
+
+`/assistant` adds a context-aware, read-only guide over Aarya's current synthetic admission state. The browser creates a sanitized snapshot containing only the admission, preferences and safety findings, merit-list positions and offers, relevant vacancy totals, document readiness and consent status, and already-evaluated scholarship results. Raw document metadata, local-storage contents and unnecessary personal information are not sent.
+
+The server route `/api/assistant` selects explicit read-only tools that reuse AdmissionSetu's deterministic preference, merit-clearing, document-readiness and scholarship engines plus its curated official CET and scheme sources. The assistant can explain consequences and provide ordinary navigation links, but it cannot accept or decline a seat, reorder preferences, join a round, share documents, submit a scholarship or reset the demo. It does not make admission decisions, guarantee eligibility or represent an official government portal.
+
+For OpenAI-powered responses, configure these server-side environment variables:
+
+```bash
+OPENAI_API_KEY=your_server_side_key
+OPENAI_MODEL=gpt-5
+```
+
+`OPENAI_MODEL` is optional and defaults to `gpt-5`. Never expose either variable through a `NEXT_PUBLIC_` name. On Vercel, add `OPENAI_API_KEY` (and optionally `OPENAI_MODEL`) in the project's Environment Variables; no separate server or deployment architecture is required.
+
+Without an API key, every other AdmissionSetu feature still works and the assistant uses a clearly labelled deterministic responder for its small set of suggested demo questions. Automated tests use the provider interface and deterministic mock, never the network or API credits. All candidate state remains synthetic, and consequential real-world information should be checked at the official source linked below each answer.
+
 ## Prototype limitations
 
 - No official CET API or live CET vacancy feed.
@@ -105,6 +124,7 @@ The navigator has no production NSP or MahaDBT API, real OTR, Aadhaar flow or sc
 - Demo confirmation does not submit an official option form or admission decision.
 - DigiLocker connection, consent and document sharing are simulated locally; no files or real identifiers are transferred.
 - Scholarship matching covers only the selected rules linked from each card; no NSP/MahaDBT account, real OTR or application submission is simulated.
+- Assistant conversations remain in memory only for the current page session; the context snapshot is supplied by the browser and is suitable for a prototype, not a production trust boundary.
 
 ## Tech stack
 

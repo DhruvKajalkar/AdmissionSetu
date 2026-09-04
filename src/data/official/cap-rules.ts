@@ -1,5 +1,5 @@
 import type { CapRoundRule, OfficialSourceReference } from "@/types";
-import { CATALOG_ACCESSED_ON } from "./sources";
+import { CATALOG_ACCESSED_ON } from "./sources.ts";
 
 export const capRoundThreeRuleSource: OfficialSourceReference = {
   kind: "OFFICIAL_CET_CELL",
