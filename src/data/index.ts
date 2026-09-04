@@ -11,6 +11,8 @@ export {
   currentFePortalSource,
   instituteListSource,
   officialCutoffs,
+  officialDatasetMetadata,
+  officialHistoricalVacancies,
   officialInstitutes,
   officialPrograms,
 } from "./official";

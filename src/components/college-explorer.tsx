@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { groupOfficialCutoffs, searchOfficialPrograms, selectPrimaryCutoff } from "@/services/official-catalog";
 import type {
   BranchFamily,
   OfficialAutonomyStatus,
   OfficialCutoffObservation,
+  OfficialDatasetMetadata,
   OfficialInstitute,
   OfficialInstituteStatus,
   OfficialProgram,
@@ -21,9 +23,9 @@ const branchFamilies: readonly BranchFamily[] = [
   "Mechanical & Automation",
   "Civil & Core",
   "Chemical & Biotechnology",
+  "Other",
 ];
 
-const instituteStatuses: readonly OfficialInstituteStatus[] = ["Government", "Un-Aided"];
 const autonomyStatuses: readonly OfficialAutonomyStatus[] = ["Autonomous", "Non-Autonomous"];
 
 interface CollegeExplorerProps {
@@ -31,6 +33,7 @@ interface CollegeExplorerProps {
   programs: readonly OfficialProgram[];
   cutoffs: readonly OfficialCutoffObservation[];
   candidate: { name: string; cetPercentile: number; category: string; homeUniversity: string };
+  metadata: OfficialDatasetMetadata;
   sources: {
     currentPortal: OfficialSourceReference;
     instituteList: OfficialSourceReference;
@@ -38,23 +41,21 @@ interface CollegeExplorerProps {
   };
 }
 
-export function CollegeExplorer({ institutes, programs, cutoffs, candidate, sources }: CollegeExplorerProps) {
+export function CollegeExplorer({ institutes, programs, cutoffs, candidate, metadata, sources }: CollegeExplorerProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [branchFamily, setBranchFamily] = useState("");
   const [instituteStatus, setInstituteStatus] = useState("");
   const [autonomyStatus, setAutonomyStatus] = useState("");
-  const [locality, setLocality] = useState("");
+  const [location, setLocation] = useState("");
   const [confirmation, setConfirmation] = useState("");
+  const [visibleLimit, setVisibleLimit] = useState(24);
   const { count, hasProgram, addProgram } = usePreferenceShortlist();
 
   const instituteByCode = useMemo(
     () => new Map(institutes.map((institute) => [institute.code, institute])),
     [institutes],
   );
-  const cutoffByChoiceCode = useMemo(
-    () => new Map(cutoffs.map((cutoff) => [cutoff.programChoiceCode, cutoff])),
-    [cutoffs],
-  );
+  const cutoffsByChoiceCode = useMemo(() => groupOfficialCutoffs(cutoffs), [cutoffs]);
   const programsByInstitute = useMemo(() => {
     const grouped = new Map<string, OfficialProgram[]>();
     programs.forEach((program) => {
@@ -64,47 +65,33 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, sour
     });
     return grouped;
   }, [programs]);
-  const localities = useMemo(
-    () => [...new Set(institutes.map((institute) => institute.locality))].sort(),
+  const instituteStatuses = useMemo(
+    () => [...new Set(institutes.map((institute) => institute.status))].sort() as OfficialInstituteStatus[],
+    [institutes],
+  );
+  const locations = useMemo(
+    () => [...new Set(institutes.flatMap((institute) => [institute.city, institute.district]))].sort(),
     [institutes],
   );
 
   const filteredPrograms = useMemo(() => {
-    const query = searchTerm.trim().toLocaleLowerCase();
-    return programs.filter((program) => {
-      const institute = instituteByCode.get(program.instituteCode);
-      if (!institute) return false;
+    return searchOfficialPrograms(institutes, programs, searchTerm, {
+      branchFamily,
+      instituteStatus,
+      autonomyStatus,
+      location,
+    }).map((match) => match.program);
+  }, [autonomyStatus, branchFamily, instituteStatus, institutes, location, programs, searchTerm]);
 
-      const searchable = [
-        institute.name,
-        institute.commonName,
-        institute.code,
-        ...institute.searchAliases,
-        program.name,
-        program.choiceCode,
-        program.branchFamily,
-      ]
-        .join(" ")
-        .toLocaleLowerCase();
-
-      return (
-        (!query || searchable.includes(query)) &&
-        (!branchFamily || program.branchFamily === branchFamily) &&
-        (!instituteStatus || institute.status === instituteStatus) &&
-        (!autonomyStatus || institute.autonomyStatus === autonomyStatus) &&
-        (!locality || institute.locality === locality)
-      );
-    });
-  }, [autonomyStatus, branchFamily, instituteByCode, instituteStatus, locality, programs, searchTerm]);
-
-  const hasActiveFilters = Boolean(searchTerm || branchFamily || instituteStatus || autonomyStatus || locality);
+  const hasActiveFilters = Boolean(searchTerm || branchFamily || instituteStatus || autonomyStatus || location);
 
   function clearFilters() {
     setSearchTerm("");
     setBranchFamily("");
     setInstituteStatus("");
     setAutonomyStatus("");
-    setLocality("");
+    setLocation("");
+    setVisibleLimit(24);
   }
 
   function handleAdd(program: OfficialProgram, institute: OfficialInstitute) {
@@ -115,8 +102,8 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, sour
   return (
     <>
       <PageHeader
-        eyebrow="Official CET reference data · curated subset"
-        title="Explore Pune engineering colleges"
+        eyebrow="Official CET reference data · static snapshot"
+        title="Explore engineering colleges"
         description={`Search ${institutes.length} institutes and ${programs.length} programmes using official CET Cell institute and intake records.`}
         action={<Link className="header-shortlist-link" href="/preferences">My Preferences · {count}</Link>}
       />
@@ -133,6 +120,11 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, sour
         </dl>
         <p className="candidate-context-note">Shown for context only. Historical cutoffs are not an eligibility decision or admission prediction.</p>
       </section>
+
+      <aside className="data-freshness-summary" aria-label="Official CET reference data freshness">
+        <strong>Static official reference snapshot</strong>
+        <span>Academic year {metadata.academicYears.join(", ")} · generated {metadata.generatedOn} · not a live CET feed</span>
+      </aside>
 
       <section className="explorer-controls" aria-labelledby="find-programmes-title">
         <div className="explorer-controls-heading">
@@ -177,10 +169,10 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, sour
             </select>
           </label>
           <label>
-            Locality
-            <select value={locality} onChange={(event) => setLocality(event.target.value)}>
-              <option value="">All Pune localities</option>
-              {localities.map((item) => <option key={item}>{item}</option>)}
+            City or district
+            <select value={location} onChange={(event) => setLocation(event.target.value)}>
+              <option value="">All locations</option>
+              {locations.map((item) => <option key={item}>{item}</option>)}
             </select>
           </label>
         </div>
@@ -189,9 +181,11 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, sour
       <details className="data-about">
         <summary>About this data</summary>
         <div>
-          <p><strong>Institute and intake data:</strong> Manually curated from Maharashtra CET Cell 2025–26 institute summaries and the <a href={sources.instituteList.url} target="_blank" rel="noreferrer">official institute list ↗</a>. The <a href={sources.currentPortal.url} target="_blank" rel="noreferrer">2026–27 portal ↗</a> is the current-cycle reference, but this prototype does not claim that the curated catalog is current-cycle seat availability.</p>
-          <p><strong>Cutoff data:</strong> A limited set of verified 2024–25 CAP Round III observations from the <a href={sources.cutoffDocument.url} target="_blank" rel="noreferrer">official cutoff document ↗</a>. The seat type is always shown because cutoff figures are contextual, not universal.</p>
+          <p><strong>Data freshness:</strong> {metadata.sourceSnapshot} Academic years represented: {metadata.academicYears.join(", ")}. Last generated: {metadata.generatedOn}. This is not a live official feed.</p>
+          <p><strong>Institute and intake data:</strong> Script-generated from Maharashtra CET Cell 2025–26 institute summaries and checked against the <a href={sources.instituteList.url} target="_blank" rel="noreferrer">official institute list ↗</a>. The <a href={sources.currentPortal.url} target="_blank" rel="noreferrer">2026–27 portal ↗</a> remains the current-cycle reference.</p>
+          <p><strong>Cutoff data:</strong> Verified 2025–26 CAP Round II and III observations imported from official CET Cell cutoff publications. Year, round, seat category, candidature context, stage and source remain attached to every observation.</p>
           <p><strong>Synthetic data:</strong> Aarya&apos;s identity, score, preferences, admission, vacancies, and future spot-round state are demonstration records.</p>
+          <p>Historical/current-cycle reference information in AdmissionSetu should be verified against the official CET Cell portal before an actual admission decision.</p>
         </div>
       </details>
 
@@ -208,6 +202,7 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, sour
       {filteredPrograms.length ? (
         <div className="program-results">
           {filteredPrograms
+            .slice(0, visibleLimit)
             .toSorted((first, second) => {
               const firstInstitute = instituteByCode.get(first.instituteCode)?.commonName ?? "";
               const secondInstitute = instituteByCode.get(second.instituteCode)?.commonName ?? "";
@@ -216,7 +211,8 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, sour
             .map((program) => {
               const institute = instituteByCode.get(program.instituteCode);
               if (!institute) return null;
-              const cutoff = cutoffByChoiceCode.get(program.choiceCode);
+              const cutoffObservations = cutoffsByChoiceCode.get(program.choiceCode) ?? [];
+              const cutoff = selectPrimaryCutoff(cutoffObservations);
               const alreadyAdded = hasProgram(program.choiceCode);
 
               return (
@@ -241,9 +237,10 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, sour
                     {cutoff ? (
                       <strong>{cutoff.percentile.toFixed(4)} percentile · {cutoff.seatType}</strong>
                     ) : (
-                      <strong>Not available in the curated subset</strong>
+                      <strong>Not available in this static snapshot</strong>
                     )}
                     <small>{cutoff ? `${cutoff.academicYear} ${cutoff.round} · merit no. ${cutoff.meritNumber.toLocaleString("en-IN")}` : "No cutoff has been inferred or estimated."}</small>
+                    {cutoff ? <small>Historical comparison only · Aarya is {(candidate.cetPercentile - cutoff.percentile).toFixed(2)} percentile points relative to this observation.</small> : null}
                   </div>
 
                   <div className="program-actions">
@@ -268,13 +265,28 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, sour
                         <div><dt>Address</dt><dd>{institute.address}</dd></div>
                       </dl>
                       <div className="institute-program-list">
-                        <h4>Programmes in this curated catalog</h4>
+                        <h4>Programmes in this reference catalog</h4>
                         <ul>
                           {(programsByInstitute.get(institute.code) ?? []).map((item) => (
                             <li key={item.choiceCode}><span>{item.name}</span><strong>{item.choiceCode} · intake {item.intake}</strong></li>
                           ))}
                         </ul>
                       </div>
+                      {cutoffObservations.length ? (
+                        <div className="historical-observations">
+                          <h4>Historical cutoff observations</h4>
+                          <ul>
+                            {cutoffObservations.slice(0, 12).map((observation) => (
+                              <li key={`${observation.academicYear}-${observation.round}-${observation.candidature}-${observation.seatType}-${observation.stage}`}>
+                                <span>{observation.academicYear} · {observation.round} · {observation.seatType} · Stage {observation.stage}</span>
+                                <strong>{observation.percentile.toFixed(4)} percentile · merit no. {observation.meritNumber.toLocaleString("en-IN")}</strong>
+                                <small>{observation.candidature}</small>
+                              </li>
+                            ))}
+                          </ul>
+                          {cutoffObservations.length > 12 ? <p>{cutoffObservations.length - 12} additional category/stage observations remain in the local official dataset.</p> : null}
+                        </div>
+                      ) : null}
                       <p className="detail-disclaimer">Historical cutoff figures can change by round, category, candidature type, and seat type. Always verify the live admission notice before making a decision.</p>
                       <a href={institute.source.url} target="_blank" rel="noreferrer">Open official CET Cell institute summary ↗</a>
                       {cutoff ? <a href={cutoff.source.url} target="_blank" rel="noreferrer">Open official cutoff document ↗</a> : null}
@@ -292,6 +304,12 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, sour
           <button type="button" onClick={clearFilters}>Clear all filters</button>
         </section>
       )}
+      {filteredPrograms.length > visibleLimit ? (
+        <div className="load-more-results">
+          <button type="button" onClick={() => setVisibleLimit((current) => current + 24)}>Show 24 more programmes</button>
+          <span>Showing {Math.min(visibleLimit, filteredPrograms.length)} of {filteredPrograms.length}</span>
+        </div>
+      ) : null}
     </>
   );
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { getPreferenceConsequence, reviewPreferenceList } from "@/services/preference-safety";
+import { groupOfficialCutoffs, selectPrimaryCutoff } from "@/services/official-catalog";
 import type {
   CapRoundRule,
   CurrentSeatContext,
@@ -107,13 +108,7 @@ export function PreferenceBuilder({
       allotmentRound: admission.allotmentRound,
     };
   }, [admissionState.currentAdmission, instituteByCode, programByCode]);
-  const cutoffByProgram = useMemo(() => {
-    const result = new Map<string, OfficialCutoffObservation>();
-    cutoffs.forEach((cutoff) => {
-      if (!result.has(cutoff.programChoiceCode)) result.set(cutoff.programChoiceCode, cutoff);
-    });
-    return result;
-  }, [cutoffs]);
+  const cutoffsByProgram = useMemo(() => groupOfficialCutoffs(cutoffs), [cutoffs]);
   const review = useMemo(() => reviewPreferenceList(preferences, rule), [preferences, rule]);
   const deadlineOpen = new Date(cycle.now).getTime() <= new Date(cycle.preferenceReviewDeadline).getTime();
   const activeScreen =
@@ -147,7 +142,7 @@ export function PreferenceBuilder({
       if (!program) return null;
       const institute = instituteByCode.get(program.instituteCode);
       if (!institute) return null;
-      const cutoff = cutoffByProgram.get(program.choiceCode);
+      const cutoff = selectPrimaryCutoff(cutoffsByProgram.get(program.choiceCode) ?? []);
       const consequence = getPreferenceConsequence(preference, rule, currentSeat);
       const isFirst = preference.position === 1;
       const isLast = preference.position === preferences.length;
@@ -196,7 +191,7 @@ export function PreferenceBuilder({
 
             {cutoff ? (
               <p className="historical-cutoff-note">
-                Historical reference: {cutoff.percentile.toFixed(2)} percentile · {cutoff.seatType} · {cutoff.round}, {cutoff.academicYear}
+                Historical reference: {cutoff.percentile.toFixed(4)} percentile · {cutoff.seatType} · {cutoff.round}, {cutoff.academicYear}
               </p>
             ) : null}
 

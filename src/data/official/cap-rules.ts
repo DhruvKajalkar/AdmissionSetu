@@ -7,6 +7,7 @@ export const capRoundThreeRuleSource: OfficialSourceReference = {
   academicYear: "2026-27",
   url: "https://fe2026.mahacet.org/StaticPages/HomePage",
   accessedOn: CATALOG_ACCESSED_ON,
+  sourceType: "OFFICIAL_WEB_PAGE",
 };
 
 export const capRoundThreeRule: CapRoundRule = {

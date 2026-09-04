@@ -314,7 +314,12 @@ export interface Program {
 
 export type PublicDataKind = "OFFICIAL_CET_CELL";
 
-export type OfficialInstituteStatus = "Government" | "Un-Aided";
+export type OfficialInstituteStatus =
+  | "Government"
+  | "Government-Aided"
+  | "Un-Aided"
+  | "University Managed (Un-Aided)"
+  | "Deemed University";
 export type OfficialAutonomyStatus = "Autonomous" | "Non-Autonomous";
 export type OfficialProgramGender = "Co-Education" | "Female";
 
@@ -324,7 +329,10 @@ export type BranchFamily =
   | "Electronics & Electrical"
   | "Mechanical & Automation"
   | "Civil & Core"
-  | "Chemical & Biotechnology";
+  | "Chemical & Biotechnology"
+  | "Other";
+
+export type OfficialSourceType = "OFFICIAL_WEB_PAGE" | "OFFICIAL_PDF";
 
 export interface OfficialSourceReference {
   kind: PublicDataKind;
@@ -332,6 +340,7 @@ export interface OfficialSourceReference {
   academicYear: string;
   url: string;
   accessedOn: string;
+  sourceType: OfficialSourceType;
 }
 
 export interface OfficialInstitute {
@@ -342,7 +351,8 @@ export interface OfficialInstitute {
   address: string;
   locality: string;
   city: string;
-  district: "Pune";
+  district: string;
+  region: string;
   university: string;
   status: OfficialInstituteStatus;
   autonomyStatus: OfficialAutonomyStatus;
@@ -357,21 +367,45 @@ export interface OfficialProgram {
   name: string;
   branchFamily: BranchFamily;
   intake: number;
-  shift: "General Shift" | "Morning Shift";
+  shift: string;
   gender: OfficialProgramGender;
   source: OfficialSourceReference;
 }
 
-export type CutoffSeatType = "GOPENS" | "GOPENH" | "LOPENS";
+export type CutoffSeatType = string;
 
 export interface OfficialCutoffObservation {
   programChoiceCode: string;
-  academicYear: "2024-25";
-  round: "CAP Round III";
+  academicYear: string;
+  round: string;
   seatType: CutoffSeatType;
   meritNumber: number;
   percentile: number;
+  stage: string;
+  candidature: string;
+  admissionType: string;
   source: OfficialSourceReference;
+}
+
+export interface OfficialHistoricalVacancyObservation {
+  programChoiceCode: string;
+  academicYear: string;
+  round: string;
+  publishedVacancyCount: number;
+  snapshotLabel: string;
+  source: OfficialSourceReference;
+}
+
+export interface OfficialDatasetMetadata {
+  generatedOn: string;
+  academicYears: readonly string[];
+  sourceSnapshot: string;
+  counts: {
+    institutes: number;
+    programs: number;
+    cutoffs: number;
+    historicalVacancies: number;
+  };
 }
 
 export type CapRound = 1 | 2 | 3 | 4;

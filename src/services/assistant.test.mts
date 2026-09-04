@@ -148,3 +148,24 @@ test("prompt-injection request cannot obtain real vacancy data or system prompt"
   assert.match(answer.answer, /only use the synthetic/i);
   assert.doesNotMatch(answer.answer, /You are Ask AdmissionSetu/);
 });
+
+test("deterministic catalog answer preserves cutoff year, round and category", async () => {
+  const answer = await new DeterministicDemoAssistantProvider().respond({
+    message: "What is the PICT ENTC historical cutoff in our data?",
+    history: [],
+    context: initialContext(),
+  });
+  assert.match(answer.answer, /PICT.*Electronics and Telecommunication/i);
+  assert.match(answer.answer, /2025-26 CAP Round (II|III).*GOPENS/i);
+  assert.ok(answer.sources.some((source) => source.kind === "OFFICIAL" && source.url?.includes("mahacet.org")));
+});
+
+test("deterministic catalog answer can find Pune AI and Data Science programmes", async () => {
+  const answer = await new DeterministicDemoAssistantProvider().respond({
+    message: "What colleges in Pune have AI & DS programmes?",
+    history: [],
+    context: initialContext(),
+  });
+  assert.match(answer.answer, /Artificial Intelligence/i);
+  assert.match(answer.answer, /Pune/i);
+});

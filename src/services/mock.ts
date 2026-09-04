@@ -5,6 +5,8 @@ import {
   demoCandidate,
   instituteListSource,
   officialCutoffs,
+  officialDatasetMetadata,
+  officialHistoricalVacancies,
   officialInstitutes,
   officialPrograms,
   programs,
@@ -36,6 +38,8 @@ export const mockOfficialCatalogService: OfficialCatalogService = {
       institutes: officialInstitutes,
       programs: officialPrograms,
       cutoffs: officialCutoffs,
+      historicalVacancies: officialHistoricalVacancies,
+      metadata: officialDatasetMetadata,
       sources: {
         currentPortal: currentFePortalSource,
         instituteList: instituteListSource,

@@ -56,14 +56,14 @@ See [DEMO.md](./DEMO.md) for the concise presenter walkthrough.
 
 ### Official CET/public reference information
 
-The manually curated subset in `src/data/official/` contains institute identities, programme choice codes, sanctioned intake and limited historical cutoffs. Every record carries its academic year, source URL and access date.
+The checked-in generated snapshot in `src/data/official/generated/` contains institute identities, programme choice codes, sanctioned intake and contextual historical cutoffs. Every record carries its academic year, source URL, access date and source type.
 
 - [Maharashtra CET Cell FE 2026–27 portal](https://fe2026.mahacet.org/StaticPages/HomePage) — source for the displayed CAP Round III first-six auto-freeze rule.
-- [Maharashtra CET Cell 2025–26 participating institutes](https://fe2025.mahacet.org/StaticPages/frmInstituteList) — institute and intake reference.
+- [Maharashtra CET Cell 2025–26 participating institutes](https://fe2025.mahacet.org/StaticPages/frmInstituteList) — institute and intake source.
 - Official institute summaries at `https://fe2025.mahacet.org/StaticPages/frmInstituteSummary?InstituteCode={code}` — institute status, autonomy, choice codes and intake.
-- [Official 2024–25 CAP Round III cutoff list](https://fe2025.mahacet.org/2024/2024ENGG_CAP3_CutOff.pdf) — source for the limited historical cutoff observations.
+- Official 2025–26 CAP Round II and III Maharashtra/Minority cutoff publications — sources for contextual cutoff observations.
 
-The subset was manually curated on 27 August 2026. It is not a live or complete current-cycle catalog. Missing values are shown as unavailable and are never inferred.
+The static snapshot was generated on 4 September 2026. It is not a live or complete current-cycle catalog. Missing or malformed values are reported and never inferred. See [the source manifest](./docs/CET_DATA_SOURCES.md) for exact coverage, methods and limitations.
 
 ### Synthetic demo information
 
@@ -114,6 +114,21 @@ OPENAI_MODEL=gpt-5
 
 Without an API key, every other AdmissionSetu feature still works and the assistant uses a clearly labelled deterministic responder for its small set of suggested demo questions. Automated tests use the provider interface and deterministic mock, never the network or API credits. All candidate state remains synthetic, and consequential real-world information should be checked at the official source linked below each answer.
 
+## V2 Official CET Data Pipeline
+
+V2 Phase 5 replaces hand-maintained catalog arrays with a repeatable offline pipeline. Maintainers retrieve selected public CET Cell institute pages and cutoff publications into `scripts/cet/source-data`, extract only the chosen institute sections, then parse, normalize and validate them with `scripts/cet/pipeline.mts`. `npm run data:generate` writes deterministic TypeScript artifacts under `src/data/official/generated`; `npm run data:validate` checks those checked-in artifacts independently.
+
+Production uses only the generated local dataset. There is no runtime scraping or live government dependency. Official names and values retain source provenance and context; familiar search aliases and normalized branch families remain separate helpers. The Explorer, preference rows and read-only assistant consume the same generated records.
+
+Official historical reference data remains separate from synthetic prototype state. In particular, historical vacancy observations can never become Aarya&apos;s live demo vacancy inventory. The current snapshot intentionally contains zero historical vacancy observations because no vacancy publication was imported with sufficient confidence in this phase.
+
+```bash
+npm run data:generate
+npm run data:validate
+```
+
+This is a static reference snapshot, not a live CET feed. Historical/current-cycle information should be verified against the official CET Cell portal before an actual admission decision.
+
 ## Prototype limitations
 
 - No official CET API or live CET vacancy feed.
@@ -156,6 +171,7 @@ Open [http://localhost:3000](http://localhost:3000). No seeding, sign-in or envi
 Validation commands:
 
 ```bash
+npm run data:validate
 npm run lint
 npm run typecheck
 npm test

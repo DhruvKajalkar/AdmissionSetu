@@ -3,6 +3,7 @@ import { officialCutoffs } from "../data/official/cutoffs.ts";
 import { officialInstitutes } from "../data/official/institutes.ts";
 import { officialPrograms } from "../data/official/programs.ts";
 import type { AssistantAction, AssistantContextSnapshot, AssistantSource } from "../types/assistant.ts";
+import { groupOfficialCutoffs, searchOfficialPrograms, selectPrimaryCutoff } from "./official-catalog.ts";
 
 export const ASSISTANT_READ_ONLY_TOOL_NAMES = [
   "get_current_admission",
@@ -36,6 +37,13 @@ const capSource: AssistantSource = {
   kind: "OFFICIAL",
   url: capRoundThreeRule.source.url,
 };
+
+const cutoffsByProgram = groupOfficialCutoffs(officialCutoffs);
+
+function catalogQuery(query: string) {
+  const ignored = new Set(["about", "college", "colleges", "institute", "institutes", "programme", "programmes", "program", "programs", "show", "tell", "what", "which", "the", "is", "are", "have", "has", "historical", "cutoff", "cutoffs", "context", "our", "in", "for"]);
+  return query.toLowerCase().replace(/\bour data\b/g, "").split(/[^a-z0-9]+/).filter((term) => term && !ignored.has(term)).join(" ");
+}
 
 function result(name: AssistantReadOnlyToolName, data: unknown, sources: AssistantSource[], actions: AssistantAction[] = []): AssistantToolResult {
   return { name, data, sources, actions };
@@ -83,36 +91,54 @@ export function runAssistantTool(
     }, [capSource], [{ label: "Review Preferences", href: "/preferences" }]);
   }
 
-  const normalized = query.trim().toLowerCase();
-  const searchTerms = normalized.split(/[^a-z0-9]+/).filter((term) =>
-    term.length >= 3 && !["about", "college", "institute", "programme", "program", "show", "tell", "what", "which"].includes(term));
-  const programs = officialPrograms.flatMap((program) => {
-    const institute = officialInstitutes.find((item) => item.code === program.instituteCode);
-    const haystack = [program.choiceCode, program.name, institute?.name, institute?.commonName, ...(institute?.searchAliases ?? [])].join(" ").toLowerCase();
-    if (normalized && !haystack.includes(normalized) && !searchTerms.some((term) => haystack.includes(term))) return [];
+  const normalized = catalogQuery(query);
+  const programs = searchOfficialPrograms(officialInstitutes, officialPrograms, normalized).flatMap(({ program, institute }) => {
+    if (!institute) return [];
+    const allCutoffs = cutoffsByProgram.get(program.choiceCode) ?? [];
+    const primaryCutoff = selectPrimaryCutoff(allCutoffs);
+    const otherRoundPrimary = primaryCutoff
+      ? allCutoffs.find((cutoff) => cutoff.round !== primaryCutoff.round && cutoff.seatType === "GOPENS" && cutoff.stage === "I")
+      : undefined;
+    const preferred = [primaryCutoff, otherRoundPrimary].filter((cutoff) => cutoff !== undefined);
+    const representativeCutoffs = primaryCutoff
+      ? [...preferred, ...allCutoffs.filter((cutoff) => !preferred.includes(cutoff))].slice(0, 12)
+      : [];
     return [{
       choiceCode: program.choiceCode,
       programme: program.name,
-      institute: institute?.name ?? "Unavailable",
+      institute: institute.name,
+      instituteCommonName: institute.commonName,
       instituteCode: program.instituteCode,
+      district: institute.district,
       intake: program.intake,
-      cutoffs: officialCutoffs.filter((cutoff) => cutoff.programChoiceCode === program.choiceCode).map((cutoff) => ({
+      cutoffs: representativeCutoffs.map((cutoff) => ({
         academicYear: cutoff.academicYear,
         round: cutoff.round,
         seatType: cutoff.seatType,
+        stage: cutoff.stage,
+        candidature: cutoff.candidature,
+        admissionType: cutoff.admissionType,
+        meritNumber: cutoff.meritNumber,
         percentile: cutoff.percentile,
+        source: { label: cutoff.source.label, url: cutoff.source.url },
       })),
     }];
   }).slice(0, 8);
-  const officialSource: AssistantSource = {
-    id: "cet-official-catalog",
-    label: "Maharashtra CET Cell curated local reference catalog",
+  const instituteSource: AssistantSource = {
+    id: `cet-official-catalog-${programs[0]?.instituteCode ?? "search"}`,
+    label: "Maharashtra CET Cell static local reference catalog",
     kind: "OFFICIAL",
     url: programs[0]
       ? officialPrograms.find((program) => program.choiceCode === programs[0].choiceCode)?.source.url
       : capRoundThreeRule.source.url,
   };
-  return result(name, { query, matches: programs }, [officialSource], [{ label: "Open College Explorer", href: "/explore" }]);
+  const cutoffSources = programs.flatMap((program) => program.cutoffs).map((cutoff) => ({
+    id: `cet-cutoff-${cutoff.academicYear}-${cutoff.round}`,
+    label: cutoff.source.label,
+    kind: "OFFICIAL" as const,
+    url: cutoff.source.url,
+  }));
+  return result(name, { query, normalizedQuery: normalized, matches: programs }, [instituteSource, ...cutoffSources], [{ label: "Open College Explorer", href: "/explore" }]);
 }
 
 function includesAny(message: string, terms: string[]) {
