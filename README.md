@@ -28,6 +28,8 @@ AdmissionSetu demonstrates one citizen-facing journey with:
 
 **One verified document set → reused with consent.**
 
+**One profile → reused for financial-aid discovery.**
+
 ## Demo Journey
 
 1. Open the app and select **Continue as Demo Student**.
@@ -43,7 +45,8 @@ AdmissionSetu demonstrates one citizen-facing journey with:
 11. Share the four verified records with VIT for the simulated reporting purpose—without another upload.
 12. Show AISSMS availability moving 2 → 3, Aarya leaving three competing lists, and lower-ranked candidates advancing.
 13. Open **Operations** to show synchronized queues, seats, event records and minimum document-readiness status.
-14. Reload to show persistence, then use **Reset Demo** to restore the starting state without changing preferences.
+14. Open **Scholarships** to compare explainable eligibility with document readiness, provide the optional synthetic hosteller detail, and continue only to an official portal.
+15. Reload to show persistence, then use **Reset Demo** to restore the starting state without changing preferences.
 
 See [DEMO.md](./DEMO.md) for the concise presenter walkthrough.
 
@@ -82,6 +85,16 @@ Institute-specific sharing records the minimum required document types, syntheti
 
 All candidate and document values are synthetic. Production integration would require authorized DigiLocker Requester onboarding, approved scopes, credentials, policy-specific requirement rules and an appropriately secured backend.
 
+## V2 Scholarship & Financial Aid Navigator
+
+V2 Phase 3 extends Aarya&apos;s existing admission journey into explainable financial-aid discovery. The `/scholarships` experience evaluates a small, manually curated set of official MahaDBT and National Scholarship Portal scheme rules against the same synthetic candidate, current admission and authoritative document-passport state already used elsewhere in AdmissionSetu.
+
+Eligibility and application readiness are deliberately separate. A scheme can match every modelled rule while still showing a missing Income Certificate or an incomplete modelled document list. Every result exposes the passed, failed and unknown rules that produced it; an unknown supplemental field produces **Possibly eligible** instead of a guessed result. The only editable supplemental demo field is Aarya&apos;s living arrangement, which is persisted with the shared simulation state.
+
+Official-portal actions are handoffs only. AdmissionSetu records that MahaDBT or NSP was opened, while clearly stating that it did not submit an application. MahaDBT already provides profile-driven suggested schemes; this prototype&apos;s contribution is to bring discovery and document readiness into the admission journey immediately after the admission outcome is known.
+
+The navigator has no production NSP or MahaDBT API, real OTR, Aadhaar flow or scholarship submission. Candidate values are synthetic, only selected published rules and a minimum document subset are modelled, and results are explanatory previews rather than legal guarantees of eligibility. Final decisions and complete requirements remain with the responsible government portal and department.
+
 ## Prototype limitations
 
 - No official CET API or live CET vacancy feed.
@@ -91,6 +104,7 @@ All candidate and document values are synthetic. Production integration would re
 - Live queues, vacancies, offers and timers are guided synthetic simulations.
 - Demo confirmation does not submit an official option form or admission decision.
 - DigiLocker connection, consent and document sharing are simulated locally; no files or real identifiers are transferred.
+- Scholarship matching covers only the selected rules linked from each card; no NSP/MahaDBT account, real OTR or application submission is simulated.
 
 ## Tech stack
 
@@ -131,8 +145,8 @@ git diff --check
 
 ## Device-local state
 
-- Admission, seat, V2 merit-clearing and document-passport simulation: `admissionsetu:admission-simulation:v4`
+- Admission, seat, V2 merit-clearing, document-passport and scholarship-navigator simulation: `admissionsetu:admission-simulation:v5`
 - Ordered CAP preferences: `admissionsetu:candidate-preferences:v2`
 - Legacy explorer shortlist migration source: `admissionsetu:preference-shortlist:v1`
 
-**Reset Demo** restores the admission, seat inventory, vacancies, interests, queue progress, offers, document passport, provider consent, sharing history and event history. It deliberately does not clear saved CAP preferences.
+**Reset Demo** restores the admission, seat inventory, vacancies, interests, queue progress, offers, document passport, provider consent, sharing history, scholarship profile, official-portal handoffs and event history. It deliberately does not clear saved CAP preferences.

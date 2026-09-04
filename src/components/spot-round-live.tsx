@@ -13,6 +13,7 @@ import {
 import type { OfficialInstitute, OfficialProgram } from "@/types";
 import { useAdmissionSimulation } from "./admission-simulation-provider";
 import { DocumentReportingPanel } from "./document-reporting-panel";
+import { FinancialAidSummary } from "./financial-aid-summary";
 import { PageHeader } from "./page-header";
 import { StatusBadge } from "./status-badge";
 
@@ -103,7 +104,7 @@ export function SpotRoundLive({
         <span>Positions use a simplified global merit rank. This is a proposed prototype model, not a statement of current CET policy.</span>
       </div>
 
-      {resetComplete ? <div className="demo-reset-feedback" role="status"><strong>V2 demo reset complete.</strong><span>The original AISSMS admission, seats, interests, offers, merit lists and document passport were restored. Saved preferences were not changed.</span></div> : null}
+      {resetComplete ? <div className="demo-reset-feedback" role="status"><strong>V2 demo reset complete.</strong><span>The original AISSMS admission, seats, interests, offers, merit lists, document passport and scholarship demo profile were restored. Saved preferences were not changed.</span></div> : null}
       {lastError ? <div className="simulation-error" role="alert"><strong>Clearing action could not be completed.</strong><span>{lastError.message}</span><button type="button" onClick={clearError}>Dismiss</button></div> : null}
 
       {outcome && previousProgram && previousInstitute ? (
@@ -127,6 +128,7 @@ export function SpotRoundLive({
             workflowId="SPOT_ROUND"
             compact
           />
+          <FinancialAidSummary postAdmission />
           <section className="movement-summary" aria-labelledby="movement-title">
             <h3 id="movement-title">Cascading queue movement</h3>
             <ul>

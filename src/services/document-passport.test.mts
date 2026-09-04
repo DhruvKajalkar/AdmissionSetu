@@ -42,7 +42,7 @@ const aissmsShare = {
 
 test("initial document passport matches the deterministic seed", () => {
   const state = createInitialAdmissionSimulationState();
-  assert.equal(state.version, 4);
+  assert.equal(state.version, 5);
   assert.equal(state.documentPassport.providerConnection.status, "NOT_CONNECTED");
   assert.equal(state.documentPassport.records.length, 6);
   assert.equal(state.documentPassport.records.filter((record) => record.verificationStatus === "VERIFIED").length, 5);

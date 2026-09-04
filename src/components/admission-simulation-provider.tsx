@@ -32,9 +32,15 @@ import {
 } from "@/services/document-passport";
 import type { ShareDocumentsInput } from "@/services/document-passport";
 import { documentDemoTimestamps } from "@/data/document-passport";
+import { scholarshipDemoTimestamps } from "@/data/scholarships";
+import {
+  recordScholarshipPortalHandoff,
+  updateScholarshipProfile as updateScholarshipProfileState,
+} from "@/services/scholarships";
+import type { ScholarshipProfileUpdate } from "@/services/scholarships";
 import type { AdmissionSimulationState, AdmissionTransitionError, DocumentConsentScope } from "@/types";
 
-const STORAGE_KEY = "admissionsetu:admission-simulation:v4";
+const STORAGE_KEY = "admissionsetu:admission-simulation:v5";
 const listeners = new Set<() => void>();
 let cachedRaw: string | null | undefined;
 let cachedState: AdmissionSimulationState | undefined;
@@ -59,6 +65,8 @@ interface AdmissionSimulationValue {
   connectDocuments: (scopes: readonly DocumentConsentScope[]) => boolean;
   revokeDocumentAccess: () => boolean;
   shareDocuments: (input: ShareDocumentsInput) => boolean;
+  updateScholarshipProfile: (update: ScholarshipProfileUpdate) => boolean;
+  recordScholarshipHandoff: (schemeId: string) => boolean;
   resetDemo: () => void;
   clearError: () => void;
 }
@@ -175,6 +183,14 @@ export function AdmissionSimulationProvider({
     (input: ShareDocumentsInput) => applyResult(shareDocumentsForPurpose(state, input, documentDemoTimestamps.shareForAdmission)),
     [applyResult, state],
   );
+  const updateScholarshipProfile = useCallback(
+    (update: ScholarshipProfileUpdate) => applyResult(updateScholarshipProfileState(state, update, scholarshipDemoTimestamps.updateProfile)),
+    [applyResult, state],
+  );
+  const recordScholarshipHandoff = useCallback(
+    (schemeId: string) => applyResult(recordScholarshipPortalHandoff(state, schemeId, scholarshipDemoTimestamps.portalHandoff)),
+    [applyResult, state],
+  );
   const resetDemo = useCallback(() => {
     setLastError(null);
     writeState(resetAdmissionSimulation(initialState));
@@ -182,8 +198,8 @@ export function AdmissionSimulationProvider({
   const clearError = useCallback(() => setLastError(null), []);
 
   const value = useMemo(
-    () => ({ state, lastError, withdrawCurrent, confirmConnected, acceptParticipatingSeat, joinRound, leaveRound, advanceRound, acceptRoundOffer, declineRoundOffer, expireRoundOffer, joinMeritRound, leaveMeritRound, advanceClearing, acceptMeritOffer, declineMeritOffer, connectDocuments, revokeDocumentAccess, shareDocuments, resetDemo, clearError }),
-    [acceptMeritOffer, acceptParticipatingSeat, acceptRoundOffer, advanceClearing, advanceRound, clearError, confirmConnected, connectDocuments, declineMeritOffer, declineRoundOffer, expireRoundOffer, joinMeritRound, joinRound, lastError, leaveMeritRound, leaveRound, resetDemo, revokeDocumentAccess, shareDocuments, state, withdrawCurrent],
+    () => ({ state, lastError, withdrawCurrent, confirmConnected, acceptParticipatingSeat, joinRound, leaveRound, advanceRound, acceptRoundOffer, declineRoundOffer, expireRoundOffer, joinMeritRound, leaveMeritRound, advanceClearing, acceptMeritOffer, declineMeritOffer, connectDocuments, revokeDocumentAccess, shareDocuments, updateScholarshipProfile, recordScholarshipHandoff, resetDemo, clearError }),
+    [acceptMeritOffer, acceptParticipatingSeat, acceptRoundOffer, advanceClearing, advanceRound, clearError, confirmConnected, connectDocuments, declineMeritOffer, declineRoundOffer, expireRoundOffer, joinMeritRound, joinRound, lastError, leaveMeritRound, leaveRound, recordScholarshipHandoff, resetDemo, revokeDocumentAccess, shareDocuments, state, updateScholarshipProfile, withdrawCurrent],
   );
   return <AdmissionSimulationContext.Provider value={value}>{children}</AdmissionSimulationContext.Provider>;
 }

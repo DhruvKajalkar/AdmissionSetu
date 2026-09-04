@@ -11,6 +11,7 @@ import type {
 import { demoCandidate } from "./candidate.ts";
 import { demoAdmissionCycle } from "./demo-cycle.ts";
 import { createInitialDocumentPassportState } from "./document-passport.ts";
+import { createInitialScholarshipNavigatorState } from "./scholarships.ts";
 
 export const HERO_SPOT_ROUND_ID = "spot-pict-entc-live";
 export const V2_HERO_OFFER_ROUND_ID = "spot-vit-computer-live";
@@ -185,7 +186,7 @@ function createInitialClearingCandidates(): CandidateClearingProfile[] {
 
 export function createInitialAdmissionSimulationState(): AdmissionSimulationState {
   return {
-    version: 4,
+    version: 5,
     candidateId: demoCandidate.id,
     currentAdmission: {
       id: "DEMO-ADMISSION-AARYA-CAP-R2",
@@ -270,6 +271,7 @@ export function createInitialAdmissionSimulationState(): AdmissionSimulationStat
       lastOutcome: null,
     },
     documentPassport: createInitialDocumentPassportState(),
+    scholarshipNavigator: createInitialScholarshipNavigatorState(),
     updatedAt: demoAdmissionCycle.currentSeatAllottedAt,
   };
 }

@@ -617,7 +617,7 @@ export function acceptClearingOffer(
 }
 
 export function isMeritClearingStateValid(state: AdmissionSimulationState) {
-  if (state.version !== 4 || state.clearing.version !== 1) return false;
+  if (state.version !== 5 || state.clearing.version !== 1) return false;
   const roundIds = new Set(state.spotRounds.map((round) => round.id));
   const candidateIds = new Set<string>();
   for (const candidate of state.clearing.candidates) {

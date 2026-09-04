@@ -6,6 +6,7 @@ import type {
   SimulationCurrentAdmission,
 } from "@/types";
 import { cloneDocumentPassportState, isDocumentPassportStateValid } from "./document-passport.ts";
+import { cloneScholarshipNavigatorState, isScholarshipNavigatorStateValid } from "./scholarships.ts";
 
 function cloneState(state: AdmissionSimulationState): AdmissionSimulationState {
   return {
@@ -45,6 +46,7 @@ function cloneState(state: AdmissionSimulationState): AdmissionSimulationState {
         : null,
     },
     documentPassport: cloneDocumentPassportState(state.documentPassport),
+    scholarshipNavigator: cloneScholarshipNavigatorState(state.scholarshipNavigator),
   };
 }
 
@@ -74,7 +76,7 @@ export function getAdmissionEvents(state: AdmissionSimulationState) {
 }
 
 export function isAdmissionSimulationStateValid(state: AdmissionSimulationState) {
-  if (state.version !== 4 || !state.candidateId || !Array.isArray(state.seats)) return false;
+  if (state.version !== 5 || !state.candidateId || !Array.isArray(state.seats)) return false;
   if (!Array.isArray(state.events) || !Array.isArray(state.externalAdmissions)) return false;
   if (!Array.isArray(state.spotRounds)) return false;
   if (
@@ -85,6 +87,7 @@ export function isAdmissionSimulationStateValid(state: AdmissionSimulationState)
     !Array.isArray(state.clearing.events)
   ) return false;
   if (!isDocumentPassportStateValid(state)) return false;
+  if (!isScholarshipNavigatorStateValid(state)) return false;
 
   const seatIds = new Set<string>();
   for (const seat of state.seats) {
@@ -160,7 +163,7 @@ export function sanitizeAdmissionSimulationState(
     ? candidate.documentPassport.records.map((record) => record?.id).sort().join("|")
     : "";
   if (
-    candidate.version !== 4 ||
+    candidate.version !== 5 ||
     candidate.candidateId !== initialState.candidateId ||
     expectedSeatIds !== candidateSeatIds ||
     expectedRoundIds !== candidateRoundIds ||

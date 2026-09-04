@@ -130,6 +130,155 @@ export interface DocumentPassportState {
   activity: DocumentActivity[];
 }
 
+export type ScholarshipPortal = "MAHADBT" | "NSP";
+export type ScholarshipSchemeType = "MERIT" | "WELFARE" | "FEE_REIMBURSEMENT" | "MAINTENANCE" | "OTHER";
+export type ScholarshipEligibilityStatus = "ELIGIBLE" | "POSSIBLY_ELIGIBLE" | "NOT_ELIGIBLE";
+export type ScholarshipCriteriaCoverage = "FULL" | "PARTIAL";
+export type ScholarshipHostelStatus = "UNKNOWN" | "HOSTELLER" | "DAY_SCHOLAR";
+export type ScholarshipAdmissionRoute = "CAP" | "SPOT_ROUND" | "CONNECTED" | "NONE";
+export type ScholarshipStudyLevel = "UNDERGRADUATE" | "POSTGRADUATE" | "DIPLOMA";
+export type ScholarshipCourseType = "PROFESSIONAL_TECHNICAL" | "ARTS" | "COMMERCE" | "SCIENCE" | "LAW";
+
+export interface ScholarshipProfile {
+  candidateId: string;
+  isSynthetic: true;
+  nationality: "INDIAN";
+  domicileState: "MAHARASHTRA";
+  studyingState: "MAHARASHTRA";
+  familyAnnualIncomeInr: number;
+  studyLevel: ScholarshipStudyLevel;
+  courseType: ScholarshipCourseType;
+  courseMode: "REGULAR";
+  currentStudyYear: number;
+  class12Percentage: number;
+  class12BoardPercentile: number | null;
+  hostelStatus: ScholarshipHostelStatus;
+  disabilityPercentage: number;
+  isReceivingOtherScholarship: boolean;
+  isReceivingOtherMaintenanceAllowance: boolean;
+  familyBeneficiaryCount: number;
+  educationGapYears: number;
+  attendanceRequirementSatisfied: boolean;
+  institutionRecognition: "RECOGNIZED";
+  institutionOwnership: "NON_PRIVATE_UNIVERSITY";
+  updatedAt: string;
+}
+
+export type ScholarshipRuleField =
+  | keyof Pick<
+      ScholarshipProfile,
+      | "nationality"
+      | "domicileState"
+      | "studyingState"
+      | "familyAnnualIncomeInr"
+      | "studyLevel"
+      | "courseType"
+      | "courseMode"
+      | "currentStudyYear"
+      | "class12Percentage"
+      | "class12BoardPercentile"
+      | "hostelStatus"
+      | "disabilityPercentage"
+      | "isReceivingOtherScholarship"
+      | "isReceivingOtherMaintenanceAllowance"
+      | "familyBeneficiaryCount"
+      | "educationGapYears"
+      | "attendanceRequirementSatisfied"
+      | "institutionRecognition"
+      | "institutionOwnership"
+    >
+  | "candidateCategory"
+  | "admissionRoute";
+
+export type ScholarshipRuleOperator = "EQUALS" | "LTE" | "GTE" | "ONE_OF";
+export type ScholarshipRuleValue = string | number | boolean | readonly string[];
+
+export interface ScholarshipRule {
+  id: string;
+  field: ScholarshipRuleField;
+  operator: ScholarshipRuleOperator;
+  value: ScholarshipRuleValue;
+  explanation: string;
+  failureExplanation: string;
+  sourceTitle: string;
+  mandatory: true;
+}
+
+export interface ScholarshipDocumentRequirement {
+  documentType: DocumentType;
+  displayName: string;
+}
+
+export interface ScholarshipOfficialSource {
+  title: string;
+  url: string;
+  portal: ScholarshipPortal;
+  lastVerifiedOn: string;
+}
+
+export interface ScholarshipScheme {
+  id: string;
+  name: string;
+  provider: string;
+  portal: ScholarshipPortal;
+  schemeType: ScholarshipSchemeType;
+  academicYear?: string;
+  benefitSummary: string;
+  applicationDeadline?: string;
+  rules: readonly ScholarshipRule[];
+  requiredDocuments: readonly ScholarshipDocumentRequirement[];
+  criteriaCoverage: ScholarshipCriteriaCoverage;
+  documentCoverage: ScholarshipCriteriaCoverage;
+  officialSources: readonly ScholarshipOfficialSource[];
+}
+
+export interface ScholarshipRuleResult {
+  ruleId: string;
+  status: "PASSED" | "FAILED" | "UNKNOWN";
+  explanation: string;
+}
+
+export interface ScholarshipDocumentReadiness {
+  documentType: DocumentType;
+  displayName: string;
+  ready: boolean;
+  verificationStatus: DocumentVerificationStatus | "NOT_IN_PASSPORT";
+  recordId: string | null;
+}
+
+export interface ScholarshipEvaluation {
+  schemeId: string;
+  status: ScholarshipEligibilityStatus;
+  passedRules: ScholarshipRuleResult[];
+  failedRules: ScholarshipRuleResult[];
+  unknownRules: ScholarshipRuleResult[];
+  requiredDocuments: ScholarshipDocumentReadiness[];
+  missingDocuments: ScholarshipDocumentReadiness[];
+  readyDocumentCount: number;
+  requiredDocumentCount: number;
+  applicationReady: boolean;
+  nextActions: string[];
+}
+
+export interface ScholarshipSummary {
+  eligible: number;
+  possiblyEligible: number;
+  notEligible: number;
+  applicationReady: number;
+}
+
+export interface ScholarshipPortalHandoff {
+  schemeId: string;
+  status: "HANDED_OFF";
+  openedAt: string;
+}
+
+export interface ScholarshipNavigatorState {
+  version: 1;
+  profile: ScholarshipProfile;
+  handoffs: ScholarshipPortalHandoff[];
+}
+
 export type InstituteType = "GOVERNMENT" | "GOVERNMENT_AIDED" | "UNIVERSITY" | "UNAIDED";
 
 export interface College {
@@ -456,7 +605,7 @@ export interface AdmissionSimulationFeedback {
 }
 
 export interface AdmissionSimulationState {
-  version: 4;
+  version: 5;
   candidateId: string;
   currentAdmission: SimulationCurrentAdmission | null;
   seats: SimulationSeat[];
@@ -467,6 +616,7 @@ export interface AdmissionSimulationState {
   lastSpotRoundOutcome: SpotRoundOutcome | null;
   clearing: MeritClearingState;
   documentPassport: DocumentPassportState;
+  scholarshipNavigator: ScholarshipNavigatorState;
   updatedAt: string;
 }
 
@@ -490,6 +640,8 @@ export type AdmissionTransitionErrorCode =
   | "DOCUMENT_CONSENT_REQUIRED"
   | "DOCUMENT_REQUIREMENT_NOT_READY"
   | "DOCUMENT_RECIPIENT_INVALID"
+  | "SCHOLARSHIP_PROFILE_INVALID"
+  | "SCHOLARSHIP_SCHEME_NOT_FOUND"
   | "INVALID_STATE";
 
 export interface AdmissionTransitionError {
