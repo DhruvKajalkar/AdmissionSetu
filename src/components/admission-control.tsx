@@ -5,6 +5,7 @@ import { useState } from "react";
 import { getAdmissionEvents, getProgrammeVacancies } from "@/services/admission-state";
 import type { OfficialInstitute, OfficialProgram } from "@/types";
 import { useAdmissionSimulation } from "./admission-simulation-provider";
+import { DocumentReportingPanel } from "./document-reporting-panel";
 import { PageHeader } from "./page-header";
 import { StatusBadge } from "./status-badge";
 
@@ -42,7 +43,7 @@ export function AdmissionControl({ institutes, programs }: { institutes: readonl
     <>
       <PageHeader eyebrow="One student · one admission state" title="My Admission" description="See and manage Aarya's one current admission in this demo." action={<StatusBadge tone="info">Demo simulation</StatusBadge>} />
 
-      {resetComplete ? <div className="demo-reset-feedback" role="status"><strong>Demo reset complete.</strong><span>Aarya again holds AISSMS Computer Engineering. Saved preferences were not changed.</span></div> : null}
+      {resetComplete ? <div className="demo-reset-feedback" role="status"><strong>Demo reset complete.</strong><span>Aarya again holds AISSMS Computer Engineering. Document consent and sharing history were restored; saved preferences were not changed.</span></div> : null}
 
       {state.lastFeedback && feedbackProgram && feedbackInstitute ? (
         <section className="seat-release-feedback" role="status" aria-labelledby="release-feedback-title">
@@ -64,6 +65,16 @@ export function AdmissionControl({ institutes, programs }: { institutes: readonl
         ) : <div className="no-current-admission"><strong>Aarya does not currently hold an admission.</strong><p>Her previously held participating seat is visible as AVAILABLE on the demo vacancy exchange.</p></div>}
       </section>
 
+      {admission?.kind === "PARTICIPATING_SEAT" && program && institute ? (
+        <DocumentReportingPanel
+          instituteCode={institute.code}
+          instituteName={institute.commonName}
+          programId={program.choiceCode}
+          programName={program.name}
+          workflowId="INSTITUTE_REPORTING"
+        />
+      ) : null}
+
       <section className="seat-lifecycle-card" aria-labelledby="seat-lifecycle-title"><div><p className="context-label">One seat · one live state</p><h2 id="seat-lifecycle-title">How a seat moves</h2><p>A seat should return to the vacancy pool as soon as the participating admission process knows it is no longer held.</p></div><ol aria-label="Seat lifecycle"><li>Available</li><li>Offered</li><li>Accepted</li><li>Released</li><li>Available</li></ol></section>
 
       <div className="simulation-action-grid">
@@ -73,7 +84,7 @@ export function AdmissionControl({ institutes, programs }: { institutes: readonl
 
       {pendingAction ? (
         <section className="simulation-confirmation" role="alertdialog" aria-modal="false" aria-labelledby="simulation-confirm-title">
-          <div><p>Confirm demo action</p><h2 id="simulation-confirm-title">{pendingAction === "WITHDRAW" ? "Release the current seat?" : pendingAction === "CONNECTED" ? "Confirm the connected demo admission?" : "Reset the admission simulation?"}</h2><p>{pendingAction === "WITHDRAW" ? "Aarya will no longer hold her current participating admission. That exact synthetic seat will return to the vacancy exchange." : pendingAction === "CONNECTED" ? "The fictional connected admission will become current. Aarya's participating seat will be released and the vacancy board will update." : "The original AISSMS seat, spot-round interests, queues, offers, synthetic inventory, and event history will be restored. Saved preferences will not be changed."}</p></div><div><button className="secondary-action-button" type="button" onClick={() => setPendingAction(null)}>Cancel</button><button className={pendingAction === "RESET" ? "danger-action-button" : "primary-action-button"} type="button" onClick={() => complete(pendingAction)}>{pendingAction === "RESET" ? "Reset Demo" : "Confirm Demo Action"}</button></div>
+          <div><p>Confirm demo action</p><h2 id="simulation-confirm-title">{pendingAction === "WITHDRAW" ? "Release the current seat?" : pendingAction === "CONNECTED" ? "Confirm the connected demo admission?" : "Reset the admission simulation?"}</h2><p>{pendingAction === "WITHDRAW" ? "Aarya will no longer hold her current participating admission. That exact synthetic seat will return to the vacancy exchange." : pendingAction === "CONNECTED" ? "The fictional connected admission will become current. Aarya's participating seat will be released and the vacancy board will update." : "The original AISSMS seat, spot-round interests, queues, offers, document consent, synthetic inventory, and event history will be restored. Saved preferences will not be changed."}</p></div><div><button className="secondary-action-button" type="button" onClick={() => setPendingAction(null)}>Cancel</button><button className={pendingAction === "RESET" ? "danger-action-button" : "primary-action-button"} type="button" onClick={() => complete(pendingAction)}>{pendingAction === "RESET" ? "Reset Demo" : "Confirm Demo Action"}</button></div>
         </section>
       ) : null}
 

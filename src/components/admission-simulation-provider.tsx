@@ -25,9 +25,16 @@ import {
   joinClearingRound,
   leaveClearingRound,
 } from "@/services/clearing-network";
-import type { AdmissionSimulationState, AdmissionTransitionError } from "@/types";
+import {
+  connectDocumentProvider,
+  revokeDocumentConsent,
+  shareDocumentsForPurpose,
+} from "@/services/document-passport";
+import type { ShareDocumentsInput } from "@/services/document-passport";
+import { documentDemoTimestamps } from "@/data/document-passport";
+import type { AdmissionSimulationState, AdmissionTransitionError, DocumentConsentScope } from "@/types";
 
-const STORAGE_KEY = "admissionsetu:admission-simulation:v3";
+const STORAGE_KEY = "admissionsetu:admission-simulation:v4";
 const listeners = new Set<() => void>();
 let cachedRaw: string | null | undefined;
 let cachedState: AdmissionSimulationState | undefined;
@@ -49,6 +56,9 @@ interface AdmissionSimulationValue {
   advanceClearing: () => boolean;
   acceptMeritOffer: (offerId: string) => boolean;
   declineMeritOffer: (offerId: string) => boolean;
+  connectDocuments: (scopes: readonly DocumentConsentScope[]) => boolean;
+  revokeDocumentAccess: () => boolean;
+  shareDocuments: (input: ShareDocumentsInput) => boolean;
   resetDemo: () => void;
   clearError: () => void;
 }
@@ -153,6 +163,18 @@ export function AdmissionSimulationProvider({
   const advanceClearing = useCallback(() => applyResult(advanceHeroClearingScenario(state)), [applyResult, state]);
   const acceptMeritOffer = useCallback((offerId: string) => applyResult(acceptClearingOffer(state, offerId)), [applyResult, state]);
   const declineMeritOffer = useCallback((offerId: string) => applyResult(declineClearingOffer(state, offerId)), [applyResult, state]);
+  const connectDocuments = useCallback(
+    (scopes: readonly DocumentConsentScope[]) => applyResult(connectDocumentProvider(state, scopes, documentDemoTimestamps.connectProvider)),
+    [applyResult, state],
+  );
+  const revokeDocumentAccess = useCallback(
+    () => applyResult(revokeDocumentConsent(state, documentDemoTimestamps.revokeProvider)),
+    [applyResult, state],
+  );
+  const shareDocuments = useCallback(
+    (input: ShareDocumentsInput) => applyResult(shareDocumentsForPurpose(state, input, documentDemoTimestamps.shareForAdmission)),
+    [applyResult, state],
+  );
   const resetDemo = useCallback(() => {
     setLastError(null);
     writeState(resetAdmissionSimulation(initialState));
@@ -160,8 +182,8 @@ export function AdmissionSimulationProvider({
   const clearError = useCallback(() => setLastError(null), []);
 
   const value = useMemo(
-    () => ({ state, lastError, withdrawCurrent, confirmConnected, acceptParticipatingSeat, joinRound, leaveRound, advanceRound, acceptRoundOffer, declineRoundOffer, expireRoundOffer, joinMeritRound, leaveMeritRound, advanceClearing, acceptMeritOffer, declineMeritOffer, resetDemo, clearError }),
-    [acceptMeritOffer, acceptParticipatingSeat, acceptRoundOffer, advanceClearing, advanceRound, clearError, confirmConnected, declineMeritOffer, declineRoundOffer, expireRoundOffer, joinMeritRound, joinRound, lastError, leaveMeritRound, leaveRound, resetDemo, state, withdrawCurrent],
+    () => ({ state, lastError, withdrawCurrent, confirmConnected, acceptParticipatingSeat, joinRound, leaveRound, advanceRound, acceptRoundOffer, declineRoundOffer, expireRoundOffer, joinMeritRound, leaveMeritRound, advanceClearing, acceptMeritOffer, declineMeritOffer, connectDocuments, revokeDocumentAccess, shareDocuments, resetDemo, clearError }),
+    [acceptMeritOffer, acceptParticipatingSeat, acceptRoundOffer, advanceClearing, advanceRound, clearError, confirmConnected, connectDocuments, declineMeritOffer, declineRoundOffer, expireRoundOffer, joinMeritRound, joinRound, lastError, leaveMeritRound, leaveRound, resetDemo, revokeDocumentAccess, shareDocuments, state, withdrawCurrent],
   );
   return <AdmissionSimulationContext.Provider value={value}>{children}</AdmissionSimulationContext.Provider>;
 }

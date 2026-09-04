@@ -5,6 +5,7 @@ import type {
   AdmissionTransitionResult,
   SimulationCurrentAdmission,
 } from "@/types";
+import { cloneDocumentPassportState, isDocumentPassportStateValid } from "./document-passport.ts";
 
 function cloneState(state: AdmissionSimulationState): AdmissionSimulationState {
   return {
@@ -43,6 +44,7 @@ function cloneState(state: AdmissionSimulationState): AdmissionSimulationState {
           }
         : null,
     },
+    documentPassport: cloneDocumentPassportState(state.documentPassport),
   };
 }
 
@@ -72,7 +74,7 @@ export function getAdmissionEvents(state: AdmissionSimulationState) {
 }
 
 export function isAdmissionSimulationStateValid(state: AdmissionSimulationState) {
-  if (state.version !== 3 || !state.candidateId || !Array.isArray(state.seats)) return false;
+  if (state.version !== 4 || !state.candidateId || !Array.isArray(state.seats)) return false;
   if (!Array.isArray(state.events) || !Array.isArray(state.externalAdmissions)) return false;
   if (!Array.isArray(state.spotRounds)) return false;
   if (
@@ -82,6 +84,7 @@ export function isAdmissionSimulationStateValid(state: AdmissionSimulationState)
     !Array.isArray(state.clearing.offers) ||
     !Array.isArray(state.clearing.events)
   ) return false;
+  if (!isDocumentPassportStateValid(state)) return false;
 
   const seatIds = new Set<string>();
   for (const seat of state.seats) {
@@ -143,6 +146,7 @@ export function sanitizeAdmissionSimulationState(
   const expectedSeatIds = initialState.seats.map((seat) => seat.id).sort().join("|");
   const expectedRoundIds = initialState.spotRounds.map((round) => round.id).sort().join("|");
   const expectedClearingCandidateIds = initialState.clearing.candidates.map((candidate) => candidate.candidateId).sort().join("|");
+  const expectedDocumentIds = initialState.documentPassport.records.map((record) => record.id).sort().join("|");
   const candidateSeatIds = Array.isArray(candidate.seats)
     ? candidate.seats.map((seat) => seat?.id).sort().join("|")
     : "";
@@ -152,12 +156,16 @@ export function sanitizeAdmissionSimulationState(
   const candidateClearingIds = Array.isArray(candidate.clearing?.candidates)
     ? candidate.clearing.candidates.map((item) => item?.candidateId).sort().join("|")
     : "";
+  const candidateDocumentIds = Array.isArray(candidate.documentPassport?.records)
+    ? candidate.documentPassport.records.map((record) => record?.id).sort().join("|")
+    : "";
   if (
-    candidate.version !== 3 ||
+    candidate.version !== 4 ||
     candidate.candidateId !== initialState.candidateId ||
     expectedSeatIds !== candidateSeatIds ||
     expectedRoundIds !== candidateRoundIds ||
     expectedClearingCandidateIds !== candidateClearingIds ||
+    expectedDocumentIds !== candidateDocumentIds ||
     !isAdmissionSimulationStateValid(candidate)
   ) {
     return cloneState(initialState);

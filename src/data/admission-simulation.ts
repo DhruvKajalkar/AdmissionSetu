@@ -10,6 +10,7 @@ import type {
 } from "@/types";
 import { demoCandidate } from "./candidate.ts";
 import { demoAdmissionCycle } from "./demo-cycle.ts";
+import { createInitialDocumentPassportState } from "./document-passport.ts";
 
 export const HERO_SPOT_ROUND_ID = "spot-pict-entc-live";
 export const V2_HERO_OFFER_ROUND_ID = "spot-vit-computer-live";
@@ -184,7 +185,7 @@ function createInitialClearingCandidates(): CandidateClearingProfile[] {
 
 export function createInitialAdmissionSimulationState(): AdmissionSimulationState {
   return {
-    version: 3,
+    version: 4,
     candidateId: demoCandidate.id,
     currentAdmission: {
       id: "DEMO-ADMISSION-AARYA-CAP-R2",
@@ -268,6 +269,7 @@ export function createInitialAdmissionSimulationState(): AdmissionSimulationStat
       heroScenario: { status: "READY" },
       lastOutcome: null,
     },
+    documentPassport: createInitialDocumentPassportState(),
     updatedAt: demoAdmissionCycle.currentSeatAllottedAt,
   };
 }

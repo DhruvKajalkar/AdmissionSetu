@@ -4671,3 +4671,236 @@ a {
     grid-column: 2;
   }
 }
+
+/* V2 verified document passport */
+.document-passport-summary,
+.provider-card,
+.passport-records,
+.requirement-section,
+.document-activity,
+.document-reporting-panel,
+.operations-document-readiness {
+  margin-bottom: 18px;
+  border: 1px solid var(--slate-200);
+  border-radius: 9px;
+  background: var(--white);
+}
+
+.document-passport-summary {
+  display: grid;
+  padding: 22px 24px;
+  border-left: 4px solid var(--blue-700);
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 24px;
+}
+
+.document-passport-summary p,
+.provider-heading p,
+.passport-records > header p,
+.requirement-section > header p,
+.document-activity > header p,
+.document-reporting-heading p,
+.operations-document-readiness > div > p {
+  margin: 0 0 5px;
+  color: var(--blue-700);
+  font-size: 0.59rem;
+  font-weight: 850;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.document-passport-summary h2,
+.provider-heading h2,
+.passport-records > header h2,
+.requirement-section > header h2,
+.document-activity > header h2,
+.document-reporting-heading h2,
+.operations-document-readiness h2 {
+  margin: 0;
+  color: var(--navy-950);
+  font-size: 1.05rem;
+}
+
+.document-passport-summary > div:first-child > span,
+.provider-heading > div > span,
+.passport-records > header > span,
+.requirement-section > header > span,
+.document-activity > header > span,
+.operations-document-readiness > div > span {
+  display: block;
+  margin-top: 7px;
+  color: var(--slate-600);
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+
+.document-passport-count {
+  display: flex;
+  min-width: 132px;
+  padding: 16px 18px;
+  border-radius: 8px;
+  background: var(--blue-50);
+  text-align: center;
+  flex-direction: column;
+}
+
+.document-passport-count strong { color: var(--navy-950); font-size: 1.45rem; }
+.document-passport-count span { color: var(--slate-600); font-size: 0.62rem; font-weight: 750; }
+
+.provider-card { padding: 22px 24px; }
+.provider-heading,
+.passport-records > header,
+.requirement-section > header,
+.document-activity > header,
+.document-reporting-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.provider-explanation {
+  max-width: 800px;
+  margin: 14px 0 18px;
+  color: var(--slate-600);
+  font-size: 0.7rem;
+  line-height: 1.55;
+}
+
+.provider-access-summary,
+.document-reporting-action {
+  display: flex;
+  padding-top: 16px;
+  border-top: 1px solid var(--slate-200);
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.provider-access-summary > div,
+.document-reporting-action {
+  color: var(--slate-600);
+  font-size: 0.66rem;
+  line-height: 1.5;
+}
+
+.provider-access-summary > div { display: flex; flex-direction: column; gap: 4px; }
+.provider-access-summary strong { color: var(--navy-900); }
+
+.passport-records,
+.requirement-section,
+.document-activity { overflow: hidden; }
+.passport-records > header,
+.requirement-section > header,
+.document-activity > header { padding: 19px 22px; border-bottom: 1px solid var(--slate-200); }
+
+.passport-record-grid {
+  display: grid;
+  padding: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.passport-record {
+  padding: 16px;
+  border: 1px solid var(--slate-200);
+  border-left: 3px solid var(--teal-700);
+  border-radius: 7px;
+}
+
+.passport-record.is-missing { border-left-color: var(--red-700); background: var(--red-50); }
+.passport-record-heading { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.passport-record-heading .document-status-symbol { width: 26px; height: 26px; }
+.passport-record h3 { margin: 0; color: var(--navy-900); font-size: 0.78rem; }
+.passport-record-heading p { margin: 4px 0 0; color: var(--slate-600); font-size: 0.61rem; }
+.passport-record dl { display: grid; margin: 14px 0 9px; padding-top: 12px; border-top: 1px solid var(--slate-100); grid-template-columns: 70px minmax(0, 1fr); }
+.passport-record dt { color: var(--slate-500); font-size: 0.57rem; font-weight: 850; text-transform: uppercase; }
+.passport-record dd { margin: 0; color: var(--slate-700); font-size: 0.63rem; }
+.passport-record > small { color: var(--slate-500); font-size: 0.59rem; }
+.missing-document-note { margin: 14px 0 0; color: var(--red-700); font-size: 0.63rem; }
+
+.requirement-grid { display: grid; padding: 16px; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.requirement-grid article { padding: 16px; border: 1px solid var(--slate-200); border-radius: 7px; }
+.requirement-grid h3 { margin: 13px 0 7px; color: var(--navy-900); font-size: 0.78rem; }
+.requirement-grid article > strong { color: var(--teal-700); font-size: 1rem; }
+.requirement-grid p { margin: 8px 0 12px; color: var(--slate-600); font-size: 0.63rem; line-height: 1.5; }
+.requirement-grid small { color: var(--slate-500); font-size: 0.57rem; font-weight: 750; text-transform: uppercase; }
+
+.document-activity ol { margin: 0; padding: 0; list-style: none; }
+.document-activity li { display: grid; padding: 14px 20px; border-bottom: 1px solid var(--slate-100); grid-template-columns: 72px minmax(0, 1fr); gap: 12px; }
+.document-activity time { color: var(--slate-500); font-size: 0.59rem; font-weight: 750; }
+.document-activity li div { display: flex; flex-direction: column; gap: 4px; }
+.document-activity li strong { color: var(--navy-900); font-size: 0.68rem; }
+.document-activity li span { color: var(--slate-600); font-size: 0.63rem; line-height: 1.45; }
+.empty-document-activity { margin: 0; padding: 20px 22px; color: var(--slate-500); font-size: 0.68rem; }
+
+.document-scope-list { display: grid; margin: 0 0 20px; padding: 0; border: 0; gap: 8px; }
+.document-scope-list legend { margin-bottom: 9px; color: var(--navy-900); font-size: 0.67rem; font-weight: 850; }
+.document-scope-list label { display: flex; padding: 11px 12px; border: 1px solid var(--slate-200); border-radius: 7px; cursor: pointer; gap: 10px; }
+.document-scope-list input { width: 18px; height: 18px; margin: 1px 0 0; flex: 0 0 auto; }
+.document-scope-list label > span { display: flex; flex-direction: column; gap: 3px; }
+.document-scope-list strong { color: var(--navy-900); font-size: 0.68rem; }
+.document-scope-list small { color: var(--slate-500); font-size: 0.59rem; }
+.manage-access-list { display: flex !important; margin-bottom: 20px; padding: 13px; border-radius: 7px; background: var(--slate-50); flex-direction: column; gap: 5px !important; }
+.manage-access-list strong { color: var(--navy-900); font-size: 0.67rem; }
+.manage-access-list span { color: var(--slate-600); font-size: 0.62rem; line-height: 1.45; }
+
+.document-reporting-panel { padding: 20px 22px; border-left: 4px solid var(--teal-700); }
+.document-reporting-panel.compact { margin: 6px 0 2px; padding: 16px; }
+.document-reporting-panel > p { margin: 11px 0 15px; color: var(--slate-600); font-size: 0.68rem; line-height: 1.5; }
+.document-share-success { display: flex; padding: 12px 14px; border-radius: 7px; background: var(--teal-50); flex-direction: column; gap: 4px; }
+.document-share-success strong { color: var(--teal-700); font-size: 0.69rem; }
+.document-share-success span { color: var(--slate-700); font-size: 0.62rem; }
+.clearing-offer-card > .document-reporting-panel { grid-column: 1 / -1; }
+
+.document-share-dialog ul { margin: 0 0 20px; padding: 0; border: 1px solid var(--slate-200); border-radius: 7px; list-style: none; }
+.document-share-dialog li { display: flex; padding: 10px 12px; border-bottom: 1px solid var(--slate-100); align-items: center; justify-content: space-between; gap: 12px; }
+.document-share-dialog li:last-child { border-bottom: 0; }
+.document-share-dialog li span { color: var(--navy-900); font-size: 0.66rem; }
+.document-share-dialog li strong { color: var(--teal-700); font-size: 0.6rem; text-transform: uppercase; }
+
+.operations-document-readiness { display: grid; padding: 20px 22px; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 20px; }
+.operations-document-readiness dl { display: grid; margin: 0; grid-template-columns: repeat(2, minmax(120px, 1fr)); gap: 12px; }
+.operations-document-readiness dl div { padding: 11px 13px; border-radius: 7px; background: var(--slate-50); }
+.operations-document-readiness dt { color: var(--slate-500); font-size: 0.56rem; font-weight: 850; text-transform: uppercase; }
+.operations-document-readiness dd { margin: 5px 0 0; color: var(--navy-900); font-size: 0.69rem; font-weight: 850; }
+.operations-document-readiness > small { color: var(--slate-500); font-size: 0.58rem; grid-column: 1 / -1; }
+
+.dashboard-document-actions { display: flex; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--slate-200); align-items: center; justify-content: space-between; gap: 14px; }
+.dashboard-document-actions > span { color: var(--slate-500); font-size: 0.62rem; line-height: 1.45; }
+
+@media (max-width: 900px) {
+  .requirement-grid { grid-template-columns: 1fr; }
+  .operations-document-readiness { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 680px) {
+  .document-passport-summary,
+  .operations-document-readiness { grid-template-columns: 1fr; }
+  .passport-record-grid { grid-template-columns: 1fr; }
+  .provider-heading,
+  .passport-records > header,
+  .requirement-section > header,
+  .document-activity > header,
+  .document-reporting-heading,
+  .provider-access-summary,
+  .document-reporting-action,
+  .dashboard-document-actions { align-items: stretch; flex-direction: column; }
+  .document-passport-count { min-width: 0; text-align: left; }
+}
+
+@media (max-width: 500px) {
+  .document-passport-summary,
+  .provider-card,
+  .document-reporting-panel { padding: 18px; }
+  .passport-records > header,
+  .requirement-section > header,
+  .document-activity > header { padding: 16px; }
+  .passport-record-grid,
+  .requirement-grid { padding: 10px; }
+  .passport-record-heading { grid-template-columns: 28px minmax(0, 1fr); }
+  .passport-record-heading .status-badge { grid-column: 2; justify-self: start; }
+  .document-activity li { grid-template-columns: 1fr; }
+  .operations-document-readiness dl { grid-template-columns: 1fr; }
+}

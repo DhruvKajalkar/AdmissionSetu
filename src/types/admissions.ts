@@ -9,26 +9,6 @@ export type HomeUniversity =
   | "SGBAU"
   | "OTHER";
 
-export type DocumentStatus = "VERIFIED" | "UPLOADED" | "PENDING" | "NOT_REQUIRED";
-
-export type DocumentKind =
-  | "MHT_CET_SCORECARD"
-  | "JEE_MAIN_SCORECARD"
-  | "SSC_MARKSHEET"
-  | "HSC_MARKSHEET"
-  | "SCHOOL_LEAVING_CERTIFICATE"
-  | "DOMICILE_CERTIFICATE"
-  | "NATIONALITY_CERTIFICATE"
-  | "CATEGORY_CERTIFICATE";
-
-export interface CandidateDocument {
-  id: string;
-  kind: DocumentKind;
-  label: string;
-  status: DocumentStatus;
-  updatedAt?: string;
-}
-
 export interface Candidate {
   id: string;
   fullName: string;
@@ -39,8 +19,115 @@ export interface Candidate {
   category: CandidateCategory;
   homeUniversity: HomeUniversity;
   currentJourneyStage: AdmissionJourneyStageId;
-  documents: CandidateDocument[];
   preferenceProgramIds: string[];
+}
+
+export type DocumentType =
+  | "SSC_MARKSHEET"
+  | "HSC_MARKSHEET"
+  | "MHT_CET_SCORECARD"
+  | "JEE_MAIN_SCORECARD"
+  | "DOMICILE_CERTIFICATE"
+  | "INCOME_CERTIFICATE";
+
+export type DocumentSource = "DIGILOCKER" | "MANUAL" | "INSTITUTION" | "SYNTHETIC";
+export type DocumentVerificationStatus =
+  | "NOT_CONNECTED"
+  | "AVAILABLE"
+  | "VERIFIED"
+  | "MISSING"
+  | "NEEDS_ATTENTION"
+  | "EXPIRED";
+
+export type DocumentConsentScope =
+  | "SSC_MARKSHEET"
+  | "HSC_MARKSHEET"
+  | "DOMICILE_CERTIFICATE"
+  | "ENTRANCE_EXAM_RECORDS";
+
+export interface DocumentRecord {
+  id: string;
+  candidateId: string;
+  documentType: DocumentType;
+  displayName: string;
+  source: DocumentSource;
+  verificationStatus: DocumentVerificationStatus;
+  issuedBy?: string;
+  issuedAt?: string;
+  expiresAt?: string;
+  accessScope?: DocumentConsentScope;
+  lastSharedAt: string | null;
+  isSynthetic: true;
+}
+
+export type DocumentProviderConnectionStatus = "NOT_CONNECTED" | "CONNECTED" | "REVOKED";
+
+export interface DocumentProviderConnection {
+  provider: "DIGILOCKER_DEMO";
+  status: DocumentProviderConnectionStatus;
+  grantedScopes: DocumentConsentScope[];
+  connectedAt: string | null;
+  revokedAt: string | null;
+}
+
+export type DocumentWorkflowId =
+  | "DOCUMENT_PASSPORT"
+  | "CAP"
+  | "INSTITUTE_REPORTING"
+  | "SPOT_ROUND";
+
+export interface DocumentRequirementBundle {
+  id: DocumentWorkflowId;
+  displayName: string;
+  description: string;
+  requiredDocumentTypes: readonly DocumentType[];
+  isPrototypeRequirementSet: true;
+}
+
+export interface DocumentWorkflowReadiness {
+  workflowId: DocumentWorkflowId;
+  readyCount: number;
+  requiredCount: number;
+  ready: boolean;
+  missingDocumentTypes: DocumentType[];
+  attentionDocumentTypes: DocumentType[];
+}
+
+export interface DocumentShareRecord {
+  id: string;
+  candidateId: string;
+  workflowId: DocumentWorkflowId;
+  recipientInstituteCode: string;
+  recipientInstituteName: string;
+  recipientProgramId: string;
+  recipientProgramName: string;
+  documentTypes: DocumentType[];
+  purpose: string;
+  sharedAt: string;
+  isSynthetic: true;
+}
+
+export type DocumentActivityType =
+  | "PROVIDER_CONNECTED"
+  | "PROVIDER_ACCESS_REVOKED"
+  | "DOCUMENTS_SHARED";
+
+export interface DocumentActivity {
+  id: string;
+  type: DocumentActivityType;
+  occurredAt: string;
+  title: string;
+  description: string;
+  recipientInstituteCode?: string;
+  documentTypes: DocumentType[];
+}
+
+export interface DocumentPassportState {
+  version: 1;
+  records: DocumentRecord[];
+  providerConnection: DocumentProviderConnection;
+  shares: DocumentShareRecord[];
+  activity: DocumentActivity[];
 }
 
 export type InstituteType = "GOVERNMENT" | "GOVERNMENT_AIDED" | "UNIVERSITY" | "UNAIDED";
@@ -369,7 +456,7 @@ export interface AdmissionSimulationFeedback {
 }
 
 export interface AdmissionSimulationState {
-  version: 3;
+  version: 4;
   candidateId: string;
   currentAdmission: SimulationCurrentAdmission | null;
   seats: SimulationSeat[];
@@ -379,6 +466,7 @@ export interface AdmissionSimulationState {
   spotRounds: SpotRound[];
   lastSpotRoundOutcome: SpotRoundOutcome | null;
   clearing: MeritClearingState;
+  documentPassport: DocumentPassportState;
   updatedAt: string;
 }
 
@@ -398,6 +486,10 @@ export type AdmissionTransitionErrorCode =
   | "CLEARING_CANDIDATE_NOT_FOUND"
   | "CLEARING_OFFER_NOT_FOUND"
   | "CLEARING_INTEREST_NOT_ACTIVE"
+  | "DOCUMENT_PROVIDER_NOT_CONNECTED"
+  | "DOCUMENT_CONSENT_REQUIRED"
+  | "DOCUMENT_REQUIREMENT_NOT_READY"
+  | "DOCUMENT_RECIPIENT_INVALID"
   | "INVALID_STATE";
 
 export interface AdmissionTransitionError {

@@ -82,7 +82,7 @@ export function DashboardView({ candidate, institutes, programs }: { candidate: 
         )}
       </div>
       <AdmissionJourney stages={journeyStages} currentStageId={journeyStageId} />
-      <div className="dashboard-detail-grid"><DocumentReadiness documents={candidate.documents} /><SectionCard className="alerts-card" title="Important Alerts" description="Only the updates that need your attention now."><div className="alerts-list">{visibleAlerts.map((alert) => <AdmissionAlert alert={alert} key={alert.id} />)}</div></SectionCard></div>
+      <div className="dashboard-detail-grid"><DocumentReadiness /><SectionCard className="alerts-card" title="Important Alerts" description="Only the updates that need your attention now."><div className="alerts-list">{visibleAlerts.map((alert) => <AdmissionAlert alert={alert} key={alert.id} />)}</div></SectionCard></div>
       <section className="dashboard-actions" aria-labelledby="quick-actions-title"><div className="dashboard-section-heading"><div><h2 id="quick-actions-title">What you can do next</h2><p>Your current seat and Live Vacancies stay in sync across AdmissionSetu.</p></div></div><nav className="quick-actions" aria-label="Next admission actions">{quickActions.map((action) => <Link className="action-card" href={action.href} key={action.href}><span className="action-index" aria-hidden="true">{action.index}</span><strong>{action.title}</strong><span>{action.description}</span><b aria-hidden="true">Open →</b></Link>)}</nav></section>
     </>
   );

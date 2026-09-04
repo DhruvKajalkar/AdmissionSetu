@@ -12,6 +12,7 @@ import {
 } from "@/services";
 import type { OfficialInstitute, OfficialProgram } from "@/types";
 import { useAdmissionSimulation } from "./admission-simulation-provider";
+import { DocumentReportingPanel } from "./document-reporting-panel";
 import { PageHeader } from "./page-header";
 import { StatusBadge } from "./status-badge";
 
@@ -102,7 +103,7 @@ export function SpotRoundLive({
         <span>Positions use a simplified global merit rank. This is a proposed prototype model, not a statement of current CET policy.</span>
       </div>
 
-      {resetComplete ? <div className="demo-reset-feedback" role="status"><strong>V2 demo reset complete.</strong><span>The original AISSMS admission, seats, interests, offers and merit lists were restored. Saved preferences were not changed.</span></div> : null}
+      {resetComplete ? <div className="demo-reset-feedback" role="status"><strong>V2 demo reset complete.</strong><span>The original AISSMS admission, seats, interests, offers, merit lists and document passport were restored. Saved preferences were not changed.</span></div> : null}
       {lastError ? <div className="simulation-error" role="alert"><strong>Clearing action could not be completed.</strong><span>{lastError.message}</span><button type="button" onClick={clearError}>Dismiss</button></div> : null}
 
       {outcome && previousProgram && previousInstitute ? (
@@ -118,6 +119,14 @@ export function SpotRoundLive({
             <article><small>Competing lists</small><strong>{outcome.closedRoundIds.length} closed</strong><span>PICT, PCCOE and MMCOE recomputed</span></article>
           </div>
           {outcome.generatedOfferIds.length ? <p className="clearing-next-offer">The released AISSMS seat immediately produced the next merit offer. Current available count: {outcome.previousAvailabilityCurrent}; the released seat is now counted as offered, not available.</p> : null}
+          <DocumentReportingPanel
+            instituteCode={institute.code}
+            instituteName={institute.commonName}
+            programId={program.choiceCode}
+            programName={program.name}
+            workflowId="SPOT_ROUND"
+            compact
+          />
           <section className="movement-summary" aria-labelledby="movement-title">
             <h3 id="movement-title">Cascading queue movement</h3>
             <ul>
@@ -154,6 +163,14 @@ export function SpotRoundLive({
                 <strong>Before you decide</strong>
                 <p>Accepting makes this your only participating admission, releases your AISSMS Computer seat, and closes PICT, PCCOE and MMCOE interests immediately.</p>
               </div>
+              <DocumentReportingPanel
+                instituteCode={institute.code}
+                instituteName={institute.commonName}
+                programId={program.choiceCode}
+                programName={program.name}
+                workflowId="SPOT_ROUND"
+                compact
+              />
               <div className="clearing-offer-actions"><button className="primary-action-button" type="button" onClick={() => setDecision("ACCEPT")}>Accept VIT seat</button><button className="secondary-action-button" type="button" onClick={() => setDecision("DECLINE")}>Decline offer</button></div>
             </section>
           ) : null}
@@ -182,7 +199,7 @@ export function SpotRoundLive({
           <section className="confirmation-dialog" role="dialog" aria-modal="true" aria-labelledby="clearing-confirmation-title">
             <p>Confirm clearing action</p>
             <h2 id="clearing-confirmation-title">{decision === "ACCEPT" ? "Accept VIT Computer Engineering?" : decision === "DECLINE" ? "Decline this seat offer?" : "Reset the V2 demo?"}</h2>
-            <span>{decision === "ACCEPT" ? "Your AISSMS seat will release and all other active merit-list interests will close immediately." : decision === "DECLINE" ? "The exact VIT seat will move to the next eligible candidate." : "Seats, candidates, offers, queues and clearing events return to the deterministic starting state. Preferences remain unchanged."}</span>
+            <span>{decision === "ACCEPT" ? "Your AISSMS seat will release and all other active merit-list interests will close immediately." : decision === "DECLINE" ? "The exact VIT seat will move to the next eligible candidate." : "Seats, candidates, offers, queues, document consent and event history return to the deterministic starting state. Preferences remain unchanged."}</span>
             <div><button className={decision === "ACCEPT" ? "primary-action-button" : "danger-action-button"} type="button" onClick={completeDecision}>{decision === "ACCEPT" ? "Confirm and accept seat" : decision === "DECLINE" ? "Confirm decline" : "Reset demo now"}</button><button className="secondary-action-button" type="button" onClick={() => setDecision(null)}>Go back</button></div>
           </section>
         </div>

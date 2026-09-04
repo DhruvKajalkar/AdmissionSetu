@@ -10,6 +10,8 @@ export { DeadlineBanner } from "./deadline-banner";
 export { DashboardView } from "./dashboard-view";
 export { DemoResetControl } from "./demo-reset-control";
 export { DocumentReadiness } from "./document-readiness";
+export { DocumentPassportView } from "./document-passport-view";
+export { DocumentReportingPanel } from "./document-reporting-panel";
 export { PageHeader } from "./page-header";
 export { OperationsView } from "./operations-view";
 export { PreferenceShortlistProvider, usePreferenceShortlist } from "./preference-shortlist";

@@ -9,10 +9,11 @@ const navigation = [
   { label: "Overview", shortLabel: "Overview", href: "/dashboard", index: "01" },
   { label: "Explore Colleges", shortLabel: "Explore", href: "/explore", index: "02" },
   { label: "My Preferences", shortLabel: "Preferences", href: "/preferences", index: "03" },
-  { label: "My Admission", shortLabel: "Admission", href: "/admission", index: "04" },
-  { label: "Live Vacancies", shortLabel: "Vacancies", href: "/vacancies", index: "05" },
-  { label: "Spot Rounds", shortLabel: "Spot Rounds", href: "/spot-rounds", index: "06" },
-  { label: "Operations", shortLabel: "Operations", href: "/operations", index: "07" },
+  { label: "My Documents", shortLabel: "Documents", href: "/documents", index: "04" },
+  { label: "My Admission", shortLabel: "Admission", href: "/admission", index: "05" },
+  { label: "Live Vacancies", shortLabel: "Vacancies", href: "/vacancies", index: "06" },
+  { label: "Spot Rounds", shortLabel: "Spot Rounds", href: "/spot-rounds", index: "07" },
+  { label: "Operations", shortLabel: "Operations", href: "/operations", index: "08" },
 ] as const;
 
 function isRouteActive(pathname: string, href: string) {

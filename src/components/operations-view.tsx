@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { V2_HERO_OFFER_ROUND_ID } from "@/data";
-import { buildMeritList, getProgrammeVacancies, getRoundAwaitingOffers } from "@/services";
+import { buildMeritList, getProgrammeVacancies, getRoundAwaitingOffers, getWorkflowReadiness } from "@/services";
 import type { OfficialInstitute, OfficialProgram } from "@/types";
 import { useAdmissionSimulation } from "./admission-simulation-provider";
 import { PageHeader } from "./page-header";
@@ -36,6 +36,14 @@ export function OperationsView({
     const round = state.spotRounds.find((item) => item.id === roundId);
     return round ? [round] : [];
   });
+  const reportingReadiness = getWorkflowReadiness(state, "INSTITUTE_REPORTING");
+  const currentAdmission = state.currentAdmission;
+  const admissionProgram = currentAdmission?.kind === "PARTICIPATING_SEAT"
+    ? programs.find((item) => item.choiceCode === currentAdmission.programId)
+    : undefined;
+  const admissionInstitute = admissionProgram
+    ? institutes.find((item) => item.code === admissionProgram.instituteCode)
+    : undefined;
 
   return (
     <>
@@ -49,6 +57,12 @@ export function OperationsView({
       <section className="operations-principle" aria-labelledby="operations-principle-title">
         <div><p>Central allocation authority</p><h2 id="operations-principle-title">Merit order + declared interest + available seat state</h2><span>Institutes cannot manually reorder or select candidates in this prototype.</span></div>
         {state.clearing.heroScenario.status === "READY" ? <button className="primary-action-button" type="button" onClick={advanceClearing}>Run deterministic VIT event</button> : <Link className="secondary-link-button" href={`/spot-rounds/${V2_HERO_OFFER_ROUND_ID}`}>{state.clearing.heroScenario.status === "OFFER_READY" ? "Review Aarya's VIT offer" : "View synchronized outcome"}</Link>}
+      </section>
+
+      <section className="operations-document-readiness" aria-labelledby="operations-document-title">
+        <div><p>Minimum necessary status</p><h2 id="operations-document-title">Document readiness</h2><span>Candidate Aarya · Admission: {admissionInstitute && admissionProgram ? `${admissionInstitute.commonName} ${admissionProgram.name}` : "No participating admission"}</span></div>
+        <dl><div><dt>Verified required documents</dt><dd>{reportingReadiness.readyCount}/{reportingReadiness.requiredCount}</dd></div><div><dt>Status</dt><dd>{!reportingReadiness.ready ? "Needs student attention" : state.documentPassport.providerConnection.status === "CONNECTED" ? "Ready for institute verification" : "Verified; student consent required"}</dd></div></dl>
+        <small>No document contents or identifiers are exposed in this operations view.</small>
       </section>
 
       {lastError ? <div className="simulation-error" role="alert"><strong>Operation could not be completed.</strong><span>{lastError.message}</span><button type="button" onClick={clearError}>Dismiss</button></div> : null}

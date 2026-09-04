@@ -9,3 +9,5 @@ export type { SeatService } from "./seats";
 export type { SpotRoundService } from "./spot-rounds";
 export { acceptSpotRoundOffer, advanceSpotRound, declineSpotRoundOffer, expireSpotRoundOffer, getActiveSpotInterestCount, getCandidateSpotStatus, getSpotRoundAvailableSeats, isActiveSpotInterest, joinSpotRound, leaveSpotRound } from "./spot-round-state";
 export { acceptClearingOffer, advanceHeroClearingScenario, buildMeritList, declineClearingOffer, generateClearingOffers, getActiveClearingInterestCount, getCandidateClearingInterest, getCandidateMeritPosition, getClearingCandidate, getRoundAwaitingOffers, isActiveClearingInterest, isMeritClearingStateValid, joinClearingRound, leaveClearingRound } from "./clearing-network";
+export { cloneDocumentPassportState, connectDocumentProvider, getAccessibleDocumentTypes, getDocumentActivity, getDocumentRecord, getLatestDocumentShare, getWorkflowReadiness, isDocumentPassportStateValid, revokeDocumentConsent, shareDocumentsForPurpose } from "./document-passport";
+export type { ShareDocumentsInput } from "./document-passport";

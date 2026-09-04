@@ -26,20 +26,24 @@ AdmissionSetu demonstrates one citizen-facing journey with:
 
 **One seat → one live state.**
 
+**One verified document set → reused with consent.**
+
 ## Demo Journey
 
 1. Open the app and select **Continue as Demo Student**.
 2. Use **Reset Demo** to restore the deterministic starting state.
 3. On **Dashboard**, show Aarya's AISSMS Computer Engineering seat.
-4. In **College Explorer**, show sourced PICT programme and cutoff references.
-5. In **My Preferences**, show the first-six auto-freeze zone and an **I'm not sure** warning.
-6. In **Live Vacancies**, note that AISSMS Computer Engineering starts with 2 demo vacancies.
-7. In **Spot Rounds**, show Aarya's derived positions across PICT, VIT, PCCOE and MMCOE.
-8. Select **Make VIT seat offerable** to recompute VIT's synthetic merit list and generate exact seat offers.
-9. Review and accept VIT Computer Engineering, then confirm the consequence.
-10. Show AISSMS availability moving 2 → 3, Aarya leaving three competing lists, and lower-ranked candidates advancing.
-11. Open **Operations** to show the synchronized queues, seats and event record from the same state.
-12. Reload to show persistence, then use **Reset Demo** to restore the starting state without changing preferences.
+4. In **My Documents**, connect the DigiLocker demo, review the requested scopes and allow selected documents.
+5. In **College Explorer**, show sourced PICT programme and cutoff references.
+6. In **My Preferences**, show the first-six auto-freeze zone and an **I'm not sure** warning.
+7. In **Live Vacancies**, note that AISSMS Computer Engineering starts with 2 demo vacancies.
+8. In **Spot Rounds**, show Aarya's derived positions across PICT, VIT, PCCOE and MMCOE.
+9. Select **Make VIT seat offerable** to recompute VIT's synthetic merit list and generate exact seat offers.
+10. Review the reusable reporting documents, accept VIT Computer Engineering, then confirm the consequence.
+11. Share the four verified records with VIT for the simulated reporting purpose—without another upload.
+12. Show AISSMS availability moving 2 → 3, Aarya leaving three competing lists, and lower-ranked candidates advancing.
+13. Open **Operations** to show synchronized queues, seats, event records and minimum document-readiness status.
+14. Reload to show persistence, then use **Reset Demo** to restore the starting state without changing preferences.
 
 See [DEMO.md](./DEMO.md) for the concise presenter walkthrough.
 
@@ -58,7 +62,7 @@ The subset was manually curated on 27 August 2026. It is not a live or complete 
 
 ### Synthetic demo information
 
-Aarya, her scores and documents, current admissions, seat ownership, live vacancies, spot rounds, queue positions, participants, offers, timers, deadlines and connected-counselling events are synthetic. Official programme codes are used only as references connecting the demo inventory to the public catalog.
+Aarya, her scores and document records, consent, sharing history, current admissions, seat ownership, live vacancies, spot rounds, queue positions, participants, offers, timers, deadlines and connected-counselling events are synthetic. Official programme codes are used only as references connecting the demo inventory to the public catalog.
 
 ## V2 Merit Clearing Network
 
@@ -68,6 +72,16 @@ When Aarya accepts VIT Computer Engineering, the clearing service accepts the ex
 
 This is a proposed AdmissionSetu clearing model. Its simplified merit logic does not reproduce all official category, reservation, home-university or candidature rules. Every candidate identity, rank, interest, queue event, offer and seat-ownership record is synthetic. Official CET institute and programme reference data remains immutable and separate in `src/data/official/`.
 
+## V2 Verified Document Passport
+
+V2 Phase 2 adds one authoritative synthetic document passport that is reused by the dashboard, current-admission reporting, spot-round offers and the compact operations view. Reusable prototype requirement bundles derive readiness directly from the same records rather than duplicating document status across pages.
+
+The consent journey is inspired by the real DigiLocker Requester model: an eligible organization would request scoped document access and the user would authorize it. In this prototype, **Connect DigiLocker**, selected scopes, access revocation and provider status are entirely deterministic local simulation state. AdmissionSetu is not an authorized DigiLocker Requester, no real DigiLocker APIs or production OAuth credentials are connected, and no external authorization request is made.
+
+Institute-specific sharing records the minimum required document types, synthetic recipient, purpose and deterministic timestamp. The underlying verified records are reused without another upload, and the student can review an append-only activity history. Revoking access removes active permission without deleting document records or historical sharing entries.
+
+All candidate and document values are synthetic. Production integration would require authorized DigiLocker Requester onboarding, approved scopes, credentials, policy-specific requirement rules and an appropriately secured backend.
+
 ## Prototype limitations
 
 - No official CET API or live CET vacancy feed.
@@ -76,6 +90,7 @@ This is a proposed AdmissionSetu clearing model. Its simplified merit logic does
 - Admission, queue, vacancy and offer state is stored only on the current device.
 - Live queues, vacancies, offers and timers are guided synthetic simulations.
 - Demo confirmation does not submit an official option form or admission decision.
+- DigiLocker connection, consent and document sharing are simulated locally; no files or real identifiers are transferred.
 
 ## Tech stack
 
@@ -116,8 +131,8 @@ git diff --check
 
 ## Device-local state
 
-- Admission, seat and V2 merit-clearing simulation: `admissionsetu:admission-simulation:v3`
+- Admission, seat, V2 merit-clearing and document-passport simulation: `admissionsetu:admission-simulation:v4`
 - Ordered CAP preferences: `admissionsetu:candidate-preferences:v2`
 - Legacy explorer shortlist migration source: `admissionsetu:preference-shortlist:v1`
 
-**Reset Demo** restores the admission, seat inventory, vacancies, interests, queue progress, offers and event history. It deliberately does not clear saved CAP preferences.
+**Reset Demo** restores the admission, seat inventory, vacancies, interests, queue progress, offers, document passport, provider consent, sharing history and event history. It deliberately does not clear saved CAP preferences.
