@@ -1,5 +1,5 @@
 import type { CapRoundRule, OfficialSourceReference } from "@/types";
-import { CATALOG_ACCESSED_ON } from "./sources";
+import { CATALOG_ACCESSED_ON } from "./sources.ts";
 
 export const capRoundThreeRuleSource: OfficialSourceReference = {
   kind: "OFFICIAL_CET_CELL",
@@ -7,6 +7,7 @@ export const capRoundThreeRuleSource: OfficialSourceReference = {
   academicYear: "2026-27",
   url: "https://fe2026.mahacet.org/StaticPages/HomePage",
   accessedOn: CATALOG_ACCESSED_ON,
+  sourceType: "OFFICIAL_WEB_PAGE",
 };
 
 export const capRoundThreeRule: CapRoundRule = {

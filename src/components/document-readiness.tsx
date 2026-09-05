@@ -1,69 +1,39 @@
+"use client";
+
+import Link from "next/link";
+import { getDocumentRecord, getWorkflowReadiness } from "@/services";
+import { useAdmissionSimulation } from "./admission-simulation-provider";
 import { SectionCard } from "./section-card";
 import { StatusBadge } from "./status-badge";
-import type { CandidateDocument, DocumentStatus } from "@/types";
 
-interface DocumentReadinessProps {
-  documents: readonly CandidateDocument[];
-}
-
-const documentState: Record<Exclude<DocumentStatus, "NOT_REQUIRED">, { label: string; tone: "success" | "warning" | "danger" }> = {
-  VERIFIED: { label: "Verified", tone: "success" },
-  UPLOADED: { label: "Needs attention", tone: "warning" },
-  PENDING: { label: "Missing", tone: "danger" },
-};
-
-function isRequiredDocument(
-  document: CandidateDocument,
-): document is CandidateDocument & { status: Exclude<DocumentStatus, "NOT_REQUIRED"> } {
-  return document.status !== "NOT_REQUIRED";
-}
-
-export function DocumentReadiness({ documents }: DocumentReadinessProps) {
-  const requiredDocuments = documents.filter(isRequiredDocument);
-  const verifiedDocuments = requiredDocuments.filter((document) => document.status === "VERIFIED");
-  const attentionDocuments = requiredDocuments.filter((document) => document.status !== "VERIFIED");
+export function DocumentReadiness() {
+  const { state } = useAdmissionSimulation();
+  const readiness = getWorkflowReadiness(state, "DOCUMENT_PASSPORT");
+  const attentionRecords = [...readiness.missingDocumentTypes, ...readiness.attentionDocumentTypes]
+    .flatMap((documentType) => {
+      const record = getDocumentRecord(state, documentType);
+      return record ? [record] : [];
+    });
 
   return (
     <div id="document-readiness">
       <SectionCard
         className="documents-card"
-        title="Document Readiness"
-        description="Your documents are checked once and stay visible throughout your admission journey."
-        action={<StatusBadge tone={attentionDocuments.length > 0 ? "warning" : "success"}>{attentionDocuments.length > 0 ? `${attentionDocuments.length} need attention` : "Ready"}</StatusBadge>}
+        title={`Documents: ${readiness.readyCount} of ${readiness.requiredCount} ready`}
+        description="One verified document set is reused across your admission journey with consent."
+        action={<StatusBadge tone={readiness.ready ? "success" : "warning"}>{readiness.ready ? "Ready" : `${attentionRecords.length} document${attentionRecords.length === 1 ? "" : "s"} needs attention`}</StatusBadge>}
       >
         <div className="document-readiness-overview">
-          <div className="document-count" aria-label={`${verifiedDocuments.length} of ${requiredDocuments.length} required documents verified`}>
-            <strong>{verifiedDocuments.length}</strong>
-            <span>of {requiredDocuments.length} verified</span>
+          <div className="document-count" aria-label={`${readiness.readyCount} of ${readiness.requiredCount} documents ready`}>
+            <strong>{readiness.readyCount}</strong>
+            <span>of {readiness.requiredCount} ready</span>
           </div>
-          <p>
-            {attentionDocuments.length > 0
-              ? "Finish the highlighted items before institute reporting to avoid last-minute delays."
-              : "All required documents are verified for the next admission step."}
-          </p>
+          <p>{readiness.ready ? "All passport records are ready." : `${attentionRecords.map((record) => record.displayName).join(", ")} needs attention. Core CAP and reporting bundles remain ready in this prototype.`}</p>
         </div>
-
-        <ul className="document-list">
-          {requiredDocuments.map((document) => {
-            const status = documentState[document.status];
-            return (
-              <li className={document.status === "PENDING" ? "document-row missing" : "document-row"} key={document.id}>
-                <span className="document-status-symbol" aria-hidden="true">
-                  {document.status === "VERIFIED" ? "✓" : document.status === "PENDING" ? "!" : "·"}
-                </span>
-                <span className="document-name">{document.label}</span>
-                <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
-                {document.status === "PENDING" ? (
-                  <a className="text-link document-action" href="#document-guidance">View requirement</a>
-                ) : null}
-              </li>
-            );
-          })}
-        </ul>
-
-        <p className="document-guidance" id="document-guidance">
-          For the demo, keep the original nationality certificate and one self-attested copy ready for institute reporting.
-        </p>
+        <div className="dashboard-document-actions">
+          <span>DigiLocker-style access is simulated and remains under your control.</span>
+          <Link className="secondary-link-button" href="/documents">View documents</Link>
+        </div>
       </SectionCard>
     </div>
   );

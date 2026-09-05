@@ -30,7 +30,7 @@ export function DemoResetControl() {
   return (
     <>
       <div className="prototype-banner">
-        <span>Hackathon prototype · Candidate, admission, vacancy, and seat states are synthetic. Official CET reference data is labelled.</span>
+        <span>Hackathon prototype · Candidate, admission, document, vacancy, and seat states are synthetic. Official CET reference data is labelled.</span>
         <div className="demo-reset-actions">
           {resetComplete ? <span role="status">Demo reset complete</span> : null}
           <button
@@ -51,10 +51,10 @@ export function DemoResetControl() {
         >
           <div>
             <strong id={confirmationTitleId}>Restore the starting demo state?</strong>
-            <span>The original AISSMS seat, vacancies, spot rounds, queues and offers will be restored. Your saved preferences will not be changed.</span>
+            <span>The original AISSMS seat, vacancies, clearing queues, document passport, consent, sharing history and scholarship demo profile will be restored. Your saved preferences will not be changed.</span>
           </div>
           <div>
-            <button type="button" onClick={() => setConfirming(false)}>Cancel</button>
+            <button autoFocus type="button" onClick={() => setConfirming(false)}>Cancel</button>
             <button className="confirm-reset-button" type="button" onClick={confirmReset}>Reset Demo</button>
           </div>
         </section>

@@ -5,6 +5,8 @@ import type {
   AdmissionTransitionResult,
   SimulationCurrentAdmission,
 } from "@/types";
+import { cloneDocumentPassportState, isDocumentPassportStateValid } from "./document-passport.ts";
+import { cloneScholarshipNavigatorState, isScholarshipNavigatorStateValid } from "./scholarships.ts";
 
 function cloneState(state: AdmissionSimulationState): AdmissionSimulationState {
   return {
@@ -23,6 +25,28 @@ function cloneState(state: AdmissionSimulationState): AdmissionSimulationState {
       scheduleConflictRoundIds: [...round.scheduleConflictRoundIds],
     })),
     lastSpotRoundOutcome: state.lastSpotRoundOutcome ? { ...state.lastSpotRoundOutcome } : null,
+    clearing: {
+      ...state.clearing,
+      candidates: state.clearing.candidates.map((candidate) => ({
+        ...candidate,
+        interests: candidate.interests.map((interest) => ({ ...interest })),
+      })),
+      offers: state.clearing.offers.map((offer) => ({ ...offer })),
+      events: state.clearing.events.map((event) => event.movements
+        ? { ...event, movements: event.movements.map((movement) => ({ ...movement })) }
+        : { ...event }),
+      heroScenario: { ...state.clearing.heroScenario },
+      lastOutcome: state.clearing.lastOutcome
+        ? {
+            ...state.clearing.lastOutcome,
+            closedRoundIds: [...state.clearing.lastOutcome.closedRoundIds],
+            movements: state.clearing.lastOutcome.movements.map((movement) => ({ ...movement })),
+            generatedOfferIds: [...state.clearing.lastOutcome.generatedOfferIds],
+          }
+        : null,
+    },
+    documentPassport: cloneDocumentPassportState(state.documentPassport),
+    scholarshipNavigator: cloneScholarshipNavigatorState(state.scholarshipNavigator),
   };
 }
 
@@ -52,9 +76,18 @@ export function getAdmissionEvents(state: AdmissionSimulationState) {
 }
 
 export function isAdmissionSimulationStateValid(state: AdmissionSimulationState) {
-  if (state.version !== 2 || !state.candidateId || !Array.isArray(state.seats)) return false;
+  if (state.version !== 5 || !state.candidateId || !Array.isArray(state.seats)) return false;
   if (!Array.isArray(state.events) || !Array.isArray(state.externalAdmissions)) return false;
   if (!Array.isArray(state.spotRounds)) return false;
+  if (
+    !state.clearing ||
+    state.clearing.version !== 1 ||
+    !Array.isArray(state.clearing.candidates) ||
+    !Array.isArray(state.clearing.offers) ||
+    !Array.isArray(state.clearing.events)
+  ) return false;
+  if (!isDocumentPassportStateValid(state)) return false;
+  if (!isScholarshipNavigatorStateValid(state)) return false;
 
   const seatIds = new Set<string>();
   for (const seat of state.seats) {
@@ -115,17 +148,27 @@ export function sanitizeAdmissionSimulationState(
   const candidate = value as AdmissionSimulationState;
   const expectedSeatIds = initialState.seats.map((seat) => seat.id).sort().join("|");
   const expectedRoundIds = initialState.spotRounds.map((round) => round.id).sort().join("|");
+  const expectedClearingCandidateIds = initialState.clearing.candidates.map((candidate) => candidate.candidateId).sort().join("|");
+  const expectedDocumentIds = initialState.documentPassport.records.map((record) => record.id).sort().join("|");
   const candidateSeatIds = Array.isArray(candidate.seats)
     ? candidate.seats.map((seat) => seat?.id).sort().join("|")
     : "";
   const candidateRoundIds = Array.isArray(candidate.spotRounds)
     ? candidate.spotRounds.map((round) => round?.id).sort().join("|")
     : "";
+  const candidateClearingIds = Array.isArray(candidate.clearing?.candidates)
+    ? candidate.clearing.candidates.map((item) => item?.candidateId).sort().join("|")
+    : "";
+  const candidateDocumentIds = Array.isArray(candidate.documentPassport?.records)
+    ? candidate.documentPassport.records.map((record) => record?.id).sort().join("|")
+    : "";
   if (
-    candidate.version !== 2 ||
+    candidate.version !== 5 ||
     candidate.candidateId !== initialState.candidateId ||
     expectedSeatIds !== candidateSeatIds ||
     expectedRoundIds !== candidateRoundIds ||
+    expectedClearingCandidateIds !== candidateClearingIds ||
+    expectedDocumentIds !== candidateDocumentIds ||
     !isAdmissionSimulationStateValid(candidate)
   ) {
     return cloneState(initialState);

@@ -9,26 +9,6 @@ export type HomeUniversity =
   | "SGBAU"
   | "OTHER";
 
-export type DocumentStatus = "VERIFIED" | "UPLOADED" | "PENDING" | "NOT_REQUIRED";
-
-export type DocumentKind =
-  | "MHT_CET_SCORECARD"
-  | "JEE_MAIN_SCORECARD"
-  | "SSC_MARKSHEET"
-  | "HSC_MARKSHEET"
-  | "SCHOOL_LEAVING_CERTIFICATE"
-  | "DOMICILE_CERTIFICATE"
-  | "NATIONALITY_CERTIFICATE"
-  | "CATEGORY_CERTIFICATE";
-
-export interface CandidateDocument {
-  id: string;
-  kind: DocumentKind;
-  label: string;
-  status: DocumentStatus;
-  updatedAt?: string;
-}
-
 export interface Candidate {
   id: string;
   fullName: string;
@@ -39,8 +19,264 @@ export interface Candidate {
   category: CandidateCategory;
   homeUniversity: HomeUniversity;
   currentJourneyStage: AdmissionJourneyStageId;
-  documents: CandidateDocument[];
   preferenceProgramIds: string[];
+}
+
+export type DocumentType =
+  | "SSC_MARKSHEET"
+  | "HSC_MARKSHEET"
+  | "MHT_CET_SCORECARD"
+  | "JEE_MAIN_SCORECARD"
+  | "DOMICILE_CERTIFICATE"
+  | "INCOME_CERTIFICATE";
+
+export type DocumentSource = "DIGILOCKER" | "MANUAL" | "INSTITUTION" | "SYNTHETIC";
+export type DocumentVerificationStatus =
+  | "NOT_CONNECTED"
+  | "AVAILABLE"
+  | "VERIFIED"
+  | "MISSING"
+  | "NEEDS_ATTENTION"
+  | "EXPIRED";
+
+export type DocumentConsentScope =
+  | "SSC_MARKSHEET"
+  | "HSC_MARKSHEET"
+  | "DOMICILE_CERTIFICATE"
+  | "ENTRANCE_EXAM_RECORDS";
+
+export interface DocumentRecord {
+  id: string;
+  candidateId: string;
+  documentType: DocumentType;
+  displayName: string;
+  source: DocumentSource;
+  verificationStatus: DocumentVerificationStatus;
+  issuedBy?: string;
+  issuedAt?: string;
+  expiresAt?: string;
+  accessScope?: DocumentConsentScope;
+  lastSharedAt: string | null;
+  isSynthetic: true;
+}
+
+export type DocumentProviderConnectionStatus = "NOT_CONNECTED" | "CONNECTED" | "REVOKED";
+
+export interface DocumentProviderConnection {
+  provider: "DIGILOCKER_DEMO";
+  status: DocumentProviderConnectionStatus;
+  grantedScopes: DocumentConsentScope[];
+  connectedAt: string | null;
+  revokedAt: string | null;
+}
+
+export type DocumentWorkflowId =
+  | "DOCUMENT_PASSPORT"
+  | "CAP"
+  | "INSTITUTE_REPORTING"
+  | "SPOT_ROUND";
+
+export interface DocumentRequirementBundle {
+  id: DocumentWorkflowId;
+  displayName: string;
+  description: string;
+  requiredDocumentTypes: readonly DocumentType[];
+  isPrototypeRequirementSet: true;
+}
+
+export interface DocumentWorkflowReadiness {
+  workflowId: DocumentWorkflowId;
+  readyCount: number;
+  requiredCount: number;
+  ready: boolean;
+  missingDocumentTypes: DocumentType[];
+  attentionDocumentTypes: DocumentType[];
+}
+
+export interface DocumentShareRecord {
+  id: string;
+  candidateId: string;
+  workflowId: DocumentWorkflowId;
+  recipientInstituteCode: string;
+  recipientInstituteName: string;
+  recipientProgramId: string;
+  recipientProgramName: string;
+  documentTypes: DocumentType[];
+  purpose: string;
+  sharedAt: string;
+  isSynthetic: true;
+}
+
+export type DocumentActivityType =
+  | "PROVIDER_CONNECTED"
+  | "PROVIDER_ACCESS_REVOKED"
+  | "DOCUMENTS_SHARED";
+
+export interface DocumentActivity {
+  id: string;
+  type: DocumentActivityType;
+  occurredAt: string;
+  title: string;
+  description: string;
+  recipientInstituteCode?: string;
+  documentTypes: DocumentType[];
+}
+
+export interface DocumentPassportState {
+  version: 1;
+  records: DocumentRecord[];
+  providerConnection: DocumentProviderConnection;
+  shares: DocumentShareRecord[];
+  activity: DocumentActivity[];
+}
+
+export type ScholarshipPortal = "MAHADBT" | "NSP";
+export type ScholarshipSchemeType = "MERIT" | "WELFARE" | "FEE_REIMBURSEMENT" | "MAINTENANCE" | "OTHER";
+export type ScholarshipEligibilityStatus = "ELIGIBLE" | "POSSIBLY_ELIGIBLE" | "NOT_ELIGIBLE";
+export type ScholarshipCriteriaCoverage = "FULL" | "PARTIAL";
+export type ScholarshipHostelStatus = "UNKNOWN" | "HOSTELLER" | "DAY_SCHOLAR";
+export type ScholarshipAdmissionRoute = "CAP" | "SPOT_ROUND" | "CONNECTED" | "NONE";
+export type ScholarshipStudyLevel = "UNDERGRADUATE" | "POSTGRADUATE" | "DIPLOMA";
+export type ScholarshipCourseType = "PROFESSIONAL_TECHNICAL" | "ARTS" | "COMMERCE" | "SCIENCE" | "LAW";
+
+export interface ScholarshipProfile {
+  candidateId: string;
+  isSynthetic: true;
+  nationality: "INDIAN";
+  domicileState: "MAHARASHTRA";
+  studyingState: "MAHARASHTRA";
+  familyAnnualIncomeInr: number;
+  studyLevel: ScholarshipStudyLevel;
+  courseType: ScholarshipCourseType;
+  courseMode: "REGULAR";
+  currentStudyYear: number;
+  class12Percentage: number;
+  class12BoardPercentile: number | null;
+  hostelStatus: ScholarshipHostelStatus;
+  disabilityPercentage: number;
+  isReceivingOtherScholarship: boolean;
+  isReceivingOtherMaintenanceAllowance: boolean;
+  familyBeneficiaryCount: number;
+  educationGapYears: number;
+  attendanceRequirementSatisfied: boolean;
+  institutionRecognition: "RECOGNIZED";
+  institutionOwnership: "NON_PRIVATE_UNIVERSITY";
+  updatedAt: string;
+}
+
+export type ScholarshipRuleField =
+  | keyof Pick<
+      ScholarshipProfile,
+      | "nationality"
+      | "domicileState"
+      | "studyingState"
+      | "familyAnnualIncomeInr"
+      | "studyLevel"
+      | "courseType"
+      | "courseMode"
+      | "currentStudyYear"
+      | "class12Percentage"
+      | "class12BoardPercentile"
+      | "hostelStatus"
+      | "disabilityPercentage"
+      | "isReceivingOtherScholarship"
+      | "isReceivingOtherMaintenanceAllowance"
+      | "familyBeneficiaryCount"
+      | "educationGapYears"
+      | "attendanceRequirementSatisfied"
+      | "institutionRecognition"
+      | "institutionOwnership"
+    >
+  | "candidateCategory"
+  | "admissionRoute";
+
+export type ScholarshipRuleOperator = "EQUALS" | "LTE" | "GTE" | "ONE_OF";
+export type ScholarshipRuleValue = string | number | boolean | readonly string[];
+
+export interface ScholarshipRule {
+  id: string;
+  field: ScholarshipRuleField;
+  operator: ScholarshipRuleOperator;
+  value: ScholarshipRuleValue;
+  explanation: string;
+  failureExplanation: string;
+  sourceTitle: string;
+  mandatory: true;
+}
+
+export interface ScholarshipDocumentRequirement {
+  documentType: DocumentType;
+  displayName: string;
+}
+
+export interface ScholarshipOfficialSource {
+  title: string;
+  url: string;
+  portal: ScholarshipPortal;
+  lastVerifiedOn: string;
+}
+
+export interface ScholarshipScheme {
+  id: string;
+  name: string;
+  provider: string;
+  portal: ScholarshipPortal;
+  schemeType: ScholarshipSchemeType;
+  academicYear?: string;
+  benefitSummary: string;
+  applicationDeadline?: string;
+  rules: readonly ScholarshipRule[];
+  requiredDocuments: readonly ScholarshipDocumentRequirement[];
+  criteriaCoverage: ScholarshipCriteriaCoverage;
+  documentCoverage: ScholarshipCriteriaCoverage;
+  officialSources: readonly ScholarshipOfficialSource[];
+}
+
+export interface ScholarshipRuleResult {
+  ruleId: string;
+  status: "PASSED" | "FAILED" | "UNKNOWN";
+  explanation: string;
+}
+
+export interface ScholarshipDocumentReadiness {
+  documentType: DocumentType;
+  displayName: string;
+  ready: boolean;
+  verificationStatus: DocumentVerificationStatus | "NOT_IN_PASSPORT";
+  recordId: string | null;
+}
+
+export interface ScholarshipEvaluation {
+  schemeId: string;
+  status: ScholarshipEligibilityStatus;
+  passedRules: ScholarshipRuleResult[];
+  failedRules: ScholarshipRuleResult[];
+  unknownRules: ScholarshipRuleResult[];
+  requiredDocuments: ScholarshipDocumentReadiness[];
+  missingDocuments: ScholarshipDocumentReadiness[];
+  readyDocumentCount: number;
+  requiredDocumentCount: number;
+  applicationReady: boolean;
+  nextActions: string[];
+}
+
+export interface ScholarshipSummary {
+  eligible: number;
+  possiblyEligible: number;
+  notEligible: number;
+  applicationReady: number;
+}
+
+export interface ScholarshipPortalHandoff {
+  schemeId: string;
+  status: "HANDED_OFF";
+  openedAt: string;
+}
+
+export interface ScholarshipNavigatorState {
+  version: 1;
+  profile: ScholarshipProfile;
+  handoffs: ScholarshipPortalHandoff[];
 }
 
 export type InstituteType = "GOVERNMENT" | "GOVERNMENT_AIDED" | "UNIVERSITY" | "UNAIDED";
@@ -78,7 +314,12 @@ export interface Program {
 
 export type PublicDataKind = "OFFICIAL_CET_CELL";
 
-export type OfficialInstituteStatus = "Government" | "Un-Aided";
+export type OfficialInstituteStatus =
+  | "Government"
+  | "Government-Aided"
+  | "Un-Aided"
+  | "University Managed (Un-Aided)"
+  | "Deemed University";
 export type OfficialAutonomyStatus = "Autonomous" | "Non-Autonomous";
 export type OfficialProgramGender = "Co-Education" | "Female";
 
@@ -88,7 +329,10 @@ export type BranchFamily =
   | "Electronics & Electrical"
   | "Mechanical & Automation"
   | "Civil & Core"
-  | "Chemical & Biotechnology";
+  | "Chemical & Biotechnology"
+  | "Other";
+
+export type OfficialSourceType = "OFFICIAL_WEB_PAGE" | "OFFICIAL_PDF";
 
 export interface OfficialSourceReference {
   kind: PublicDataKind;
@@ -96,6 +340,7 @@ export interface OfficialSourceReference {
   academicYear: string;
   url: string;
   accessedOn: string;
+  sourceType: OfficialSourceType;
 }
 
 export interface OfficialInstitute {
@@ -106,7 +351,8 @@ export interface OfficialInstitute {
   address: string;
   locality: string;
   city: string;
-  district: "Pune";
+  district: string;
+  region: string;
   university: string;
   status: OfficialInstituteStatus;
   autonomyStatus: OfficialAutonomyStatus;
@@ -121,21 +367,45 @@ export interface OfficialProgram {
   name: string;
   branchFamily: BranchFamily;
   intake: number;
-  shift: "General Shift" | "Morning Shift";
+  shift: string;
   gender: OfficialProgramGender;
   source: OfficialSourceReference;
 }
 
-export type CutoffSeatType = "GOPENS" | "GOPENH" | "LOPENS";
+export type CutoffSeatType = string;
 
 export interface OfficialCutoffObservation {
   programChoiceCode: string;
-  academicYear: "2024-25";
-  round: "CAP Round III";
+  academicYear: string;
+  round: string;
   seatType: CutoffSeatType;
   meritNumber: number;
   percentile: number;
+  stage: string;
+  candidature: string;
+  admissionType: string;
   source: OfficialSourceReference;
+}
+
+export interface OfficialHistoricalVacancyObservation {
+  programChoiceCode: string;
+  academicYear: string;
+  round: string;
+  publishedVacancyCount: number;
+  snapshotLabel: string;
+  source: OfficialSourceReference;
+}
+
+export interface OfficialDatasetMetadata {
+  generatedOn: string;
+  academicYears: readonly string[];
+  sourceSnapshot: string;
+  counts: {
+    institutes: number;
+    programs: number;
+    cutoffs: number;
+    historicalVacancies: number;
+  };
 }
 
 export type CapRound = 1 | 2 | 3 | 4;
@@ -369,7 +639,7 @@ export interface AdmissionSimulationFeedback {
 }
 
 export interface AdmissionSimulationState {
-  version: 2;
+  version: 5;
   candidateId: string;
   currentAdmission: SimulationCurrentAdmission | null;
   seats: SimulationSeat[];
@@ -378,6 +648,9 @@ export interface AdmissionSimulationState {
   lastFeedback: AdmissionSimulationFeedback | null;
   spotRounds: SpotRound[];
   lastSpotRoundOutcome: SpotRoundOutcome | null;
+  clearing: MeritClearingState;
+  documentPassport: DocumentPassportState;
+  scholarshipNavigator: ScholarshipNavigatorState;
   updatedAt: string;
 }
 
@@ -394,6 +667,15 @@ export type AdmissionTransitionErrorCode =
   | "SPOT_ROUND_NOT_JOINED"
   | "SPOT_EVENT_UNAVAILABLE"
   | "SPOT_OFFER_UNAVAILABLE"
+  | "CLEARING_CANDIDATE_NOT_FOUND"
+  | "CLEARING_OFFER_NOT_FOUND"
+  | "CLEARING_INTEREST_NOT_ACTIVE"
+  | "DOCUMENT_PROVIDER_NOT_CONNECTED"
+  | "DOCUMENT_CONSENT_REQUIRED"
+  | "DOCUMENT_REQUIREMENT_NOT_READY"
+  | "DOCUMENT_RECIPIENT_INVALID"
+  | "SCHOLARSHIP_PROFILE_INVALID"
+  | "SCHOLARSHIP_SCHEME_NOT_FOUND"
   | "INVALID_STATE";
 
 export interface AdmissionTransitionError {
@@ -479,4 +761,116 @@ export interface SpotRoundOutcome {
   previousAvailabilityBefore: number;
   previousAvailabilityAfter: number;
   closedInterestCount: number;
+}
+
+export type ClearingCandidateStatus = "ACTIVE" | "ADMITTED" | "INACTIVE";
+
+export type ClearingInterestStatus =
+  | "REGISTERED"
+  | "WAITING"
+  | "ELIGIBLE"
+  | "OFFERED"
+  | "ACCEPTED"
+  | "DECLINED"
+  | "WITHDRAWN"
+  | "CLOSED_AFTER_ACCEPTANCE";
+
+export interface CandidateClearingInterest {
+  roundId: string;
+  status: ClearingInterestStatus;
+  joinedAt: string;
+}
+
+export interface CandidateClearingProfile {
+  candidateId: string;
+  displayLabel: string;
+  meritRank: number;
+  cetPercentile?: number;
+  activeAdmissionSeatId: string | null;
+  status: ClearingCandidateStatus;
+  interests: CandidateClearingInterest[];
+}
+
+export type ClearingOfferStatus =
+  | "AWAITING_DECISION"
+  | "ACCEPTED"
+  | "DECLINED"
+  | "WITHDRAWN";
+
+export interface ClearingOffer {
+  id: string;
+  roundId: string;
+  candidateId: string;
+  seatId: string;
+  status: ClearingOfferStatus;
+  offeredAt: string;
+  remainingSeconds: number;
+}
+
+export interface MeritListEntry {
+  candidateId: string;
+  displayLabel: string;
+  meritRank: number;
+  position: number;
+  status: ClearingInterestStatus;
+  isDemoCandidate: boolean;
+}
+
+export interface ClearingQueueMovement {
+  roundId: string;
+  candidateId: string;
+  displayLabel: string;
+  fromPosition: number;
+  toPosition: number;
+}
+
+export type ClearingEventType =
+  | "INTEREST_JOINED"
+  | "INTEREST_WITHDRAWN"
+  | "SEAT_AVAILABLE"
+  | "OFFER_GENERATED"
+  | "OFFER_DECLINED"
+  | "OFFER_ACCEPTED"
+  | "PREVIOUS_SEAT_RELEASED"
+  | "COMPETING_LISTS_CLOSED"
+  | "MERIT_LIST_RECOMPUTED"
+  | "CANDIDATE_ADVANCED";
+
+export interface ClearingEvent {
+  id: string;
+  type: ClearingEventType;
+  occurredAt: string;
+  title: string;
+  description: string;
+  technicalDetail: string;
+  roundId?: string;
+  candidateId?: string;
+  seatId?: string;
+  movements?: ClearingQueueMovement[];
+}
+
+export interface ClearingAcceptanceOutcome {
+  offerId: string;
+  roundId: string;
+  seatId: string;
+  previousSeatId: string;
+  previousProgramId: string;
+  previousAvailabilityBefore: number;
+  previousAvailabilityAfterRelease: number;
+  previousAvailabilityCurrent: number;
+  closedRoundIds: string[];
+  movements: ClearingQueueMovement[];
+  generatedOfferIds: string[];
+  occurredAt: string;
+}
+
+export interface MeritClearingState {
+  version: 1;
+  candidates: CandidateClearingProfile[];
+  offers: ClearingOffer[];
+  events: ClearingEvent[];
+  heroScenario: {
+    status: "READY" | "OFFER_READY" | "ACCEPTED";
+  };
+  lastOutcome: ClearingAcceptanceOutcome | null;
 }

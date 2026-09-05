@@ -1,47 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { MAX_ACTIVE_SPOT_INTERESTS } from "@/data";
+import { MAX_ACTIVE_SPOT_INTERESTS, V2_HERO_OFFER_ROUND_ID } from "@/data";
 import {
-  getActiveSpotInterestCount,
-  getCandidateSpotStatus,
-  getSpotRoundAvailableSeats,
-  isActiveSpotInterest,
+  getActiveClearingInterestCount,
+  getCandidateClearingInterest,
+  getCandidateMeritPosition,
+  getProgrammeVacancies,
+  getRoundAwaitingOffers,
+  isActiveClearingInterest,
 } from "@/services";
-import type { OfficialInstitute, OfficialProgram, ParticipantStatus, SpotRoundStatus } from "@/types";
+import type { ClearingInterestStatus, OfficialInstitute, OfficialProgram, SpotRoundStatus } from "@/types";
 import { useAdmissionSimulation } from "./admission-simulation-provider";
 import { PageHeader } from "./page-header";
 import { StatusBadge } from "./status-badge";
 
-function formatRoundTime(value: string) {
-  return new Intl.DateTimeFormat("en-IN", {
-    day: "numeric",
-    month: "short",
-    hour: "numeric",
-    minute: "2-digit",
-    timeZone: "Asia/Kolkata",
-  }).format(new Date(value));
-}
-
 function toneForStatus(status: SpotRoundStatus) {
   if (status === "LIVE") return "danger" as const;
   if (status === "UPCOMING") return "info" as const;
-  if (status === "PAUSED") return "warning" as const;
   return "neutral" as const;
 }
 
-function participantStatusLabel(status: ParticipantStatus) {
-  const labels: Record<ParticipantStatus, string> = {
-    REGISTERED: "Joined",
-    WAITING: "Waiting in queue",
-    ELIGIBLE: "Next for offer",
-    OFFERED: "Offer received",
-    ACCEPTED: "Accepted",
-    DECLINED: "Declined",
-    WITHDRAWN: "Not joined",
-    EXPIRED: "Offer expired",
-  };
-  return labels[status];
+function interestLabel(status?: ClearingInterestStatus) {
+  if (!status || status === "WITHDRAWN") return "Not joined";
+  if (status === "OFFERED") return "Offer pending";
+  if (status === "ACCEPTED") return "Accepted";
+  if (status === "CLOSED_AFTER_ACCEPTANCE") return "Withdrawn after another admission";
+  if (status === "DECLINED") return "Offer declined";
+  return status === "ELIGIBLE" ? "Next eligible" : "Waiting";
 }
 
 export function SpotRoundDiscovery({
@@ -51,99 +37,114 @@ export function SpotRoundDiscovery({
   institutes: readonly OfficialInstitute[];
   programs: readonly OfficialProgram[];
 }) {
-  const { state, lastError, joinRound, leaveRound, clearError } = useAdmissionSimulation();
-  const activeCount = getActiveSpotInterestCount(state);
+  const {
+    state,
+    lastError,
+    joinMeritRound,
+    leaveMeritRound,
+    advanceClearing,
+    clearError,
+  } = useAdmissionSimulation();
+  const activeCount = getActiveClearingInterestCount(state);
   const atLimit = activeCount >= MAX_ACTIVE_SPOT_INTERESTS;
+  const aarya = state.clearing.candidates.find((candidate) => candidate.candidateId === state.candidateId);
+  const heroOffer = state.clearing.offers.find(
+    (offer) => offer.candidateId === state.candidateId && offer.status === "AWAITING_DECISION",
+  );
 
   return (
     <>
       <PageHeader
-        eyebrow="Centralized institute admissions"
+        eyebrow="Synchronized merit clearing"
         title="Spot Rounds"
-        description="Track institute-level vacancies and participate from one place instead of following separate college notices."
-        action={<StatusBadge tone="danger">Demo live simulation</StatusBadge>}
+        description="Join merit-ranked programme lists. One acceptance synchronizes every active interest and the central seat inventory."
+        action={<StatusBadge tone="danger">Synthetic live clearing</StatusBadge>}
       />
 
-      <section className="spot-participation-summary" aria-labelledby="spot-limit-title">
+      <section className="clearing-intro" aria-labelledby="clearing-intro-title">
         <div>
-          <p>AdmissionSetu prototype participation limit</p>
-          <h2 id="spot-limit-title">Active interests: {activeCount} / {MAX_ACTIVE_SPOT_INTERESTS}</h2>
-          <p>This proposed product rule makes registrations meaningful. It is not an existing Maharashtra CET rule.</p>
+          <p>Proposed AdmissionSetu model</p>
+          <h2 id="clearing-intro-title">One merit state across participating rounds</h2>
+          <span>Positions use a simplified global synthetic merit rank. This does not reproduce every official reservation or candidature rule.</span>
         </div>
-        <div className="spot-limit-meter" aria-label={`${activeCount} of ${MAX_ACTIVE_SPOT_INTERESTS} active spot-round interests`}>
-          {Array.from({ length: MAX_ACTIVE_SPOT_INTERESTS }, (_, index) => (
-            <span className={index < activeCount ? "filled" : ""} key={index} />
-          ))}
-        </div>
+        <dl>
+          <div><dt>Your synthetic merit rank</dt><dd>{aarya?.meritRank ?? "—"}</dd></div>
+          <div><dt>Active interests</dt><dd>{activeCount} / {MAX_ACTIVE_SPOT_INTERESTS}</dd></div>
+        </dl>
+        <Link className="secondary-link-button" href="/operations">Open prototype operations view</Link>
       </section>
 
-      <aside className="schedule-overlap-banner" aria-labelledby="schedule-overlap-title">
-        <span aria-hidden="true">↔</span>
-        <div>
-          <p>Schedule overlap</p>
-          <h2 id="schedule-overlap-title">PICT starts at 10:00 AM while VIT Pune starts at 10:15 AM</h2>
-          <p>You can remain registered in both. AdmissionSetu manages your live status and shows when an offer requires action—there is no need to be physically present at two institutes.</p>
-        </div>
-      </aside>
+      {state.clearing.heroScenario.status === "READY" ? (
+        <aside className="clearing-hero-event" aria-labelledby="clearing-event-title">
+          <div>
+            <p>Deterministic demo event</p>
+            <h2 id="clearing-event-title">A VIT Computer seat can now move to Aarya by merit</h2>
+            <span>Two higher-ranked candidates confirm other choices. Recompute the VIT list and allocate its exact available seats.</span>
+          </div>
+          <button className="primary-action-button" type="button" onClick={advanceClearing}>Make VIT seat offerable</button>
+        </aside>
+      ) : heroOffer ? (
+        <aside className="clearing-offer-banner" role="status">
+          <div><p>Action required</p><h2>VIT Computer Engineering offer pending</h2><span>An exact seat is reserved for your decision.</span></div>
+          <Link className="primary-link-button" href={`/spot-rounds/${V2_HERO_OFFER_ROUND_ID}`}>Review seat offer</Link>
+        </aside>
+      ) : state.clearing.heroScenario.status === "ACCEPTED" ? (
+        <aside className="clearing-accepted-banner" role="status">
+          <div><p>Synchronized</p><h2>VIT accepted; competing merit lists updated</h2><span>Aarya now has one current participating admission.</span></div>
+          <Link className="primary-link-button" href={`/spot-rounds/${V2_HERO_OFFER_ROUND_ID}`}>View clearing outcome</Link>
+        </aside>
+      ) : null}
 
       {lastError ? (
         <div className="simulation-error" role="alert">
-          <strong>Spot-round action could not be completed.</strong>
+          <strong>Clearing action could not be completed.</strong>
           <span>{lastError.message}</span>
           <button type="button" onClick={clearError}>Dismiss</button>
         </div>
       ) : null}
 
-      {atLimit ? (
-        <div className="spot-limit-warning" role="status">
-          <strong>5 / 5 active spot rounds</strong>
-          <span>Leave one active round before joining another. This is an AdmissionSetu prototype participation limit.</span>
-        </div>
-      ) : null}
-
-      <section className="spot-round-grid" aria-label="Synthetic spot rounds">
-        {state.spotRounds.map((round) => {
+      <section className="merit-round-grid" aria-label="Synthetic merit-ranked programme rounds">
+        {state.spotRounds.filter((round) => round.status !== "COMPLETED").map((round) => {
           const institute = institutes.find((item) => item.code === round.instituteCode);
           const program = programs.find((item) => item.choiceCode === round.programId);
           if (!institute || !program) return null;
-          const candidateStatus = getCandidateSpotStatus(round);
-          const active = isActiveSpotInterest(candidateStatus);
-          const available = getSpotRoundAvailableSeats(state, round.id);
-          const completed = round.status === "COMPLETED";
-          const accepted = candidateStatus === "ACCEPTED";
+          const interest = getCandidateClearingInterest(state, state.candidateId, round.id);
+          const position = getCandidateMeritPosition(state, round.id);
+          const active = interest ? isActiveClearingInterest(interest.status) : false;
+          const pendingOffer = getRoundAwaitingOffers(state, round.id).some(
+            (offer) => offer.candidateId === state.candidateId,
+          );
+          const available = getProgrammeVacancies(state, round.programId);
           return (
-            <article className={`spot-round-card ${round.status.toLowerCase()}`} key={round.id}>
-              <div className="spot-round-card-heading">
-                <div>
-                  <span>{institute.commonName}</span>
-                  <StatusBadge tone={toneForStatus(round.status)}>{round.status}</StatusBadge>
-                </div>
-                {round.scheduleConflictRoundIds.length ? <em>Schedule overlap</em> : null}
-              </div>
+            <article className="merit-round-card" key={round.id}>
+              <header>
+                <div><span>{institute.commonName}</span><StatusBadge tone={toneForStatus(round.status)}>{round.status}</StatusBadge></div>
+                <small>Choice code {program.choiceCode}</small>
+              </header>
               <h2>{program.name}</h2>
-              <p>{institute.name}</p>
               <dl>
-                <div><dt>Synthetic seats available</dt><dd>{available}</dd></div>
-                <div><dt>{round.status === "LIVE" ? "Started" : "Starts"}</dt><dd>{formatRoundTime(round.startsAt)}</dd></div>
-                <div><dt>Your state</dt><dd>{accepted || active ? participantStatusLabel(candidateStatus) : "Not joined"}</dd></div>
+                <div><dt>Merit position</dt><dd>{position ? `#${position.position}` : "—"}</dd></div>
+                <div><dt>Candidates ahead</dt><dd>{position ? position.position - 1 : "—"}</dd></div>
+                <div><dt>Seats available</dt><dd>{available}</dd></div>
+                <div><dt>Your status</dt><dd>{interestLabel(interest?.status)}</dd></div>
               </dl>
-              <div className="spot-round-card-actions">
-                {accepted ? <Link className="primary-link-button" href={`/spot-rounds/${round.id}`}>View admission</Link> : null}
-                {!accepted && active && round.status === "LIVE" ? <Link className="primary-link-button" href={`/spot-rounds/${round.id}`}>View Live Round</Link> : null}
-                {!accepted && active ? <button className="spot-leave-button" type="button" onClick={() => leaveRound(round.id)}>Leave Round</button> : null}
-                {!accepted && !active && !completed ? (
-                  <button className="spot-join-button" type="button" disabled={atLimit} onClick={() => joinRound(round.id)}>
-                    Join Spot Round
-                  </button>
+              <div className="merit-round-actions">
+                {(active || pendingOffer || interest?.status === "ACCEPTED" || interest?.status === "CLOSED_AFTER_ACCEPTANCE") ? (
+                  <Link className={pendingOffer ? "primary-link-button" : "secondary-link-button"} href={`/spot-rounds/${round.id}`}>
+                    {pendingOffer ? "Review seat offer" : "Open merit list"}
+                  </Link>
                 ) : null}
-                {completed ? <button type="button" disabled>Round completed</button> : null}
+                {active && !pendingOffer ? <button type="button" className="spot-leave-button" onClick={() => leaveMeritRound(round.id)}>Leave list</button> : null}
+                {!interest || ["WITHDRAWN", "DECLINED"].includes(interest.status) ? (
+                  <button type="button" className="spot-join-button" disabled={atLimit || aarya?.status === "ADMITTED"} onClick={() => joinMeritRound(round.id)}>Join merit list</button>
+                ) : null}
               </div>
             </article>
           );
         })}
       </section>
 
-      <p className="spot-data-note">All seats, queues, applicants, offers, withdrawals, timing and round states on this page are synthetic. Institute and programme identities are sourced separately from the public CET catalog.</p>
+      <p className="spot-data-note">Candidate identities, ranks, interests, seats, offers and clearing events are synthetic. Institute and programme reference data remains sourced separately from the public CET catalog.</p>
     </>
   );
 }

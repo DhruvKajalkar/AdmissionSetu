@@ -16,6 +16,7 @@ const roundThreeRule: CapRoundRule = {
     academicYear: "2026-27",
     url: "https://fe2026.mahacet.org/StaticPages/HomePage",
     accessedOn: "2026-08-27",
+    sourceType: "OFFICIAL_WEB_PAGE",
   },
 };
 
@@ -66,4 +67,3 @@ test("reordering recomputes positions", () => {
   assert.deepEqual(reordered.map((item) => item.programId), ["programme-2", "programme-3", "programme-1"]);
   assert.deepEqual(reordered.map((item) => item.position), [1, 2, 3]);
 });
-

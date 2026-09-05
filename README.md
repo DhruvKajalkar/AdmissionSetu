@@ -2,89 +2,109 @@
 
 **One admission journey. Every seat accounted for.**
 
-AdmissionSetu is a hackathon prototype for a simpler, safer Maharashtra engineering admission journey.
+AdmissionSetu is a hackathon prototype for a unified, student-centred Maharashtra engineering admission platform.
 
 ## Problem
 
-Students must currently connect decisions spread across MHT-CET CAP, institute-level rounds, individual college notices, vacancy lists and parallel counselling systems. The same student can be tracking several processes while seat releases appear elsewhere and later, making consequences difficult to understand.
+Engineering admission decisions are fragmented across:
 
-## Solution
+- multiple portals and counselling systems;
+- preference forms with difficult-to-see consequences;
+- delayed vacancy information and institute-level rounds;
+- repeated document collection; and
+- disconnected financial-aid discovery.
 
-AdmissionSetu demonstrates one citizen-facing journey with:
+Students must reconstruct one high-stakes journey from these separate systems, while a released seat may take time to become visible to another eligible candidate.
 
-- one unified student admission state;
-- an explorer built from sourced CET institute, programme, intake and historical cutoff references;
-- mistake-resistant CAP preference ordering and safety review;
-- one live state for each synthetic seat;
-- centralized live vacancies;
-- guided online spot-round queues and offers; and
-- automatic release of the previous seat when a new seat is accepted.
+## V2 solution
 
-## Core design principles
+### Student layer
+
+- one unified candidate and admission profile;
+- an explorer backed by sourced official CET reference data;
+- CAP preference ordering with consequence previews and safety checks;
+- one reusable verified-document passport with explicit simulated consent;
+- explainable scholarship matching separated from document readiness; and
+- a read-only contextual Admission Assistant.
+
+### Clearing layer
+
+- one exact lifecycle for every synthetic seat;
+- synchronized merit lists derived from declared interest and merit order;
+- automatic withdrawal from competing lists after acceptance;
+- cascading queue and offer recomputation; and
+- immediate recycling of released capacity to the next eligible candidate.
+
+### Operations layer
+
+- a clearly labelled prototype authority/institution view;
+- shared visibility into seats, merit lists, offers and event history; and
+- document-readiness status without exposing document contents.
+
+## Core principles
 
 **One student → one admission state.**
 
 **One seat → one live state.**
 
-## Demo Journey
+**One merit network → synchronized clearing.**
 
-1. Open the app and select **Continue as Demo Student**.
-2. Use **Reset Demo** to restore the deterministic starting state.
-3. On **Dashboard**, show Aarya's AISSMS Computer Engineering seat.
-4. In **College Explorer**, show sourced PICT programme and cutoff references.
-5. In **My Preferences**, show the first-six auto-freeze zone and an **I'm not sure** warning.
-6. In **Live Vacancies**, note that AISSMS Computer Engineering starts with 2 demo vacancies.
-7. In **Spot Rounds**, join the live PICT ENTC round.
-8. Select **Advance Demo Event** five times; PICT availability briefly moves 2 → 3 and Aarya reaches the offer.
-9. Accept PICT ENTC and confirm the consequence.
-10. Show that AISSMS availability moved 2 → 3 and PICT is now Aarya's one current admission.
-11. Reload to show persistence, then use **Reset Demo** to restore the starting state without changing preferences.
+**One verified document set → reused with consent.**
 
-See [DEMO.md](./DEMO.md) for the concise presenter walkthrough.
+**One profile → reused across admissions and financial aid.**
 
-## Data
+## Official data
 
-### Official CET/public reference information
+The checked-in generated metadata currently records:
 
-The manually curated subset in `src/data/official/` contains institute identities, programme choice codes, sanctioned intake and limited historical cutoffs. Every record carries its academic year, source URL and access date.
+- **48 institutes**;
+- **610 programmes**; and
+- **7,481 contextual cutoff observations**.
 
-- [Maharashtra CET Cell FE 2026–27 portal](https://fe2026.mahacet.org/StaticPages/HomePage) — source for the displayed CAP Round III first-six auto-freeze rule.
-- [Maharashtra CET Cell 2025–26 participating institutes](https://fe2025.mahacet.org/StaticPages/frmInstituteList) — institute and intake reference.
-- Official institute summaries at `https://fe2025.mahacet.org/StaticPages/frmInstituteSummary?InstituteCode={code}` — institute status, autonomy, choice codes and intake.
-- [Official 2024–25 CAP Round III cutoff list](https://fe2025.mahacet.org/2024/2024ENGG_CAP3_CutOff.pdf) — source for the limited historical cutoff observations.
+The catalog is a static 2025–26 reference snapshot generated from public Maharashtra CET Cell institute summaries and CAP Round II/III cutoff publications. Official names, codes, intake and cutoff observations retain source and academic-year context. It is not a live CET feed.
 
-The subset was manually curated on 27 August 2026. It is not a live or complete current-cycle catalog. Missing values are shown as unavailable and are never inferred.
+Aarya, candidate ranks, admissions, seat ownership, vacancy totals, queues, offers, deadlines, document records, consent events and scholarship-profile values are synthetic. They are kept separate from official reference data.
 
-### Synthetic demo information
+See [CET data sources and refresh steps](./docs/CET_DATA_SOURCES.md).
 
-Aarya, her scores and documents, current admissions, seat ownership, live vacancies, spot rounds, queue positions, participants, offers, timers, deadlines and connected-counselling events are synthetic. Official programme codes are used only as references connecting the demo inventory to the public catalog.
+## AI
 
-## Prototype limitations
+The Admission Assistant is a read-only natural-language layer over a sanitized snapshot of the current prototype state and existing deterministic domain services. It can explain consequences and link to relevant pages and official sources, but cannot accept a seat, reorder preferences, join a round, share documents, submit an application or reset the demo.
 
-- No official CET API or live CET vacancy feed.
-- No real JoSAA, JEE or connected-counselling API.
-- No real applicant identity or admission data.
-- Admission, queue, vacancy and offer state is stored only on the current device.
-- Live queues, vacancies, offers and timers are guided synthetic simulations.
-- Demo confirmation does not submit an official option form or admission decision.
+With no API configuration—or if the provider fails—the rest of AdmissionSetu continues to work and the assistant returns a clearly labelled deterministic response for its demo questions. Automated tests do not call an external model.
 
-## Tech stack
+### Vercel assistant configuration
 
-- Next.js 16 App Router
-- React 19
-- TypeScript with strict checking
-- Tailwind CSS 4
-- Local TypeScript seed data and service modules
-- Browser `localStorage` for device-local preferences and simulation state
-- Node's built-in test runner for domain tests
+1. Add `OPENAI_API_KEY` to the Vercel project’s server-side Environment Variables.
+2. Optionally add `OPENAI_MODEL`; it defaults to `gpt-5`.
+3. Do not use a `NEXT_PUBLIC_` prefix for either value.
+4. Redeploy after changing environment variables.
+5. Open `/assistant` and confirm an answer is labelled **OpenAI response**; without a key, expect **Deterministic demo response**.
 
-No secrets, authentication, database or external runtime integration are required.
+The browser only calls `/api/assistant`; the API key is read inside the server route’s provider module.
 
-## Codex
+## Demo
 
-The prototype was developed iteratively with OpenAI Codex. Codex supported project scaffolding, domain modelling, implementation, automated tests, focused refactors and browser-led QA. Product decisions and the final prototype scope remained part of the human-directed hackathon workflow.
+Use [DEMO_V2.md](./DEMO_V2.md) as the definitive short judging walkthrough.
 
-## Running locally
+## Architecture
+
+See [V2 architecture](./docs/V2_ARCHITECTURE.md) for the state, service and production-boundary overview.
+
+## Data refresh
+
+Production and preview builds read checked-in generated TypeScript artifacts. They do not fetch CET pages, run Python or regenerate data during deployment.
+
+Maintainers can rehearse the deterministic local pipeline with:
+
+```bash
+npm run data:generate
+npm run data:validate
+```
+
+For a source refresh, follow [the documented snapshot, extraction, generation and validation sequence](./docs/CET_DATA_SOURCES.md#refresh-rehearsal).
+
+## Run locally
 
 Requires Node.js 20.9 or newer and npm.
 
@@ -93,11 +113,12 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). No seeding, sign-in or environment variables are required.
+Open [http://localhost:3000](http://localhost:3000). No sign-in, database or environment variable is required for the deterministic prototype.
 
-Validation commands:
+Run the full verification suite with:
 
 ```bash
+npm run data:validate
 npm run lint
 npm run typecheck
 npm test
@@ -105,10 +126,24 @@ npm run build
 git diff --check
 ```
 
-## Device-local state
+## Technology and deployment
 
-- Admission and spot-round simulation: `admissionsetu:admission-simulation:v2`
-- Ordered CAP preferences: `admissionsetu:candidate-preferences:v2`
-- Legacy explorer shortlist migration source: `admissionsetu:preference-shortlist:v1`
+- Next.js 16 App Router and React 19
+- strict TypeScript and Tailwind CSS 4
+- local typed seed data and domain services
+- device-local persistence for the hackathon simulation
+- Node’s built-in test runner
+- Vercel-compatible server route for the optional assistant
 
-**Reset Demo** restores the admission, seat inventory, vacancies, interests, queue progress, offers and event history. It deliberately does not clear saved CAP preferences.
+No authentication, database, live government API or external notification infrastructure is required.
+
+## Limitations
+
+- This is not an official government service or a live CET vacancy feed.
+- Merit clearing uses a simplified global synthetic rank and does not reproduce reservation, candidature or home-university policy.
+- DigiLocker connection, consent and document sharing are local simulations; no real files or identifiers are transferred.
+- Scholarship coverage is deliberately small and explanatory; official portals make final eligibility and application decisions.
+- Candidate, admission and clearing state is stored only on the current device and is not a production trust boundary.
+- Assistant conversations are page-session state; its context is suitable for a prototype, not a government deployment.
+
+**Reset Demo** restores the AISSMS admission, seat inventory, clearing state, offers, document passport, consent/history and scholarship profile. Saved CAP preferences intentionally remain unchanged.

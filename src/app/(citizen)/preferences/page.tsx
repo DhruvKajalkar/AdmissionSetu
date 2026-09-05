@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PreferenceBuilder } from "@/components";
 import { capRoundThreeRule, demoAdmissionCycle } from "@/data";
 import { mockOfficialCatalogService } from "@/services";
+import { selectDisplayCutoffs } from "@/services/official-catalog";
 
 export const metadata: Metadata = {
   title: "My Preferences",
@@ -15,7 +16,7 @@ export default async function PreferencesPage() {
     <PreferenceBuilder
       institutes={catalog.institutes}
       programs={catalog.programs}
-      cutoffs={catalog.cutoffs}
+      cutoffs={selectDisplayCutoffs(catalog.cutoffs)}
       rule={capRoundThreeRule}
       cycle={demoAdmissionCycle}
     />

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CollegeExplorer } from "@/components";
 import { mockCandidateService, mockOfficialCatalogService } from "@/services";
+import { selectDisplayCutoffs } from "@/services/official-catalog";
 
 export const metadata: Metadata = {
   title: "College Explorer",
@@ -17,7 +18,8 @@ export default async function ExplorePage() {
     <CollegeExplorer
       institutes={catalog.institutes}
       programs={catalog.programs}
-      cutoffs={catalog.cutoffs}
+      cutoffs={selectDisplayCutoffs(catalog.cutoffs)}
+      metadata={catalog.metadata}
       sources={catalog.sources}
       candidate={{
         name: candidate.fullName,
