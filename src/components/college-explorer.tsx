@@ -182,7 +182,7 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, meta
         <summary>About this data</summary>
         <div>
           <p><strong>Data freshness:</strong> {metadata.sourceSnapshot} Academic years represented: {metadata.academicYears.join(", ")}. Last generated: {metadata.generatedOn}. This is not a live official feed.</p>
-          <p><strong>Institute and intake data:</strong> Script-generated from Maharashtra CET Cell 2025–26 institute summaries and checked against the <a href={sources.instituteList.url} target="_blank" rel="noreferrer">official institute list ↗</a>. The <a href={sources.currentPortal.url} target="_blank" rel="noreferrer">2026–27 portal ↗</a> remains the current-cycle reference.</p>
+          <p><strong>Institute and intake data:</strong> Script-generated from Maharashtra CET Cell 2025–26 institute summaries and checked against the <a href={sources.instituteList.url} target="_blank" rel="noreferrer" aria-label="Official institute list (opens in a new tab)">official institute list ↗</a>. The <a href={sources.currentPortal.url} target="_blank" rel="noreferrer" aria-label="2026–27 CET Cell portal (opens in a new tab)">2026–27 portal ↗</a> remains the current-cycle reference.</p>
           <p><strong>Cutoff data:</strong> Verified 2025–26 CAP Round II and III observations imported from official CET Cell cutoff publications. Year, round, seat category, candidature context, stage and source remain attached to every observation.</p>
           <p><strong>Synthetic data:</strong> Aarya&apos;s identity, score, preferences, admission, vacancies, and future spot-round state are demonstration records.</p>
           <p>Historical/current-cycle reference information in AdmissionSetu should be verified against the official CET Cell portal before an actual admission decision.</p>
@@ -288,8 +288,8 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, meta
                         </div>
                       ) : null}
                       <p className="detail-disclaimer">Historical cutoff figures can change by round, category, candidature type, and seat type. Always verify the live admission notice before making a decision.</p>
-                      <a href={institute.source.url} target="_blank" rel="noreferrer">Open official CET Cell institute summary ↗</a>
-                      {cutoff ? <a href={cutoff.source.url} target="_blank" rel="noreferrer">Open official cutoff document ↗</a> : null}
+                      <a href={institute.source.url} target="_blank" rel="noreferrer" aria-label={`Open the official CET Cell summary for ${institute.commonName} (opens in a new tab)`}>Open official CET Cell institute summary ↗</a>
+                      {cutoff ? <a href={cutoff.source.url} target="_blank" rel="noreferrer" aria-label={`Open the official cutoff document for ${program.name} (opens in a new tab)`}>Open official cutoff document ↗</a> : null}
                     </div>
                   </details>
                 </article>

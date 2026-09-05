@@ -12,11 +12,11 @@ import { StatusBadge } from "./status-badge";
 
 const suggestedQuestions = [
   "What happens if I accept VIT?",
+  "Which spot round is my highest position in?",
   "Why are my top six preferences risky?",
   "Which documents am I missing?",
   "Which scholarships could match me?",
-  "Where am I highest in the merit lists?",
-  "Am I ready for institute reporting?",
+  "What historical cutoff data do we have for PICT ENTC?",
 ] as const;
 
 interface ChatMessage {
@@ -117,7 +117,7 @@ export function AdmissionAssistantView() {
                     {message.sources?.length ? (
                       <div className="assistant-sources">
                         <strong>Sources</strong>
-                        <ul>{message.sources.map((source) => <li key={source.id}>{source.url ? <a href={source.url} target="_blank" rel="noreferrer">{source.label}</a> : <span>{source.label}</span>}<em>{source.kind.replace("_", " ").toLowerCase()}</em></li>)}</ul>
+                        <ul>{message.sources.map((source) => <li key={source.id}>{source.url ? <a href={source.url} target="_blank" rel="noreferrer" aria-label={`${source.label} (opens in a new tab)`}>{source.label}</a> : <span>{source.label}</span>}<em>{source.kind.replace("_", " ").toLowerCase()}</em></li>)}</ul>
                       </div>
                     ) : null}
                     {message.actions?.length ? <nav className="assistant-actions" aria-label="Related pages">{message.actions.map((action) => <Link href={action.href} key={action.href}>{action.label} →</Link>)}</nav> : null}

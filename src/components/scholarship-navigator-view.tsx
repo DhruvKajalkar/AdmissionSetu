@@ -178,7 +178,7 @@ export function ScholarshipNavigatorView() {
                   <div>
                     <strong>Based on official criteria</strong>
                     <span>Last verified {scheme.officialSources[0].lastVerifiedOn}</span>
-                    {scheme.officialSources.map((source) => <a href={source.url} target="_blank" rel="noreferrer" key={source.url}>{source.title} ↗</a>)}
+                    {scheme.officialSources.map((source) => <a href={source.url} target="_blank" rel="noreferrer" aria-label={`${source.title} (opens in a new tab)`} key={source.url}>{source.title} ↗</a>)}
                   </div>
                   <a
                     className="primary-link-button scholarship-portal-link"
@@ -203,13 +203,13 @@ export function ScholarshipNavigatorView() {
           <p>Official journey context</p>
           <h2 id="nsp-context-title">National Scholarship Portal and OTR</h2>
           <span>NSP describes One Time Registration as a student identifier used across the academic career. AdmissionSetu does not generate an OTR, simulate Aadhaar, or replace NSP registration.</span>
-          <a href={scholarshipContextSources.nspStudents} target="_blank" rel="noreferrer">Read the official NSP student guidance ↗</a>
+          <a href={scholarshipContextSources.nspStudents} target="_blank" rel="noreferrer" aria-label="Read the official NSP student guidance (opens in a new tab)">Read the official NSP student guidance ↗</a>
         </section>
         <section aria-labelledby="mahadbt-context-title">
           <p>Why AdmissionSetu adds value</p>
           <h2 id="mahadbt-context-title">MahaDBT already suggests eligible schemes</h2>
           <span>MahaDBT uses completed profile information for suggested schemes. This prototype demonstrates how an admission profile and verified document set could make that handoff understandable immediately after admission.</span>
-          <a href={scholarshipContextSources.mahadbtEligibility} target="_blank" rel="noreferrer">Open official MahaDBT eligibility finder ↗</a>
+          <a href={scholarshipContextSources.mahadbtEligibility} target="_blank" rel="noreferrer" aria-label="Open the official MahaDBT eligibility finder (opens in a new tab)">Open official MahaDBT eligibility finder ↗</a>
         </section>
       </div>
 

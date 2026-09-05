@@ -160,6 +160,16 @@ test("deterministic catalog answer preserves cutoff year, round and category", a
   assert.ok(answer.sources.some((source) => source.kind === "OFFICIAL" && source.url?.includes("mahacet.org")));
 });
 
+test("suggested PICT ENTC catalog question resolves in deterministic mode", async () => {
+  const answer = await new DeterministicDemoAssistantProvider().respond({
+    message: "What historical cutoff data do we have for PICT ENTC?",
+    history: [],
+    context: initialContext(),
+  });
+  assert.match(answer.answer, /PICT.*Electronics and Telecommunication/i);
+  assert.doesNotMatch(answer.answer, /don't have verified information/i);
+});
+
 test("deterministic catalog answer can find Pune AI and Data Science programmes", async () => {
   const answer = await new DeterministicDemoAssistantProvider().respond({
     message: "What colleges in Pune have AI & DS programmes?",

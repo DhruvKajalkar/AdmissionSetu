@@ -26,14 +26,24 @@ Official CET Cell pages and publications
   -> Explorer, preferences, read-only assistant
 ```
 
-Run generation and validation with:
+## Refresh rehearsal
+
+Refreshing public sources is an explicit maintainer workflow, never a production build step:
+
+1. Run `npm run data:fetch` with network access. This replaces the selected institute HTML snapshots and the CAP Round II/III PDF snapshots under `scripts/cet/source-data/` after checking expected institute codes and PDF signatures.
+2. Run `python scripts/cet/extract-cutoffs.py`. This reads the refreshed PDFs with `pypdf` and replaces only the selected-institute text extracts.
+3. Run `npm run data:generate`. The deterministic parser normalizes and validates the snapshots, reports every warning and skipped record to the console, and replaces the TypeScript artifacts under `src/data/official/generated/`.
+4. Run `npm run data:validate`. This independently checks the committed artifacts for identifiers, relationships, bounds, provenance, duplicate/conflicting observations and metadata-count drift.
+5. Review the source and generated diffs, investigate all warning/skip count changes, then run the full application verification suite before committing.
+
+To rehearse deterministic regeneration without changing the source snapshot, run:
 
 ```bash
 npm run data:generate
 npm run data:validate
 ```
 
-`npm run data:fetch` is a maintainer-only network refresh. It is not called by the application, build, or validation commands. The Python extraction step uses `pypdf` and is needed only when the checked-in cutoff PDFs are refreshed.
+`npm run data:fetch` is not called by the application, build, or validation commands. Python and `pypdf` are needed only when checked-in cutoff PDFs are refreshed; neither is required at production runtime.
 
 ## Normalization and provenance
 
@@ -55,4 +65,3 @@ The 2025–26 CAP Round II extract contains two value sequences whose PDF text l
 This dataset is public reference information only. Aarya, candidate ranks, current admissions, synthetic seat inventory, live vacancy totals, merit queues, offers and events remain in the separate demo simulation state. Imported historical vacancies—when a later verified source is supported—must use `OfficialHistoricalVacancyObservation` and must never feed the live vacancy exchange.
 
 Historical/current-cycle reference information in AdmissionSetu should be verified against the official CET Cell portal before an actual admission decision.
-

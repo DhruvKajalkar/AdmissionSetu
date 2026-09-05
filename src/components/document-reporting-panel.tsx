@@ -71,12 +71,12 @@ export function DocumentReportingPanel({
 
       {confirming ? (
         <div className="confirmation-overlay" role="presentation">
-          <section className="confirmation-dialog document-share-dialog" role="dialog" aria-modal="true" aria-labelledby="share-documents-title">
+          <section className="confirmation-dialog document-share-dialog" role="dialog" aria-modal="true" aria-labelledby="share-documents-title" aria-describedby="share-documents-description">
             <p>Share for this admission</p>
             <h2 id="share-documents-title">Share verified documents with {instituteName}?</h2>
-            <span>Only these {documents.length} verified records will be shared for this simulated admission. Nothing is uploaded or sent externally.</span>
+            <span id="share-documents-description">Only these {documents.length} verified records will be shared for this simulated admission. Nothing is uploaded or sent externally.</span>
             <ul>{documents.map((document) => <li key={document.id}><span>{document.displayName}</span><strong>Ready</strong></li>)}</ul>
-            <div><button className="primary-action-button" type="button" onClick={confirmShare}>Share for this admission</button><button className="secondary-action-button" type="button" onClick={() => setConfirming(false)}>Cancel</button></div>
+            <div><button className="primary-action-button" type="button" onClick={confirmShare}>Share for this admission</button><button autoFocus className="secondary-action-button" type="button" onClick={() => setConfirming(false)}>Cancel</button></div>
           </section>
         </div>
       ) : null}

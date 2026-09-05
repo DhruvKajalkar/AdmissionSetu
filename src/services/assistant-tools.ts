@@ -41,7 +41,7 @@ const capSource: AssistantSource = {
 const cutoffsByProgram = groupOfficialCutoffs(officialCutoffs);
 
 function catalogQuery(query: string) {
-  const ignored = new Set(["about", "college", "colleges", "institute", "institutes", "programme", "programmes", "program", "programs", "show", "tell", "what", "which", "the", "is", "are", "have", "has", "historical", "cutoff", "cutoffs", "context", "our", "in", "for"]);
+  const ignored = new Set(["about", "college", "colleges", "institute", "institutes", "programme", "programmes", "program", "programs", "show", "tell", "what", "which", "the", "is", "are", "have", "has", "historical", "cutoff", "cutoffs", "context", "data", "do", "we", "our", "in", "for"]);
   return query.toLowerCase().replace(/\bour data\b/g, "").split(/[^a-z0-9]+/).filter((term) => term && !ignored.has(term)).join(" ");
 }
 

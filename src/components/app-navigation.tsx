@@ -5,18 +5,51 @@ import { usePathname } from "next/navigation";
 import { AdmissionSetuMark } from "./admission-setu-mark";
 import { usePreferenceShortlist } from "./preference-shortlist";
 
-const navigation = [
-  { label: "Overview", shortLabel: "Overview", href: "/dashboard", index: "01" },
-  { label: "Explore Colleges", shortLabel: "Explore", href: "/explore", index: "02" },
-  { label: "My Preferences", shortLabel: "Preferences", href: "/preferences", index: "03" },
-  { label: "My Documents", shortLabel: "Documents", href: "/documents", index: "04" },
-  { label: "Scholarships", shortLabel: "Scholarships", href: "/scholarships", index: "05" },
-  { label: "Ask AdmissionSetu", shortLabel: "Ask", href: "/assistant", index: "06" },
-  { label: "My Admission", shortLabel: "Admission", href: "/admission", index: "07" },
-  { label: "Live Vacancies", shortLabel: "Vacancies", href: "/vacancies", index: "08" },
-  { label: "Spot Rounds", shortLabel: "Spot Rounds", href: "/spot-rounds", index: "09" },
-  { label: "Operations", shortLabel: "Operations", href: "/operations", index: "10" },
-] as const;
+interface NavigationItem {
+  label: string;
+  shortLabel: string;
+  href: string;
+  index: string;
+}
+
+interface NavigationGroup {
+  label: string;
+  operations: boolean;
+  items: readonly NavigationItem[];
+}
+
+const navigationGroups: readonly NavigationGroup[] = [
+  {
+    label: "Admission journey",
+    operations: false,
+    items: [
+      { label: "Dashboard", shortLabel: "Dashboard", href: "/dashboard", index: "01" },
+      { label: "Explore Colleges", shortLabel: "Explore", href: "/explore", index: "02" },
+      { label: "My Preferences", shortLabel: "Preferences", href: "/preferences", index: "03" },
+      { label: "My Admission", shortLabel: "Admission", href: "/admission", index: "04" },
+      { label: "Live Vacancies", shortLabel: "Vacancies", href: "/vacancies", index: "05" },
+      { label: "Spot Rounds", shortLabel: "Spot Rounds", href: "/spot-rounds", index: "06" },
+    ],
+  },
+  {
+    label: "Support",
+    operations: false,
+    items: [
+      { label: "My Documents", shortLabel: "Documents", href: "/documents", index: "07" },
+      { label: "Scholarships", shortLabel: "Scholarships", href: "/scholarships", index: "08" },
+      { label: "Ask AdmissionSetu", shortLabel: "Ask", href: "/assistant", index: "09" },
+    ],
+  },
+  {
+    label: "Prototype operations",
+    operations: true,
+    items: [
+      { label: "Operations", shortLabel: "Prototype Ops", href: "/operations", index: "10" },
+    ],
+  },
+];
+
+const navigation = navigationGroups.flatMap((group) => group.items);
 
 function isRouteActive(pathname: string, href: string) {
   return href === "/dashboard" ? pathname === href : pathname.startsWith(href);
@@ -34,21 +67,26 @@ export function AppNavigation() {
           <span>AdmissionSetu</span>
         </Link>
 
-        <nav className="sidebar-links">
-          {navigation.map((item) => {
-            const active = isRouteActive(pathname, item.href);
-            return (
-              <Link
-                key={item.href}
-                className={active ? "sidebar-link active" : "sidebar-link"}
-                href={item.href}
-                aria-current={active ? "page" : undefined}
-              >
-                <span className="nav-index" aria-hidden="true">{item.index}</span>
-                <span>{item.href === "/preferences" ? `${item.label} · ${count}` : item.label}</span>
-              </Link>
-            );
-          })}
+        <nav className="sidebar-links" aria-label="Admission and support navigation">
+          {navigationGroups.map((group) => (
+            <div className={group.operations ? "sidebar-nav-group operations" : "sidebar-nav-group"} key={group.label}>
+              <span className="sidebar-nav-label">{group.label}</span>
+              {group.items.map((item) => {
+                const active = isRouteActive(pathname, item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    className={`${active ? "sidebar-link active" : "sidebar-link"}${group.operations ? " operations-link" : ""}`}
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                  >
+                    <span className="nav-index" aria-hidden="true">{item.index}</span>
+                    <span>{item.href === "/preferences" ? `${item.label} · ${count}` : item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         <div className="sidebar-profile">
@@ -73,7 +111,7 @@ export function AppNavigation() {
           return (
             <Link
               key={item.href}
-              className={active ? "mobile-nav-link active" : "mobile-nav-link"}
+              className={`${active ? "mobile-nav-link active" : "mobile-nav-link"}${item.href === "/operations" ? " prototype-operations-link" : ""}`}
               href={item.href}
               aria-current={active ? "page" : undefined}
             >

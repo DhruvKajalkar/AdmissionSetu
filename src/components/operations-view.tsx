@@ -50,7 +50,7 @@ export function OperationsView({
       <PageHeader
         eyebrow="Prototype operations view"
         title="Merit Clearing Operations"
-        description="A compact operational view of the same synthetic candidates, offers and authoritative seat records shown to students."
+        description="The authority and institution perspective on the same central clearing state used throughout the student journey."
         action={<StatusBadge tone="warning">Synthetic clearing data</StatusBadge>}
       />
 

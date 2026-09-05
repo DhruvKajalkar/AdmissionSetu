@@ -104,7 +104,7 @@ export function SpotRoundLive({
         <span>Positions use a simplified global merit rank. This is a proposed prototype model, not a statement of current CET policy.</span>
       </div>
 
-      {resetComplete ? <div className="demo-reset-feedback" role="status"><strong>V2 demo reset complete.</strong><span>The original AISSMS admission, seats, interests, offers, merit lists, document passport and scholarship demo profile were restored. Saved preferences were not changed.</span></div> : null}
+      {resetComplete ? <div className="demo-reset-feedback" role="status"><strong>Demo reset complete.</strong><span>The original AISSMS admission, seats, interests, offers, merit lists, document passport and scholarship demo profile were restored. Saved preferences were not changed.</span></div> : null}
       {lastError ? <div className="simulation-error" role="alert"><strong>Clearing action could not be completed.</strong><span>{lastError.message}</span><button type="button" onClick={clearError}>Dismiss</button></div> : null}
 
       {outcome && previousProgram && previousInstitute ? (
@@ -140,7 +140,7 @@ export function SpotRoundLive({
               })}
             </ul>
           </section>
-          <div className="spot-success-actions"><Link className="primary-link-button" href="/operations">View synchronized operations</Link><Link className="secondary-link-button" href="/vacancies">View live vacancies</Link><button className="secondary-action-button" type="button" onClick={() => setDecision("RESET")}>Reset V2 demo</button></div>
+          <div className="spot-success-actions"><Link className="primary-link-button" href="/operations">View synchronized operations</Link><Link className="secondary-link-button" href="/vacancies">View live vacancies</Link><button className="secondary-action-button" type="button" onClick={() => setDecision("RESET")}>Reset demo</button></div>
         </section>
       ) : (
         <>
@@ -198,11 +198,11 @@ export function SpotRoundLive({
 
       {decision ? (
         <div className="confirmation-overlay" role="presentation">
-          <section className="confirmation-dialog" role="dialog" aria-modal="true" aria-labelledby="clearing-confirmation-title">
+          <section className="confirmation-dialog" role="dialog" aria-modal="true" aria-labelledby="clearing-confirmation-title" aria-describedby="clearing-confirmation-description">
             <p>Confirm clearing action</p>
-            <h2 id="clearing-confirmation-title">{decision === "ACCEPT" ? "Accept VIT Computer Engineering?" : decision === "DECLINE" ? "Decline this seat offer?" : "Reset the V2 demo?"}</h2>
-            <span>{decision === "ACCEPT" ? "Your AISSMS seat will release and all other active merit-list interests will close immediately." : decision === "DECLINE" ? "The exact VIT seat will move to the next eligible candidate." : "Seats, candidates, offers, queues, document consent and event history return to the deterministic starting state. Preferences remain unchanged."}</span>
-            <div><button className={decision === "ACCEPT" ? "primary-action-button" : "danger-action-button"} type="button" onClick={completeDecision}>{decision === "ACCEPT" ? "Confirm and accept seat" : decision === "DECLINE" ? "Confirm decline" : "Reset demo now"}</button><button className="secondary-action-button" type="button" onClick={() => setDecision(null)}>Go back</button></div>
+            <h2 id="clearing-confirmation-title">{decision === "ACCEPT" ? "Accept VIT Computer Engineering?" : decision === "DECLINE" ? "Decline this seat offer?" : "Reset the demo?"}</h2>
+            <span id="clearing-confirmation-description">{decision === "ACCEPT" ? "Your AISSMS seat will release and all other active merit-list interests will close immediately." : decision === "DECLINE" ? "The exact VIT seat will move to the next eligible candidate." : "Seats, candidates, offers, queues, document consent and event history return to the deterministic starting state. Preferences remain unchanged."}</span>
+            <div><button className={decision === "ACCEPT" ? "primary-action-button" : "danger-action-button"} type="button" onClick={completeDecision}>{decision === "ACCEPT" ? "Confirm and accept seat" : decision === "DECLINE" ? "Confirm decline" : "Reset demo now"}</button><button autoFocus className="secondary-action-button" type="button" onClick={() => setDecision(null)}>Go back</button></div>
           </section>
         </div>
       ) : null}

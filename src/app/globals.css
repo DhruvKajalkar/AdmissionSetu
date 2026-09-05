@@ -745,7 +745,30 @@ a {
   margin-top: 22px;
   flex: 1;
   flex-direction: column;
-  gap: 5px;
+  gap: 16px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.sidebar-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sidebar-nav-group.operations {
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--slate-100);
+}
+
+.sidebar-nav-label {
+  padding: 0 12px 4px;
+  color: var(--slate-500);
+  font-size: 0.58rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .sidebar-link {
@@ -779,6 +802,16 @@ a {
 
 .sidebar-link.active .nav-index {
   color: var(--blue-600);
+}
+
+.sidebar-link.operations-link {
+  border: 1px solid var(--slate-200);
+  background: var(--slate-50);
+}
+
+.sidebar-link.operations-link.active {
+  border-color: #b8d7ed;
+  background: var(--blue-50);
 }
 
 .sidebar-profile {
@@ -1444,6 +1477,11 @@ a {
   .mobile-nav-link.active {
     border-color: var(--blue-700);
     color: var(--blue-700);
+  }
+
+  .mobile-nav-link.prototype-operations-link {
+    margin-left: 8px;
+    border-left: 1px solid var(--slate-200);
   }
 
   .app-main {

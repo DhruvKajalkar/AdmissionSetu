@@ -54,7 +54,7 @@ export function DemoResetControl() {
             <span>The original AISSMS seat, vacancies, clearing queues, document passport, consent, sharing history and scholarship demo profile will be restored. Your saved preferences will not be changed.</span>
           </div>
           <div>
-            <button type="button" onClick={() => setConfirming(false)}>Cancel</button>
+            <button autoFocus type="button" onClick={() => setConfirming(false)}>Cancel</button>
             <button className="confirm-reset-button" type="button" onClick={confirmReset}>Reset Demo</button>
           </div>
         </section>

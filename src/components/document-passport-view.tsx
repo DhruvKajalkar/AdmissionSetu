@@ -188,12 +188,12 @@ export function DocumentPassportView() {
 
       {dialog ? (
         <div className="confirmation-overlay" role="presentation">
-          <section className="confirmation-dialog document-consent-dialog" role="dialog" aria-modal="true" aria-labelledby="document-consent-title">
+          <section className="confirmation-dialog document-consent-dialog" role="dialog" aria-modal="true" aria-labelledby="document-consent-title" aria-describedby="document-consent-description">
             <p>{dialog === "CONSENT" ? "Explicit student consent" : "Manage connected service"}</p>
             <h2 id="document-consent-title">{dialog === "CONSENT" ? "Allow AdmissionSetu to access selected documents?" : "Manage DigiLocker demo access"}</h2>
             {dialog === "CONSENT" ? (
               <>
-                <span>AdmissionSetu would request access as an authorized DigiLocker Requester in a production implementation. This demo creates no OAuth token and makes no external call.</span>
+                <span id="document-consent-description">AdmissionSetu would request access as an authorized DigiLocker Requester in a production implementation. This demo creates no OAuth token and makes no external call.</span>
                 <fieldset className="document-scope-list">
                   <legend>Requested document scopes</legend>
                   {DIGILOCKER_DEMO_SCOPES.map((scope) => (
@@ -203,13 +203,13 @@ export function DocumentPassportView() {
                     </label>
                   ))}
                 </fieldset>
-                <div><button className="primary-action-button" type="button" onClick={allowSelectedDocuments}>Allow selected documents</button><button className="secondary-action-button" type="button" onClick={() => setDialog(null)}>Cancel</button></div>
+                <div><button className="primary-action-button" type="button" onClick={allowSelectedDocuments}>Allow selected documents</button><button autoFocus className="secondary-action-button" type="button" onClick={() => setDialog(null)}>Cancel</button></div>
               </>
             ) : (
               <>
-                <span>Revoking access removes AdmissionSetu&apos;s active permission. It does not delete the underlying synthetic document records or prior activity history.</span>
+                <span id="document-consent-description">Revoking access removes AdmissionSetu&apos;s active permission. It does not delete the underlying synthetic document records or prior activity history.</span>
                 <div className="manage-access-list"><strong>Currently allowed</strong><span>{connection.grantedScopes.map((scope) => scopeLabels[scope].title).join(" · ")}</span></div>
-                <div><button className="danger-action-button" type="button" onClick={revokeAccess}>Revoke DigiLocker access</button><button className="secondary-action-button" type="button" onClick={() => setDialog(null)}>Keep access</button></div>
+                <div><button className="danger-action-button" type="button" onClick={revokeAccess}>Revoke DigiLocker access</button><button autoFocus className="secondary-action-button" type="button" onClick={() => setDialog(null)}>Keep access</button></div>
               </>
             )}
           </section>

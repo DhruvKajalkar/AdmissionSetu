@@ -20,11 +20,6 @@ function scheme(id: string): ScholarshipScheme {
   return selected;
 }
 
-function requireSuccess<T extends { ok: boolean; state: unknown }>(result: T) {
-  assert.equal(result.ok, true);
-  return result.state;
-}
-
 function acceptedVitState() {
   const advanced = advanceHeroClearingScenario(createInitialAdmissionSimulationState());
   assert.equal(advanced.ok, true);
@@ -220,4 +215,3 @@ test("accepting VIT updates CAP-dependent scholarship results from the live admi
   assert.equal(acceptedEvaluation.status, "NOT_ELIGIBLE");
   assert.ok(acceptedEvaluation.failedRules.some((result) => result.ruleId === "rajarshi-cap"));
 });
-

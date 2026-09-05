@@ -587,7 +587,7 @@ export function PreferenceBuilder({
         <div className="round-rule-meta">
           <span>Review closes</span>
           <strong>{formatDeadline(cycle.preferenceReviewDeadline)}</strong>
-          <a href={rule.source.url} target="_blank" rel="noreferrer">Read the official CET Cell source ↗</a>
+          <a href={rule.source.url} target="_blank" rel="noreferrer" aria-label="Read the official CET Cell source (opens in a new tab)">Read the official CET Cell source ↗</a>
         </div>
       </aside>
 

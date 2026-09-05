@@ -55,7 +55,7 @@ export function SpotRoundDiscovery({
   return (
     <>
       <PageHeader
-        eyebrow="V2 merit clearing network"
+        eyebrow="Synchronized merit clearing"
         title="Spot Rounds"
         description="Join merit-ranked programme lists. One acceptance synchronizes every active interest and the central seat inventory."
         action={<StatusBadge tone="danger">Synthetic live clearing</StatusBadge>}
