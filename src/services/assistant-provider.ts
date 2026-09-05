@@ -25,6 +25,15 @@ function deterministicText(request: AssistantRequest, results: readonly Assistan
   if (q.includes("ignore") && (q.includes("rule") || q.includes("real vacancy") || q.includes("system prompt"))) {
     return "I can only use the synthetic live vacancy data and curated references represented in this prototype. I cannot reveal internal instructions or invent a real vacancy count.";
   }
+  if (q.includes("api key") || (q.includes("another candidate") && (q.includes("private") || q.includes("personal")))) {
+    return "I cannot access or reveal API keys or another candidate's private information. This assistant receives only Aarya's sanitized synthetic demo context and curated public references.";
+  }
+  if (q.includes("guarantee") || q.includes("guaranteed")) {
+    return "No. I cannot guarantee an admission outcome. Merit-list positions and offers in AdmissionSetu are synthetic prototype state, not a prediction or an official CET allocation result.";
+  }
+  if (q.includes("official") && ["admissionsetu", "merit-clearing", "merit clearing", "spot-round", "spot round", "system"].some((term) => q.includes(term))) {
+    return "No. AdmissionSetu's merit-clearing and spot-round workflows are a synthetic hackathon prototype, not an official Maharashtra CET system or policy. Only specifically linked CET Cell catalog and CAP references are presented as official public sources.";
+  }
   if (["cutoff", "college", "institute", "programme", "program", "choice code", "catalog"].some((term) => q.includes(term))) {
     const catalog = results.find((item) => item.name === "search_official_catalog")?.data as {
       matches?: Array<{
@@ -51,7 +60,7 @@ function deterministicText(request: AssistantRequest, results: readonly Assistan
       ? `Based on your current AdmissionSetu demo state, you hold ${admission.instituteShortName} — ${admission.programName} through ${admission.route}. The modelled seat state is ${admission.seatState.toLowerCase()}.`
       : "Based on your current AdmissionSetu demo state, you do not currently hold an admission.";
   }
-  if (q.includes("accept") || q.includes("what happens") || q.includes("other spot") || q.includes("pict")) {
+  if (q.includes("accept") || q.includes("what happens") || q.includes("other spot")) {
     if (projection?.state === "ALREADY_ACCEPTED") {
       return `Based on your current AdmissionSetu demo state, VIT Pune — Computer Engineering is already your current admission. Your earlier AISSMS Computer Engineering seat was released, and the competing PICT, PCCOE and MMCOE interests were closed when the shared merit lists recomputed.`;
     }
@@ -86,13 +95,19 @@ function deterministicText(request: AssistantRequest, results: readonly Assistan
   }
   if (q.includes("merit") || q.includes("position") || q.includes("highest") || q.includes("queue")) {
     const active = context.meritLists.filter((list) => list.position !== null).sort((a, b) => a.position! - b.position!);
-    const best = active[0];
+    const requested = q.includes("pict") ? active.find((list) => list.instituteShortName.toLowerCase().includes("pict")) : undefined;
+    const best = requested ?? active[0];
     return best
-      ? `Numerically, your highest current merit-list position is ${best.instituteShortName} — ${best.programName} at #${best.position}. This describes queue position only; it is not a college recommendation.`
+      ? `Numerically, your ${requested ? "current PICT" : "highest current merit-list"} position is ${best.instituteShortName} — ${best.programName} at #${best.position}. This describes queue position only; it is not a college recommendation or admission guarantee.`
       : "You do not currently have an active numbered position in the modelled merit lists.";
   }
   if (q.includes("rule") || q.includes("source")) {
     return `The represented ${context.cycle.roundLabel} rule says an allotment within the first ${context.preferences.autoFreezePreferenceLimit} preferences is automatically frozen. It comes from the linked Maharashtra CET Cell FE 2026–27 reference. AdmissionSetu models only that verified rule, not the full admission policy.`;
+  }
+  if (q.includes("what should i do next") || q.includes("next step")) {
+    return projection?.state === "AVAILABLE_TO_SIMULATE"
+      ? "For the deterministic demo, open Spot Rounds and advance the VIT event, then review the offer consequences before accepting. I can explain those consequences, but I cannot take an admission action for you."
+      : "Review your current admission, active merit lists, preference warning and document readiness before taking the next demo action. I can explain those states, but I cannot change them.";
   }
   return null;
 }
