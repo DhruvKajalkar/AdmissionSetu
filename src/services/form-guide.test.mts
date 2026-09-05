@@ -169,13 +169,14 @@ test("successful vision response is mapped server-side without sending candidate
       output: [{ content: [{ type: "output_text", text: JSON.stringify({ fields: [field("Candidate name", "CANDIDATE_NAME")] }) }] }],
     });
   };
-  const environment = { NODE_ENV: "test", OPENAI_API_KEY: "test-key", OPENAI_VISION_MODEL: "test-vision-model" } as NodeJS.ProcessEnv;
+  const environment = { NODE_ENV: "test", OPENAI_API_KEY: "test-key", OPENAI_VISION_MODEL: "gpt-5" } as NodeJS.ProcessEnv;
   const response = await handleFormGuideRequest(formRequest(), environment, fetcher);
   const body = await response.json();
   assert.equal(response.status, 200);
   assert.equal(body.fields[0].suggestedValue, "Aarya Deshmukh");
   assert.equal(providerRequest.includes("Aarya Deshmukh"), false);
   assert.equal(providerRequest.includes('"store":false'), true);
+  assert.equal(providerRequest.includes('"reasoning":{"effort":"minimal"}'), true);
   assert.equal(providerRequest.includes('"type":"input_image"'), true);
 });
 

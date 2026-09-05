@@ -67,6 +67,9 @@ export class OpenAIFormGuideProvider implements FormGuideVisionProvider {
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
       body: JSON.stringify({
         model: this.model,
+        ...(this.model === "gpt-5" || this.model.startsWith("gpt-5-")
+          ? { reasoning: { effort: "minimal" } }
+          : {}),
         instructions: FORM_GUIDE_INSTRUCTIONS,
         input: [{
           role: "user",
