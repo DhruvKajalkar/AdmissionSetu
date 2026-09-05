@@ -11,6 +11,7 @@ import { acceptClearingOffer, advanceHeroClearingScenario, getCandidateClearingI
 import { getWorkflowReadiness } from "./document-passport.ts";
 import { reviewPreferenceList } from "./preference-safety.ts";
 import { evaluateAllSchemes, getScholarshipSummary } from "./scholarships.ts";
+import { deriveAlerts, getAlertSummary, getAlertTimingLabel } from "./alerts.ts";
 
 function catalog(programId: string) {
   const program = officialPrograms.find((item) => item.choiceCode === programId);
@@ -103,6 +104,8 @@ export function buildAssistantContextSnapshot(
   const preferenceReview = reviewPreferenceList(preferences, capRoundThreeRule);
   const workflows = DOCUMENT_REQUIREMENT_BUNDLES.map((bundle) => getWorkflowReadiness(state, bundle.id));
   const evaluations = evaluateAllSchemes(state, candidate);
+  const alerts = deriveAlerts(state, preferences, candidate);
+  const activeAlerts = alerts.filter((alert) => alert.status === "ACTIVE" && alert.actionable);
   const meritCandidate = state.clearing.candidates.find((item) => item.candidateId === candidate.id);
   const programIds = [...new Set(state.spotRounds.map((round) => round.programId))];
 
@@ -116,6 +119,18 @@ export function buildAssistantContextSnapshot(
       jeePercentile: candidate.jeePercentile,
     },
     cycle: { currentRound: demoAdmissionCycle.currentRound, roundLabel: demoAdmissionCycle.roundLabel },
+    alerts: {
+      actionableCount: getAlertSummary(alerts).actionableCount,
+      highestPriority: activeAlerts.slice(0, 5).map((alert) => ({
+        priority: alert.priority,
+        title: alert.title,
+        message: alert.message,
+        dueLabel: getAlertTimingLabel(alert),
+        actionLabel: alert.actionLabel ?? null,
+        actionHref: alert.actionHref ?? null,
+        source: alert.source,
+      })),
+    },
     currentAdmission: currentAdmission(state),
     preferences: {
       items: preferences.map((preference) => {

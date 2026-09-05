@@ -83,6 +83,12 @@ With no API configuration—or if the provider fails—the rest of AdmissionSetu
 
 The browser only calls `/api/assistant`; the API key is read inside the server route’s provider module.
 
+## Personalized Action Center
+
+The Action Center derives a single personalized timeline from Aarya's current admission state. It prioritizes active seat offers and their deterministic expiry window, supported merit-position movements, CAP preference risks, missing Document Passport items, scholarship readiness, and recently completed admission actions. The dashboard shows only the highest-priority next steps, while Ask AdmissionSetu receives the same sanitized priority order for questions such as “What should I do next?”
+
+Reminder controls are deliberately lightweight and device-local. Snoozed and dismissed low-priority items are persisted, while alert content is recalculated from authoritative prototype state to avoid stale notifications. Reminders appear only inside AdmissionSetu while using the prototype; there is no SMS, email, WhatsApp, OS push, service-worker, or background delivery backend. Offer and reminder timing is deterministic for the demo.
+
 ## Demo
 
 Use [DEMO_V2.md](./DEMO_V2.md) as the definitive short judging walkthrough.
@@ -145,5 +151,6 @@ No authentication, database, live government API or external notification infras
 - Scholarship coverage is deliberately small and explanatory; official portals make final eligibility and application decisions.
 - Candidate, admission and clearing state is stored only on the current device and is not a production trust boundary.
 - Assistant conversations are page-session state; its context is suitable for a prototype, not a government deployment.
+- Action Center reminders are in-app controls tied to a deterministic demo clock, not a production notification service.
 
-**Reset Demo** restores the AISSMS admission, seat inventory, clearing state, offers, document passport, consent/history and scholarship profile. Saved CAP preferences intentionally remain unchanged.
+**Reset Demo** restores the AISSMS admission, seat inventory, clearing state, offers, document passport, consent/history, scholarship profile and alert reminder controls. Saved CAP preferences intentionally remain unchanged.

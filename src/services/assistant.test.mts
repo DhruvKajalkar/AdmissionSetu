@@ -160,7 +160,8 @@ test("prescribed deterministic QA prompts answer the requested scope", async () 
   assert.match(guarantee.answer, /cannot guarantee/i);
   assert.match(official.answer, /synthetic hackathon prototype/i);
   assert.match(official.answer, /not an official Maharashtra CET system/i);
-  assert.match(next.answer, /open Spot Rounds and advance the VIT event/i);
+  assert.match(next.answer, /Review your Round III preference #1/i);
+  assert.match(next.answer, /institute reporting documents are currently ready/i);
 });
 
 test("deterministic safety prompts refuse secrets and other-candidate private data", async () => {

@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types --test src/services/preference-safety.test.mts src/services/admission-state.test.mts src/services/spot-round-state.test.mts src/services/clearing-network.test.mts src/services/document-passport.test.mts src/services/scholarships.test.mts src/services/assistant.test.mts src/services/official-catalog.test.mts",
+    "test": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types --test src/services/preference-safety.test.mts src/services/admission-state.test.mts src/services/spot-round-state.test.mts src/services/clearing-network.test.mts src/services/document-passport.test.mts src/services/scholarships.test.mts src/services/assistant.test.mts src/services/official-catalog.test.mts src/services/alerts.test.mts",
     "data:fetch": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/cet/fetch-sources.mts",
     "data:generate": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/cet/generate.mts",
     "data:validate": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types scripts/cet/validate.mts"

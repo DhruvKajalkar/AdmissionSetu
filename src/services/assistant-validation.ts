@@ -17,7 +17,7 @@ function record(value: unknown): value is Record<string, unknown> {
 export function isAssistantContextSnapshot(value: unknown): value is AssistantContextSnapshot {
   if (!record(value) || value.version !== 1 || !record(value.candidate) || value.candidate.isSynthetic !== true) return false;
   if (typeof value.candidate.id !== "string" || typeof value.candidate.displayName !== "string") return false;
-  if (!record(value.cycle) || !record(value.preferences) || !Array.isArray(value.preferences.items) || !Array.isArray(value.preferences.findings)) return false;
+  if (!record(value.cycle) || !record(value.alerts) || !Array.isArray(value.alerts.highestPriority) || !record(value.preferences) || !Array.isArray(value.preferences.items) || !Array.isArray(value.preferences.findings)) return false;
   if (!Array.isArray(value.meritLists) || !Array.isArray(value.vacancies) || !record(value.documents) || !Array.isArray(value.documents.records) || !Array.isArray(value.documents.workflows)) return false;
   if (!record(value.scholarships) || !record(value.scholarships.profile) || !record(value.scholarships.summary) || !Array.isArray(value.scholarships.evaluations)) return false;
   if (value.currentAdmission !== null && !record(value.currentAdmission)) return false;

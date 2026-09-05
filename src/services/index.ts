@@ -1,5 +1,6 @@
 export type { AdmissionService } from "./admissions";
 export { acceptSeat, confirmExternalAdmission, getAdmissionEvents, getCandidateCurrentAdmission, getProgrammeVacancies, isAdmissionSimulationStateValid, offerSeat, releaseSeat, resetAdmissionSimulation, returnOfferedSeat, sanitizeAdmissionSimulationState, withdrawCurrentAdmission } from "./admission-state";
+export { ALERT_DEMO_NOW, deriveAlerts, dismissAlert, getActiveAlerts, getAlertSummary, getAlertTimingLabel, getDashboardTopAlerts, getSnoozeUntil, snoozeAlert } from "./alerts";
 export type { CandidateService } from "./candidates";
 export type { CollegeService } from "./colleges";
 export type { OfficialCatalog, OfficialCatalogService } from "./official-catalog";

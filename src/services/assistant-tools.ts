@@ -12,6 +12,7 @@ export const ASSISTANT_READ_ONLY_TOOL_NAMES = [
   "get_offer_consequences",
   "get_document_readiness",
   "get_scholarship_matches",
+  "get_next_actions",
   "get_cap_rule",
   "search_official_catalog",
 ] as const;
@@ -80,6 +81,9 @@ export function runAssistantTool(
       url: evaluation.sourceUrl,
     }));
     return result(name, context.scholarships, [demoSource, ...sources], [{ label: "Open Scholarships", href: "/scholarships" }]);
+  }
+  if (name === "get_next_actions") {
+    return result(name, context.alerts, [demoSource, { id: "personalized-action-center", label: "AdmissionSetu personalized action timeline", kind: "PROTOTYPE_RULE" }], [{ label: "Open Action Center", href: "/alerts" }]);
   }
   if (name === "get_cap_rule") {
     return result(name, {
@@ -155,6 +159,7 @@ export function selectAssistantTools(message: string): AssistantReadOnlyToolName
   if (includesAny(normalized, ["merit", "position", "queue", "highest", "spot round", "pict", "pccoe", "mmcoe"])) tools.add("get_active_merit_lists");
   if (includesAny(normalized, ["document", "missing", "reporting", "digilocker", "consent", "ready"])) tools.add("get_document_readiness");
   if (includesAny(normalized, ["scholarship", "financial aid", "eligible", "panjabrao", "mahadbt", "nsp"])) tools.add("get_scholarship_matches");
+  if (includesAny(normalized, ["what should i do next", "next step", "next action", "alert", "reminder", "action center"])) tools.add("get_next_actions");
   if (includesAny(normalized, ["college", "institute", "programme", "program", "choice code", "cutoff", "catalog"])) tools.add("search_official_catalog");
   return [...tools];
 }

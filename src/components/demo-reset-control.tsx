@@ -51,7 +51,7 @@ export function DemoResetControl() {
         >
           <div>
             <strong id={confirmationTitleId}>Restore the starting demo state?</strong>
-            <span>The original AISSMS seat, vacancies, clearing queues, document passport, consent, sharing history and scholarship demo profile will be restored. Your saved preferences will not be changed.</span>
+            <span>The original AISSMS seat, vacancies, clearing queues, document passport, consent, sharing history, scholarship demo profile and in-app reminder controls will be restored. Your saved preferences will not be changed.</span>
           </div>
           <div>
             <button autoFocus type="button" onClick={() => setConfirming(false)}>Cancel</button>
