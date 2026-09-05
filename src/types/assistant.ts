@@ -33,6 +33,7 @@ export interface AssistantContextSnapshot {
     isSynthetic: true;
     cetPercentile: number;
     jeePercentile: number;
+    category: string;
   };
   cycle: {
     currentRound: number;
@@ -106,6 +107,7 @@ export interface AssistantContextSnapshot {
       familyAnnualIncomeInr: number;
       hostelStatus: string;
       class12BoardPercentile: number | null;
+      domicileState: string;
     };
     summary: {
       eligible: number;

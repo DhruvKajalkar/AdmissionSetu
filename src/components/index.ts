@@ -15,6 +15,7 @@ export { DocumentReadiness } from "./document-readiness";
 export { DocumentPassportView } from "./document-passport-view";
 export { DocumentReportingPanel } from "./document-reporting-panel";
 export { FinancialAidSummary } from "./financial-aid-summary";
+export { FormGuideView } from "./form-guide-view";
 export { PageHeader } from "./page-header";
 export { OperationsView } from "./operations-view";
 export { PreferenceShortlistProvider, usePreferenceShortlist } from "./preference-shortlist";

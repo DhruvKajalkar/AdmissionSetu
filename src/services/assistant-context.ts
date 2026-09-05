@@ -117,6 +117,7 @@ export function buildAssistantContextSnapshot(
       isSynthetic: true,
       cetPercentile: candidate.cetPercentile,
       jeePercentile: candidate.jeePercentile,
+      category: candidate.category,
     },
     cycle: { currentRound: demoAdmissionCycle.currentRound, roundLabel: demoAdmissionCycle.roundLabel },
     alerts: {
@@ -191,6 +192,7 @@ export function buildAssistantContextSnapshot(
         familyAnnualIncomeInr: state.scholarshipNavigator.profile.familyAnnualIncomeInr,
         hostelStatus: state.scholarshipNavigator.profile.hostelStatus,
         class12BoardPercentile: state.scholarshipNavigator.profile.class12BoardPercentile,
+        domicileState: state.scholarshipNavigator.profile.domicileState,
       },
       summary: getScholarshipSummary(evaluations),
       evaluations: evaluations.map((evaluation) => {

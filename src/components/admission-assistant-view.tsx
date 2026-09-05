@@ -9,6 +9,7 @@ import { useAdmissionSimulation } from "./admission-simulation-provider";
 import { PageHeader } from "./page-header";
 import { usePreferenceShortlist } from "./preference-shortlist";
 import { StatusBadge } from "./status-badge";
+import { FormGuideView } from "./form-guide-view";
 
 const suggestedQuestions = [
   "What happens if I accept VIT?",
@@ -36,6 +37,7 @@ export function AdmissionAssistantView() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const nextId = useRef(1);
+  const [mode, setMode] = useState<"QUESTION" | "FORM_GUIDE">("QUESTION");
 
   async function sendQuestion(question: string) {
     const message = question.trim();
@@ -88,6 +90,14 @@ export function AdmissionAssistantView() {
         action={<StatusBadge tone="info">Synthetic context</StatusBadge>}
       />
 
+      <div className="assistant-mode-switch" aria-label="Assistant mode">
+        <button type="button" aria-pressed={mode === "QUESTION"} onClick={() => setMode("QUESTION")}>Ask a question</button>
+        <button type="button" aria-pressed={mode === "FORM_GUIDE"} onClick={() => setMode("FORM_GUIDE")}>Guide me through a form</button>
+      </div>
+
+      {mode === "FORM_GUIDE" ? <FormGuideView /> : (
+        <>
+
       <section className="assistant-boundary-note" aria-label="Assistant limitations">
         <strong>Advice only — no admission actions</strong>
         <span>The assistant can explain your current demo state and link to the right page. It cannot accept seats, change preferences, share documents or submit applications.</span>
@@ -139,6 +149,8 @@ export function AdmissionAssistantView() {
           {error ? <p className="assistant-error" role="alert">{error} Your admission state has not changed.</p> : null}
         </form>
       </section>
+        </>
+      )}
     </>
   );
 }

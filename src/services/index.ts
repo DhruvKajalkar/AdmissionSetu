@@ -20,3 +20,8 @@ export type { AssistantProvider } from "./assistant-provider";
 export { ASSISTANT_READ_ONLY_TOOL_NAMES, runAssistantTool, runToolsForMessage, selectAssistantTools } from "./assistant-tools";
 export type { AssistantReadOnlyToolName, AssistantToolResult } from "./assistant-tools";
 export { ASSISTANT_LIMITS, isAssistantContextSnapshot, validateAssistantRequest } from "./assistant-validation";
+export { buildFormGuideContextSnapshot, FORM_FIELD_PURPOSES, isPolicySensitiveFormLabel, isSensitiveFormLabel, mapDetectedFormFields } from "./form-guide";
+export { FORM_GUIDE_INSTRUCTIONS, getFormGuideProvider, OpenAIFormGuideProvider } from "./form-guide-provider";
+export type { FormGuideVisionInput, FormGuideVisionProvider } from "./form-guide-provider";
+export { handleFormGuideRequest } from "./form-guide-route";
+export { FORM_GUIDE_IMAGE_TYPES, FORM_GUIDE_LIMITS, hasSupportedImageSignature, isFormGuideContextSnapshot, parseDetectedFields, parseFormGuideContext, validateFormGuideMetadata } from "./form-guide-validation";

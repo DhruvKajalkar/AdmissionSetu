@@ -21,6 +21,17 @@ export type {
 } from "./alerts";
 
 export type {
+  DetectedFormField,
+  FormFieldConfidence,
+  FormFieldGuidance,
+  FormFieldGuidanceStatus,
+  FormFieldPurpose,
+  FormGuideContextSnapshot,
+  FormGuideErrorResponse,
+  FormGuideResponse,
+} from "./form-guide";
+
+export type {
   Admission,
   AdmissionAlert,
   AdmissionAlertTone,
