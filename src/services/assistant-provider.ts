@@ -105,9 +105,11 @@ function deterministicText(request: AssistantRequest, results: readonly Assistan
     return `The represented ${context.cycle.roundLabel} rule says an allotment within the first ${context.preferences.autoFreezePreferenceLimit} preferences is automatically frozen. It comes from the linked Maharashtra CET Cell FE 2026–27 reference. AdmissionSetu models only that verified rule, not the full admission policy.`;
   }
   if (q.includes("what should i do next") || q.includes("next step")) {
-    return projection?.state === "AVAILABLE_TO_SIMULATE"
-      ? "For the deterministic demo, open Spot Rounds and advance the VIT event, then review the offer consequences before accepting. I can explain those consequences, but I cannot take an admission action for you."
-      : "Review your current admission, active merit lists, preference warning and document readiness before taking the next demo action. I can explain those states, but I cannot change them.";
+    const actions = context.alerts.highestPriority.slice(0, 3);
+    if (!actions.length) return "Your Action Center has no active next steps right now. I can explain your current admission state, but I cannot change it.";
+    const reporting = context.documents.workflows.find((item) => item.workflowId === "INSTITUTE_REPORTING");
+    const ordered = actions.map((alert, index) => `${index + 1}. ${alert.title}${alert.dueLabel ? ` — ${alert.dueLabel}` : ""}.`).join(" ");
+    return `${ordered} Your institute reporting documents are currently ${reporting?.ready ? "ready" : "not ready"}. This order comes from the Action Center; I can explain these states, but I cannot take an action for you.`;
   }
   return null;
 }

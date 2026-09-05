@@ -60,6 +60,11 @@ function cloneState(state: AdmissionSimulationState): AdmissionSimulationState {
           }
         : null,
     },
+    alertControls: {
+      ...state.alertControls,
+      snoozedUntilByAlertId: { ...state.alertControls.snoozedUntilByAlertId },
+      dismissedAlertIds: [...state.alertControls.dismissedAlertIds],
+    },
   };
 }
 
@@ -208,7 +213,7 @@ function generateOffersInternal(
       seatId: seat.id,
       status: "AWAITING_DECISION",
       offeredAt: occurredAt,
-      remainingSeconds: 600,
+      remainingSeconds: candidate.isDemoCandidate ? 42 * 60 : 10 * 60,
     };
     generated.push(offer);
     next.seats = next.seats.map((item) => item.id === seat.id

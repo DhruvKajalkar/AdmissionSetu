@@ -2,7 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSyncExternalStore } from "react";
+import { createInitialAdmissionSimulationState, demoCandidate } from "@/data";
+import { deriveAlerts, getAlertSummary } from "@/services";
 import { AdmissionSetuMark } from "./admission-setu-mark";
+import { useAdmissionSimulation } from "./admission-simulation-provider";
 import { usePreferenceShortlist } from "./preference-shortlist";
 
 interface NavigationItem {
@@ -35,21 +39,33 @@ const navigationGroups: readonly NavigationGroup[] = [
     label: "Support",
     operations: false,
     items: [
-      { label: "My Documents", shortLabel: "Documents", href: "/documents", index: "07" },
-      { label: "Scholarships", shortLabel: "Scholarships", href: "/scholarships", index: "08" },
-      { label: "Ask AdmissionSetu", shortLabel: "Ask", href: "/assistant", index: "09" },
+      { label: "Alerts", shortLabel: "Alerts", href: "/alerts", index: "07" },
+      { label: "My Documents", shortLabel: "Documents", href: "/documents", index: "08" },
+      { label: "Scholarships", shortLabel: "Scholarships", href: "/scholarships", index: "09" },
+      { label: "Ask AdmissionSetu", shortLabel: "Ask", href: "/assistant", index: "10" },
     ],
   },
   {
     label: "Prototype operations",
     operations: true,
     items: [
-      { label: "Operations", shortLabel: "Prototype Ops", href: "/operations", index: "10" },
+      { label: "Operations", shortLabel: "Prototype Ops", href: "/operations", index: "11" },
     ],
   },
 ];
 
 const navigation = navigationGroups.flatMap((group) => group.items);
+const initialPreferences = demoCandidate.preferenceProgramIds.map((programId, index) => ({
+  programId,
+  position: index + 1,
+  acceptanceIntent: "UNSURE" as const,
+}));
+const initialActionableAlertCount = getAlertSummary(
+  deriveAlerts(createInitialAdmissionSimulationState(), initialPreferences, demoCandidate),
+).actionableCount;
+const subscribeHydration = () => () => undefined;
+const getClientHydrationSnapshot = () => true;
+const getServerHydrationSnapshot = () => false;
 
 function isRouteActive(pathname: string, href: string) {
   return href === "/dashboard" ? pathname === href : pathname.startsWith(href);
@@ -57,7 +73,24 @@ function isRouteActive(pathname: string, href: string) {
 
 export function AppNavigation() {
   const pathname = usePathname();
-  const { count } = usePreferenceShortlist();
+  const { state } = useAdmissionSimulation();
+  const { count, preferences } = usePreferenceShortlist();
+  const hasHydrated = useSyncExternalStore(
+    subscribeHydration,
+    getClientHydrationSnapshot,
+    getServerHydrationSnapshot,
+  );
+  const actionableAlertCount = hasHydrated
+    ? getAlertSummary(deriveAlerts(state, preferences, demoCandidate)).actionableCount
+    : initialActionableAlertCount;
+  const preferenceCount = hasHydrated ? count : initialPreferences.length;
+
+  function labelFor(item: NavigationItem, short = false) {
+    const label = short ? item.shortLabel : item.label;
+    if (item.href === "/preferences") return `${label} · ${preferenceCount}`;
+    if (item.href === "/alerts") return `${label} · ${actionableAlertCount}`;
+    return label;
+  }
 
   return (
     <>
@@ -81,7 +114,7 @@ export function AppNavigation() {
                     aria-current={active ? "page" : undefined}
                   >
                     <span className="nav-index" aria-hidden="true">{item.index}</span>
-                    <span>{item.href === "/preferences" ? `${item.label} · ${count}` : item.label}</span>
+                    <span>{labelFor(item)}</span>
                   </Link>
                 );
               })}
@@ -115,7 +148,7 @@ export function AppNavigation() {
               href={item.href}
               aria-current={active ? "page" : undefined}
             >
-              {item.href === "/preferences" ? `${item.shortLabel} · ${count}` : item.shortLabel}
+              {labelFor(item, true)}
             </Link>
           );
         })}

@@ -47,6 +47,11 @@ function cloneState(state: AdmissionSimulationState): AdmissionSimulationState {
     },
     documentPassport: cloneDocumentPassportState(state.documentPassport),
     scholarshipNavigator: cloneScholarshipNavigatorState(state.scholarshipNavigator),
+    alertControls: {
+      ...state.alertControls,
+      snoozedUntilByAlertId: { ...state.alertControls.snoozedUntilByAlertId },
+      dismissedAlertIds: [...state.alertControls.dismissedAlertIds],
+    },
   };
 }
 
@@ -88,6 +93,18 @@ export function isAdmissionSimulationStateValid(state: AdmissionSimulationState)
   ) return false;
   if (!isDocumentPassportStateValid(state)) return false;
   if (!isScholarshipNavigatorStateValid(state)) return false;
+  if (
+    !state.alertControls ||
+    state.alertControls.version !== 1 ||
+    !state.alertControls.snoozedUntilByAlertId ||
+    typeof state.alertControls.snoozedUntilByAlertId !== "object" ||
+    Array.isArray(state.alertControls.snoozedUntilByAlertId) ||
+    !Array.isArray(state.alertControls.dismissedAlertIds) ||
+    new Set(state.alertControls.dismissedAlertIds).size !== state.alertControls.dismissedAlertIds.length ||
+    Object.entries(state.alertControls.snoozedUntilByAlertId).some(
+      ([id, until]) => !id || typeof until !== "string" || Number.isNaN(Date.parse(until)),
+    )
+  ) return false;
 
   const seatIds = new Set<string>();
   for (const seat of state.seats) {

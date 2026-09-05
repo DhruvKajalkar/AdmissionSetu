@@ -1,3 +1,5 @@
+import type { AlertControlState } from "./alerts";
+
 export type CandidateCategory = "OPEN" | "OBC" | "SC" | "ST" | "VJNT" | "EWS";
 
 export type HomeUniversity =
@@ -651,6 +653,7 @@ export interface AdmissionSimulationState {
   clearing: MeritClearingState;
   documentPassport: DocumentPassportState;
   scholarshipNavigator: ScholarshipNavigatorState;
+  alertControls: AlertControlState;
   updatedAt: string;
 }
 

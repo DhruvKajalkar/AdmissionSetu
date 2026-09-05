@@ -38,7 +38,8 @@ import {
   updateScholarshipProfile as updateScholarshipProfileState,
 } from "@/services/scholarships";
 import type { ScholarshipProfileUpdate } from "@/services/scholarships";
-import type { AdmissionSimulationState, AdmissionTransitionError, DocumentConsentScope } from "@/types";
+import { dismissAlert as dismissAlertState, snoozeAlert as snoozeAlertState } from "@/services/alerts";
+import type { AdmissionSimulationState, AdmissionTransitionError, AlertItem, AlertSnoozeOption, DocumentConsentScope } from "@/types";
 
 const STORAGE_KEY = "admissionsetu:admission-simulation:v5";
 const listeners = new Set<() => void>();
@@ -67,6 +68,8 @@ interface AdmissionSimulationValue {
   shareDocuments: (input: ShareDocumentsInput) => boolean;
   updateScholarshipProfile: (update: ScholarshipProfileUpdate) => boolean;
   recordScholarshipHandoff: (schemeId: string) => boolean;
+  snoozeAlert: (alertId: string, option: AlertSnoozeOption) => void;
+  dismissAlert: (alert: AlertItem) => boolean;
   resetDemo: () => void;
   clearError: () => void;
 }
@@ -191,6 +194,19 @@ export function AdmissionSimulationProvider({
     (schemeId: string) => applyResult(recordScholarshipPortalHandoff(state, schemeId, scholarshipDemoTimestamps.portalHandoff)),
     [applyResult, state],
   );
+  const snoozeAlert = useCallback(
+    (alertId: string, option: AlertSnoozeOption) => writeState(snoozeAlertState(state, alertId, option)),
+    [state],
+  );
+  const dismissAlert = useCallback(
+    (alert: AlertItem) => {
+      const next = dismissAlertState(state, alert);
+      if (next === state) return false;
+      writeState(next);
+      return true;
+    },
+    [state],
+  );
   const resetDemo = useCallback(() => {
     setLastError(null);
     writeState(resetAdmissionSimulation(initialState));
@@ -198,8 +214,8 @@ export function AdmissionSimulationProvider({
   const clearError = useCallback(() => setLastError(null), []);
 
   const value = useMemo(
-    () => ({ state, lastError, withdrawCurrent, confirmConnected, acceptParticipatingSeat, joinRound, leaveRound, advanceRound, acceptRoundOffer, declineRoundOffer, expireRoundOffer, joinMeritRound, leaveMeritRound, advanceClearing, acceptMeritOffer, declineMeritOffer, connectDocuments, revokeDocumentAccess, shareDocuments, updateScholarshipProfile, recordScholarshipHandoff, resetDemo, clearError }),
-    [acceptMeritOffer, acceptParticipatingSeat, acceptRoundOffer, advanceClearing, advanceRound, clearError, confirmConnected, connectDocuments, declineMeritOffer, declineRoundOffer, expireRoundOffer, joinMeritRound, joinRound, lastError, leaveMeritRound, leaveRound, recordScholarshipHandoff, resetDemo, revokeDocumentAccess, shareDocuments, state, updateScholarshipProfile, withdrawCurrent],
+    () => ({ state, lastError, withdrawCurrent, confirmConnected, acceptParticipatingSeat, joinRound, leaveRound, advanceRound, acceptRoundOffer, declineRoundOffer, expireRoundOffer, joinMeritRound, leaveMeritRound, advanceClearing, acceptMeritOffer, declineMeritOffer, connectDocuments, revokeDocumentAccess, shareDocuments, updateScholarshipProfile, recordScholarshipHandoff, snoozeAlert, dismissAlert, resetDemo, clearError }),
+    [acceptMeritOffer, acceptParticipatingSeat, acceptRoundOffer, advanceClearing, advanceRound, clearError, confirmConnected, connectDocuments, declineMeritOffer, declineRoundOffer, dismissAlert, expireRoundOffer, joinMeritRound, joinRound, lastError, leaveMeritRound, leaveRound, recordScholarshipHandoff, resetDemo, revokeDocumentAccess, shareDocuments, snoozeAlert, state, updateScholarshipProfile, withdrawCurrent],
   );
   return <AdmissionSimulationContext.Provider value={value}>{children}</AdmissionSimulationContext.Provider>;
 }

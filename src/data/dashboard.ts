@@ -1,5 +1,5 @@
-import type { AdmissionAlert, AdmissionDeadline, AdmissionJourneyStage } from "@/types";
-import { demoAdmissionCycle } from "./demo-cycle";
+import type { AdmissionAlert, AdmissionDeadline, AdmissionJourneyStage } from "../types/admissions.ts";
+import { demoAdmissionCycle } from "./demo-cycle.ts";
 
 export const DEMO_NOW = demoAdmissionCycle.now;
 

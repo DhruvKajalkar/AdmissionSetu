@@ -1,16 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { admissionJourneyStages, dashboardAlerts, DEMO_NOW, nextAdmissionDeadline } from "@/data";
+import { admissionJourneyStages, DEMO_NOW, nextAdmissionDeadline } from "@/data";
 import { formatPercentile, formatShortDeadline, formatTimeRemaining } from "@/lib/format";
+import { getAlertTimingLabel, getDashboardTopAlerts } from "@/services";
 import type { AdmissionJourneyStage, Candidate, OfficialInstitute, OfficialProgram } from "@/types";
-import { AdmissionAlert } from "./admission-alert";
 import { AdmissionJourney } from "./admission-journey";
 import { useAdmissionSimulation } from "./admission-simulation-provider";
 import { DeadlineBanner } from "./deadline-banner";
 import { DocumentReadiness } from "./document-readiness";
 import { FinancialAidSummary } from "./financial-aid-summary";
 import { PageHeader } from "./page-header";
+import { usePreferenceShortlist } from "./preference-shortlist";
 import { SectionCard } from "./section-card";
 import { StatCard } from "./stat-card";
 import { StatusBadge } from "./status-badge";
@@ -25,6 +26,7 @@ const quickActions = [
 
 export function DashboardView({ candidate, institutes, programs }: { candidate: Candidate; institutes: readonly OfficialInstitute[]; programs: readonly OfficialProgram[] }) {
   const { state } = useAdmissionSimulation();
+  const { preferences } = usePreferenceShortlist();
   const admission = state.currentAdmission;
   const participatingProgram = admission?.kind === "PARTICIPATING_SEAT" ? programs.find((program) => program.choiceCode === admission.programId) : undefined;
   const participatingInstitute = participatingProgram ? institutes.find((institute) => institute.code === participatingProgram.instituteCode) : undefined;
@@ -43,9 +45,7 @@ export function DashboardView({ candidate, institutes, programs }: { candidate: 
       return stage;
     })
     : admissionJourneyStages;
-  const visibleAlerts = hasFinalAdmission
-    ? dashboardAlerts.filter((alert) => alert.id !== "alert-institute-window")
-    : dashboardAlerts;
+  const topAlerts = getDashboardTopAlerts(state, preferences, candidate);
 
   return (
     <>
@@ -83,7 +83,7 @@ export function DashboardView({ candidate, institutes, programs }: { candidate: 
         )}
       </div>
       <AdmissionJourney stages={journeyStages} currentStageId={journeyStageId} />
-      <div className="dashboard-detail-grid"><DocumentReadiness /><SectionCard className="alerts-card" title="Important Alerts" description="Only the updates that need your attention now."><div className="alerts-list">{visibleAlerts.map((alert) => <AdmissionAlert alert={alert} key={alert.id} />)}</div></SectionCard></div>
+      <div className="dashboard-detail-grid"><DocumentReadiness /><SectionCard className="alerts-card" title="What needs your attention" description="Your highest-priority actions from the same admission state." action={<Link className="text-link" href="/alerts">View all alerts →</Link>}><div className="dashboard-alert-list">{topAlerts.length ? topAlerts.map((alert) => <article className="dashboard-action-alert" key={alert.id}><div><span>{alert.priority} · {alert.source}</span><h3>{alert.title}</h3><p>{getAlertTimingLabel(alert) ?? alert.message}</p></div>{alert.actionHref && alert.actionLabel ? <Link href={alert.actionHref}>{alert.actionLabel} →</Link> : null}</article>) : <p className="action-center-empty">No unresolved actions right now.</p>}</div></SectionCard></div>
       <FinancialAidSummary />
       <section className="dashboard-assistant-cta" aria-labelledby="dashboard-assistant-title">
         <div><p>Context-aware guidance</p><h2 id="dashboard-assistant-title">Ask AdmissionSetu</h2><span>Get a read-only explanation using your current admission, merit, preference, document and scholarship state.</span></div>

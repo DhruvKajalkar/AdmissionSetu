@@ -9,6 +9,18 @@ export type {
 } from "./assistant";
 
 export type {
+  AlertControlState,
+  AlertItem,
+  AlertPriority,
+  AlertSection,
+  AlertSnoozeOption,
+  AlertSource,
+  AlertStatus,
+  AlertSummary,
+  AlertType,
+} from "./alerts";
+
+export type {
   Admission,
   AdmissionAlert,
   AdmissionAlertTone,

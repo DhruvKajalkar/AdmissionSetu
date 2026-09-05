@@ -272,6 +272,11 @@ export function createInitialAdmissionSimulationState(): AdmissionSimulationStat
     },
     documentPassport: createInitialDocumentPassportState(),
     scholarshipNavigator: createInitialScholarshipNavigatorState(),
+    alertControls: {
+      version: 1,
+      snoozedUntilByAlertId: {},
+      dismissedAlertIds: [],
+    },
     updatedAt: demoAdmissionCycle.currentSeatAllottedAt,
   };
 }

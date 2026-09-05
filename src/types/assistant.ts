@@ -38,6 +38,18 @@ export interface AssistantContextSnapshot {
     currentRound: number;
     roundLabel: string;
   };
+  alerts: {
+    actionableCount: number;
+    highestPriority: Array<{
+      priority: "CRITICAL" | "HIGH" | "MEDIUM" | "LOW";
+      title: string;
+      message: string;
+      dueLabel: string | null;
+      actionLabel: string | null;
+      actionHref: string | null;
+      source: string;
+    }>;
+  };
   currentAdmission: null | {
     kind: "PARTICIPATING_SEAT" | "CONNECTED_ADMISSION";
     instituteName: string;
