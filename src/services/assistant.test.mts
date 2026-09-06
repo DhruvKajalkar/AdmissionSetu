@@ -121,6 +121,18 @@ test("request validation rejects a malformed payload", () => {
   assert.deepEqual(validateAssistantRequest({ message: "hello", history: "bad", context: initialContext() }), { ok: false, error: "Conversation history is malformed." });
 });
 
+test("request validation accepts a provider-sized assistant reply in conversation history", () => {
+  const validation = validateAssistantRequest({
+    message: "Which is the best college?",
+    history: [
+      { role: "user", content: "Compare PICT ENTC and VIT Computer." },
+      { role: "assistant", content: "Sourced comparison context. ".repeat(180) },
+    ],
+    context: initialContext(),
+  });
+  assert.equal(validation.ok, true);
+});
+
 test("request validation rejects an oversized message", () => {
   const validation = validateAssistantRequest({ message: "x".repeat(501), history: [], context: initialContext() });
   assert.equal(validation.ok, false);

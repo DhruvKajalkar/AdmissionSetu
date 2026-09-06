@@ -3,7 +3,7 @@ import type { AssistantContextSnapshot, AssistantRequest } from "../types/assist
 export const ASSISTANT_LIMITS = {
   messageCharacters: 500,
   historyMessages: 8,
-  historyMessageCharacters: 1_000,
+  historyMessageCharacters: 8_000,
   serializedContextCharacters: 80_000,
   requestCharacters: 100_000,
 } as const;
