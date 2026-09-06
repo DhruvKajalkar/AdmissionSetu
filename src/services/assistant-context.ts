@@ -12,6 +12,7 @@ import { getWorkflowReadiness } from "./document-passport.ts";
 import { reviewPreferenceList } from "./preference-safety.ts";
 import { evaluateAllSchemes, getScholarshipSummary } from "./scholarships.ts";
 import { deriveAlerts, getAlertSummary, getAlertTimingLabel } from "./alerts.ts";
+import { buildBoundedCollegeAssistantContext } from "./college-intelligence.ts";
 
 function catalog(programId: string) {
   const program = officialPrograms.find((item) => item.choiceCode === programId);
@@ -211,6 +212,7 @@ export function buildAssistantContextSnapshot(
         };
       }),
     },
+    collegeIntelligence: buildBoundedCollegeAssistantContext(state, preferences),
     offerProjection: projectVitOffer(state),
   };
 }

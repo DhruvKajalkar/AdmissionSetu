@@ -99,6 +99,16 @@ The Action Center derives a single personalized timeline from Aarya's current ad
 
 Reminder controls are deliberately lightweight and device-local. Snoozed and dismissed low-priority items are persisted, while alert content is recalculated from authoritative prototype state to avoid stale notifications. Reminders appear only inside AdmissionSetu while using the prototype; there is no SMS, email, WhatsApp, OS push, service-worker, or background delivery backend. Offer and reminder timing is deterministic for the demo.
 
+## College Intelligence & Compare
+
+College Intelligence extends the existing official CET catalogue with a deliberately small, structured research layer for PICT, VIT Pune, PCCOE, AISSMS COE and MMCOE. Institute and programme IDs still come from the generated CET data; the intelligence records add separately sourced fee, placement, accreditation and facility disclosures without duplicating catalogue intake or cutoff facts.
+
+Every added fact points to normalized provenance labelled **Official** or **Institute-reported**, with its academic year or cohort where available. Programme-level facts, department disclosures and institute-wide disclosures retain different scopes. In particular, an institute-wide placement figure is never presented as a branch-specific outcome, and a department figure is not inherited by another programme.
+
+The `/compare` view supports two to four programmes and starts with the deterministic PICT E&TC, VIT Computer Engineering and PCCOE CSE (AI & ML) scenario. It combines sourced public facts with a clearly separated student overlay drawn from the existing preference, seat and merit-clearing engines: preference position, current admission, synthetic vacancies and merit-list state. It offers no ranking, winner, score or admission-probability prediction.
+
+Coverage is intentionally limited, sources belong to different academic years, and placement metrics may use different cohorts and scopes. Missing verified information is shown as unavailable rather than estimated. There is no subjective college rating; students should open the linked source and verify current official information before making a decision.
+
 ## Demo
 
 Use [DEMO_V2.md](./DEMO_V2.md) as the definitive short judging walkthrough.

@@ -25,3 +25,4 @@ export { FORM_GUIDE_INSTRUCTIONS, getFormGuideProvider, OpenAIFormGuideProvider 
 export type { FormGuideVisionInput, FormGuideVisionProvider } from "./form-guide-provider";
 export { handleFormGuideRequest } from "./form-guide-route";
 export { FORM_GUIDE_IMAGE_TYPES, FORM_GUIDE_LIMITS, hasSupportedImageSignature, isFormGuideContextSnapshot, parseDetectedFields, parseFormGuideContext, validateFormGuideMetadata } from "./form-guide-validation";
+export { buildBoundedCollegeAssistantContext, buildProgrammeComparison, formatPlacementMetric, getCollegeIntelligenceSource, getCoveredInstituteCodes, getInstituteIntelligence, getProgrammeIntelligence } from "./college-intelligence";

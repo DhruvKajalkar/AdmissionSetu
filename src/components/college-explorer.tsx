@@ -15,6 +15,7 @@ import type {
 } from "@/types";
 import { PageHeader } from "./page-header";
 import { usePreferenceShortlist } from "./preference-shortlist";
+import { useProgrammeCompareSelection } from "./programme-compare-selection";
 
 const branchFamilies: readonly BranchFamily[] = [
   "Computer & IT",
@@ -39,9 +40,10 @@ interface CollegeExplorerProps {
     instituteList: OfficialSourceReference;
     cutoffDocument: OfficialSourceReference;
   };
+  intelligenceInstituteCodes: readonly string[];
 }
 
-export function CollegeExplorer({ institutes, programs, cutoffs, candidate, metadata, sources }: CollegeExplorerProps) {
+export function CollegeExplorer({ institutes, programs, cutoffs, candidate, metadata, sources, intelligenceInstituteCodes }: CollegeExplorerProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [branchFamily, setBranchFamily] = useState("");
   const [instituteStatus, setInstituteStatus] = useState("");
@@ -50,6 +52,7 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, meta
   const [confirmation, setConfirmation] = useState("");
   const [visibleLimit, setVisibleLimit] = useState(24);
   const { count, hasProgram, addProgram } = usePreferenceShortlist();
+  const comparison = useProgrammeCompareSelection();
 
   const instituteByCode = useMemo(
     () => new Map(institutes.map((institute) => [institute.code, institute])),
@@ -99,13 +102,21 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, meta
     setConfirmation(`${program.name} at ${institute.commonName} was added to My Preferences.`);
   }
 
+  function handleCompare(program: OfficialProgram, institute: OfficialInstitute) {
+    const selected = comparison.isSelected(program.choiceCode);
+    const succeeded = comparison.toggleProgram(program.choiceCode);
+    setConfirmation(succeeded
+      ? `${program.name} at ${institute.commonName} was ${selected ? "removed from" : "added to"} comparison.`
+      : `Comparison is limited to ${comparison.maximum} programmes. Remove one before adding another.`);
+  }
+
   return (
     <>
       <PageHeader
         eyebrow="Official CET reference data · static snapshot"
         title="Explore engineering colleges"
         description={`Search ${institutes.length} institutes and ${programs.length} programmes using official CET Cell institute and intake records.`}
-        action={<Link className="header-shortlist-link" href="/preferences">My Preferences · {count}</Link>}
+        action={<div className="explorer-header-actions"><Link className="header-shortlist-link" href="/compare">Compare · {comparison.count}</Link><Link className="header-shortlist-link" href="/preferences">My Preferences · {count}</Link></div>}
       />
 
       <section className="candidate-context" aria-labelledby="candidate-context-title">
@@ -214,12 +225,14 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, meta
               const cutoffObservations = cutoffsByChoiceCode.get(program.choiceCode) ?? [];
               const cutoff = selectPrimaryCutoff(cutoffObservations);
               const alreadyAdded = hasProgram(program.choiceCode);
+              const hasIntelligence = intelligenceInstituteCodes.includes(institute.code);
+              const inComparison = comparison.isSelected(program.choiceCode);
 
               return (
                 <article className="program-card" key={program.choiceCode}>
                   <div className="program-card-topline">
                     <span className="institute-code">Institute {institute.code}</span>
-                    <span className="official-data-label">Official public data · {program.source.academicYear}</span>
+                    <span className="official-data-label">{hasIntelligence ? "College intelligence available" : "Official public data"} · {program.source.academicYear}</span>
                   </div>
                   <p className="program-institute-name">{institute.commonName}</p>
                   <h3>{program.name}</h3>
@@ -252,6 +265,8 @@ export function CollegeExplorer({ institutes, programs, cutoffs, candidate, meta
                     >
                       {alreadyAdded ? "✓ Already added" : "+ Add to preferences"}
                     </button>
+                    {hasIntelligence ? <button className={inComparison ? "compare-button selected" : "compare-button"} type="button" onClick={() => handleCompare(program, institute)}>{inComparison ? "✓ In comparison" : "+ Compare"}</button> : null}
+                    {hasIntelligence ? <Link className="details-link-button" href={`/explore/${institute.code}`}>College details</Link> : null}
                   </div>
 
                   <details className="program-details">

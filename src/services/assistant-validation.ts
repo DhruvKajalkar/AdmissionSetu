@@ -20,6 +20,7 @@ export function isAssistantContextSnapshot(value: unknown): value is AssistantCo
   if (!record(value.cycle) || !record(value.alerts) || !Array.isArray(value.alerts.highestPriority) || !record(value.preferences) || !Array.isArray(value.preferences.items) || !Array.isArray(value.preferences.findings)) return false;
   if (!Array.isArray(value.meritLists) || !Array.isArray(value.vacancies) || !record(value.documents) || !Array.isArray(value.documents.records) || !Array.isArray(value.documents.workflows)) return false;
   if (!record(value.scholarships) || !record(value.scholarships.profile) || !record(value.scholarships.summary) || !Array.isArray(value.scholarships.evaluations)) return false;
+  if (!Array.isArray(value.collegeIntelligence) || value.collegeIntelligence.length > 8) return false;
   if (value.currentAdmission !== null && !record(value.currentAdmission)) return false;
   if (value.offerProjection !== null && !record(value.offerProjection)) return false;
   try {
