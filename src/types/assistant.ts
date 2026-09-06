@@ -1,4 +1,4 @@
-export type AssistantSourceKind = "OFFICIAL" | "DEMO_STATE" | "PROTOTYPE_RULE";
+export type AssistantSourceKind = "OFFICIAL" | "INSTITUTE_REPORTED" | "DEMO_STATE" | "PROTOTYPE_RULE";
 
 export interface AssistantSource {
   id: string;
@@ -127,6 +127,29 @@ export interface AssistantContextSnapshot {
       sourceUrl: string;
     }>;
   };
+  collegeIntelligence: Array<{
+    choiceCode: string;
+    institute: string;
+    programme: string;
+    intake: number;
+    location: string;
+    autonomyStatus: string;
+    fee: null | { amountInr: number; academicYear: string; categoryScope: string; sourceId: string };
+    institutePlacements: Array<{ metric: string; value: number; unit: string; cohort: string; scope: string; limitation: string | null; sourceId: string }>;
+    programmePlacements: Array<{ metric: string; value: number; unit: string; cohort: string; scope: string; limitation: string | null; sourceId: string }>;
+    accreditation: Array<{ kind: string; value: string; scope: string; limitation: string | null; sourceId: string }>;
+    facilities: Array<{ type: string; name: string; sourceId: string }>;
+    latestCutoffObservations: Array<{ academicYear: string; round: string; seatType: string; stage: string; percentile: number; meritNumber: number; sourceUrl: string }>;
+    userContext: {
+      preferencePosition: number | null;
+      isCurrentAdmission: boolean;
+      currentAdmissionLabel: string | null;
+      syntheticVacancies: number | null;
+      meritPosition: number | null;
+      meritStatus: string | null;
+    };
+    sources: Array<{ id: string; title: string; sourceClass: "OFFICIAL" | "INSTITUTE_REPORTED" | "COMMUNITY"; url: string; academicYear: string | null }>;
+  }>;
   offerProjection: null | {
     state: "AVAILABLE_TO_SIMULATE" | "AWAITING_DECISION" | "ALREADY_ACCEPTED" | "UNAVAILABLE";
     roundId: string;

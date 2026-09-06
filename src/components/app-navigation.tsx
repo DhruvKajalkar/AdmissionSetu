@@ -29,27 +29,28 @@ const navigationGroups: readonly NavigationGroup[] = [
     items: [
       { label: "Dashboard", shortLabel: "Dashboard", href: "/dashboard", index: "01" },
       { label: "Explore Colleges", shortLabel: "Explore", href: "/explore", index: "02" },
-      { label: "My Preferences", shortLabel: "Preferences", href: "/preferences", index: "03" },
-      { label: "My Admission", shortLabel: "Admission", href: "/admission", index: "04" },
-      { label: "Live Vacancies", shortLabel: "Vacancies", href: "/vacancies", index: "05" },
-      { label: "Spot Rounds", shortLabel: "Spot Rounds", href: "/spot-rounds", index: "06" },
+      { label: "Compare Programmes", shortLabel: "Compare", href: "/compare", index: "03" },
+      { label: "My Preferences", shortLabel: "Preferences", href: "/preferences", index: "04" },
+      { label: "My Admission", shortLabel: "Admission", href: "/admission", index: "05" },
+      { label: "Live Vacancies", shortLabel: "Vacancies", href: "/vacancies", index: "06" },
+      { label: "Spot Rounds", shortLabel: "Spot Rounds", href: "/spot-rounds", index: "07" },
     ],
   },
   {
     label: "Support",
     operations: false,
     items: [
-      { label: "Alerts", shortLabel: "Alerts", href: "/alerts", index: "07" },
-      { label: "My Documents", shortLabel: "Documents", href: "/documents", index: "08" },
-      { label: "Scholarships", shortLabel: "Scholarships", href: "/scholarships", index: "09" },
-      { label: "Ask AdmissionSetu", shortLabel: "Ask", href: "/assistant", index: "10" },
+      { label: "Alerts", shortLabel: "Alerts", href: "/alerts", index: "08" },
+      { label: "My Documents", shortLabel: "Documents", href: "/documents", index: "09" },
+      { label: "Scholarships", shortLabel: "Scholarships", href: "/scholarships", index: "10" },
+      { label: "Ask AdmissionSetu", shortLabel: "Ask", href: "/assistant", index: "11" },
     ],
   },
   {
     label: "Prototype operations",
     operations: true,
     items: [
-      { label: "Operations", shortLabel: "Prototype Ops", href: "/operations", index: "11" },
+      { label: "Operations", shortLabel: "Prototype Ops", href: "/operations", index: "12" },
     ],
   },
 ];

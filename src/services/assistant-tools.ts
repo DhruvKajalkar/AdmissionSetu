@@ -15,6 +15,7 @@ export const ASSISTANT_READ_ONLY_TOOL_NAMES = [
   "get_next_actions",
   "get_cap_rule",
   "search_official_catalog",
+  "compare_college_intelligence",
 ] as const;
 
 export type AssistantReadOnlyToolName = (typeof ASSISTANT_READ_ONLY_TOOL_NAMES)[number];
@@ -95,6 +96,31 @@ export function runAssistantTool(
     }, [capSource], [{ label: "Review Preferences", href: "/preferences" }]);
   }
 
+  if (name === "compare_college_intelligence") {
+    const normalized = query.toLowerCase();
+    const aliases: Record<string, string[]> = {
+      "06271": ["pict", "06271"],
+      "06273": ["vit", "vishwakarma", "06273"],
+      "06175": ["pccoe", "06175"],
+      "06278": ["aissms", "06278"],
+      "06156": ["mmcoe", "06156"],
+    };
+    const matched = context.collegeIntelligence.filter((item) =>
+      aliases[item.choiceCode.slice(0, 5)]?.some((alias) => normalized.includes(alias))
+      || normalized.includes(item.choiceCode),
+    );
+    const selected = (matched.length ? matched : context.collegeIntelligence).slice(0, 4);
+    const sources: AssistantSource[] = [...new Map(selected.flatMap((item) => item.sources).map((source) => [source.id, source])).values()]
+      .map((source) => ({
+        id: source.id,
+        label: source.title,
+        kind: source.sourceClass === "OFFICIAL" ? "OFFICIAL" : "INSTITUTE_REPORTED" as const,
+        url: source.url,
+      }));
+    sources.unshift(demoSource);
+    return result(name, selected, sources, [{ label: "Compare Programmes", href: "/compare" }]);
+  }
+
   const normalized = catalogQuery(query);
   const programs = searchOfficialPrograms(officialInstitutes, officialPrograms, normalized).flatMap(({ program, institute }) => {
     if (!institute) return [];
@@ -161,6 +187,7 @@ export function selectAssistantTools(message: string): AssistantReadOnlyToolName
   if (includesAny(normalized, ["scholarship", "financial aid", "eligible", "panjabrao", "mahadbt", "nsp"])) tools.add("get_scholarship_matches");
   if (includesAny(normalized, ["what should i do next", "next step", "next action", "alert", "reminder", "action center"])) tools.add("get_next_actions");
   if (includesAny(normalized, ["college", "institute", "programme", "program", "choice code", "cutoff", "catalog"])) tools.add("search_official_catalog");
+  if (includesAny(normalized, ["compare", "comparison", "placement", "salary", "package", "hostel", "facility", "facilities", "fee", "accreditation", "naac", "nba", "rank", "ranking", "better", "choose", "best"])) tools.add("compare_college_intelligence");
   return [...tools];
 }
 

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { CollegeExplorer } from "@/components";
-import { mockCandidateService, mockOfficialCatalogService } from "@/services";
+import { getCoveredInstituteCodes, mockCandidateService, mockOfficialCatalogService } from "@/services";
 import { selectDisplayCutoffs } from "@/services/official-catalog";
 
 export const metadata: Metadata = {
@@ -27,6 +27,7 @@ export default async function ExplorePage() {
         category: candidate.category,
         homeUniversity: candidate.homeUniversity,
       }}
+      intelligenceInstituteCodes={getCoveredInstituteCodes()}
     />
   );
 }

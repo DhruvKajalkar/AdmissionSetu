@@ -18,6 +18,7 @@ const suggestedQuestions = [
   "Which documents am I missing?",
   "Which scholarships could match me?",
   "What historical cutoff data do we have for PICT ENTC?",
+  "Compare PICT ENTC and VIT Computer.",
 ] as const;
 
 interface ChatMessage {

@@ -7,6 +7,7 @@ export { AdmissionSimulationProvider, useAdmissionSimulation } from "./admission
 export { AdmissionSetuMark } from "./admission-setu-mark";
 export { AppNavigation, AppNavigationFallback } from "./app-navigation";
 export { CollegeExplorer } from "./college-explorer";
+export { CollegeIntelligenceView } from "./college-intelligence-view";
 export { CitizenProviders } from "./citizen-providers";
 export { DeadlineBanner } from "./deadline-banner";
 export { DashboardView } from "./dashboard-view";
@@ -19,7 +20,9 @@ export { FormGuideView } from "./form-guide-view";
 export { PageHeader } from "./page-header";
 export { OperationsView } from "./operations-view";
 export { PreferenceShortlistProvider, usePreferenceShortlist } from "./preference-shortlist";
+export { ProgrammeCompareSelectionProvider, useProgrammeCompareSelection } from "./programme-compare-selection";
 export { PreferenceBuilder } from "./preference-list";
+export { ProgrammeCompareView } from "./programme-compare-view";
 export { SectionCard } from "./section-card";
 export { ScholarshipNavigatorView } from "./scholarship-navigator-view";
 export { StatCard } from "./stat-card";

@@ -32,6 +32,22 @@ export type {
 } from "./form-guide";
 
 export type {
+  AccreditationDisclosure,
+  CampusFacility,
+  CollegeDataSource,
+  CollegeDataSourceClass,
+  CollegeFactScope,
+  FeeDisclosure,
+  InstituteIntelligence,
+  PlacementDisclosure,
+  ProgrammeComparison,
+  ProgrammeComparisonEntry,
+  ProgrammeIntelligence,
+  ProgrammeUserContext,
+  SourcedCollegeText,
+} from "./college-intelligence";
+
+export type {
   Admission,
   AdmissionAlert,
   AdmissionAlertTone,

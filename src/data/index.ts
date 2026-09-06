@@ -3,6 +3,7 @@ export { AISSMS_CLEARING_ROUND_ID, createInitialAdmissionSimulationState, demoSi
 export { createInitialDocumentPassportState, DIGILOCKER_DEMO_SCOPES, DOCUMENT_REQUIREMENT_BUNDLES, documentDemoTimestamps } from "./document-passport";
 export { createInitialScholarshipNavigatorState, SCHOLARSHIP_PORTAL_URLS, SCHOLARSHIP_SCHEMES, scholarshipContextSources, scholarshipDemoTimestamps } from "./scholarships";
 export { colleges, programs } from "./colleges";
+export { collegeIntelligenceSources, HERO_COMPARISON_CHOICE_CODES, instituteIntelligence, programmeIntelligence } from "./college-intelligence";
 export { demoAdmissionCycle } from "./demo-cycle";
 export {
   capThreeCutoffSource,
