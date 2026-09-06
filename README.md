@@ -83,6 +83,16 @@ With no API configuration—or if the provider fails—the rest of AdmissionSetu
 
 The browser only calls `/api/assistant`; the API key is read inside the server route’s provider module.
 
+## Guided Form Assistant
+
+Form Guide is a separate supervised mode inside Ask AdmissionSetu. The student intentionally selects one PNG, JPEG or WebP screenshot of a form; the server asks an image-capable OpenAI model to identify only the visible fields, then AdmissionSetu maps those fields to a bounded sanitized snapshot of the student's synthetic profile, current admission and Document Passport. Every available suggestion includes its source and a reminder to verify the value before manually entering it.
+
+The client sends screenshots only to `/api/form-guide`. `OPENAI_API_KEY` remains server-side, `OPENAI_VISION_MODEL` may optionally override `OPENAI_MODEL`, and provider requests use `store: false`. Screenshots are processed in memory and are not intentionally written to files, localStorage or application logs. Removing the screenshot or reloading clears the client preview.
+
+Screenshot and user text are treated as untrusted data. The vision model detects fields but does not supply student values; deterministic server rules handle sensitive fields, missing documents and policy-sensitive classifications. AdmissionSetu does not provide OTPs, passwords, PINs, CVVs, Aadhaar identifiers or banking credentials. It does not click, autofill, upload or submit anything. If vision is unavailable, the UI explicitly reports that analysis is unavailable and does not fabricate a result.
+
+This is a prototype guided-assistance feature, not a browser automation agent.
+
 ## Personalized Action Center
 
 The Action Center derives a single personalized timeline from Aarya's current admission state. It prioritizes active seat offers and their deterministic expiry window, supported merit-position movements, CAP preference risks, missing Document Passport items, scholarship readiness, and recently completed admission actions. The dashboard shows only the highest-priority next steps, while Ask AdmissionSetu receives the same sanitized priority order for questions such as “What should I do next?”

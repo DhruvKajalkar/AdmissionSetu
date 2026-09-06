@@ -148,13 +148,16 @@ export class OpenAIResponsesAssistantProvider implements AssistantProvider {
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
       body: JSON.stringify({
         model: this.model,
+        ...(this.model === "gpt-5" || this.model.startsWith("gpt-5-")
+          ? { reasoning: { effort: "minimal" } }
+          : {}),
         instructions: ADMISSION_ASSISTANT_INSTRUCTIONS,
         input: [
           ...request.history.map((item) => ({ role: item.role, content: item.content })),
           { role: "user", content: request.message },
           { role: "developer", content: `Sanitized current demo state and read-only results:\n${JSON.stringify({ context: request.context, toolResults: results.map((item) => ({ name: item.name, data: item.data })) })}` },
         ],
-        max_output_tokens: 500,
+        max_output_tokens: 1_200,
         store: false,
       }),
     });
