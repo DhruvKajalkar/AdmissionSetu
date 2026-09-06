@@ -193,6 +193,26 @@ export function sanitizeAdmissionSimulationState(
   return cloneState(candidate);
 }
 
+export function serializeAdmissionSimulationState(state: AdmissionSimulationState) {
+  return JSON.stringify(state);
+}
+
+export function restoreAdmissionSimulationState(
+  raw: string | null,
+  initialState: AdmissionSimulationState,
+) {
+  let parsed: unknown = null;
+  try {
+    parsed = raw ? JSON.parse(raw) : null;
+  } catch {
+    parsed = null;
+  }
+  return {
+    parsed,
+    state: sanitizeAdmissionSimulationState(parsed, initialState),
+  };
+}
+
 export function offerSeat(
   state: AdmissionSimulationState,
   seatId: string,

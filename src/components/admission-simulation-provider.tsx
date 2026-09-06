@@ -7,7 +7,8 @@ import {
   acceptSeat,
   confirmExternalAdmission,
   resetAdmissionSimulation,
-  sanitizeAdmissionSimulationState,
+  restoreAdmissionSimulationState,
+  serializeAdmissionSimulationState,
   withdrawCurrentAdmission,
 } from "@/services/admission-state";
 import {
@@ -80,18 +81,12 @@ function readState(initialState: AdmissionSimulationState) {
   const raw = localStorage.getItem(STORAGE_KEY);
   if (raw === cachedRaw && cachedState) return cachedState;
   cachedRaw = raw;
-  let parsed: unknown = null;
-  try {
-    parsed = raw ? JSON.parse(raw) : null;
-  } catch {
-    parsed = null;
-  }
-  cachedState = sanitizeAdmissionSimulationState(parsed, initialState);
+  cachedState = restoreAdmissionSimulationState(raw, initialState).state;
   return cachedState;
 }
 
 function writeState(state: AdmissionSimulationState) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  localStorage.setItem(STORAGE_KEY, serializeAdmissionSimulationState(state));
   cachedRaw = undefined;
   cachedState = state;
   listeners.forEach((listener) => listener());
@@ -122,22 +117,14 @@ export function AdmissionSimulationProvider({
   }, []);
   const getSnapshot = useCallback(() => readState(initialState), [initialState]);
   const getServerSnapshot = useCallback(() => serverState, [serverState]);
-  const persistedState = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-  const [hasHydrated, setHasHydrated] = useState(false);
-  const state = hasHydrated ? persistedState : serverState;
+  const state = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   useEffect(() => {
-    const hydrationFrame = window.requestAnimationFrame(() => setHasHydrated(true));
     const raw = localStorage.getItem(STORAGE_KEY);
-    let parsed: unknown = null;
-    try {
-      parsed = raw ? JSON.parse(raw) : null;
-    } catch {
-      parsed = null;
+    const restored = restoreAdmissionSimulationState(raw, initialState);
+    if (!raw || JSON.stringify(restored.parsed) !== serializeAdmissionSimulationState(restored.state)) {
+      writeState(restored.state);
     }
-    const sanitized = sanitizeAdmissionSimulationState(parsed, initialState);
-    if (!raw || JSON.stringify(parsed) !== JSON.stringify(sanitized)) writeState(sanitized);
-    return () => window.cancelAnimationFrame(hydrationFrame);
   }, [initialState]);
 
   const applyResult = useCallback((result: ReturnType<typeof withdrawCurrentAdmission>) => {
